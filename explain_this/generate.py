@@ -1,20 +1,26 @@
 import os
-import google.generativeai as genai
+from google import genai
 
-API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not API_KEY:
+if not GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY is not set")
 
-genai.configure(api_key=API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 
-model = genai.GenerativeModel("gemini-pro")
+MODEL = "gemini-1.5-flash"
 
 
 def generate_explanation(prompt: str) -> str:
-    response = model.generate_content(prompt)
+    try:
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=prompt,
+        )
+    except Exception as e:
+        raise RuntimeError(f"Gemini request failed: {e}")
 
-    if not response.text:
+    if not response or not response.text:
         raise RuntimeError("Gemini returned no text")
 
     return response.text.strip()
