@@ -1,4 +1,3 @@
-#explain_this/generate.py
 import os
 import google.generativeai as genai
 
@@ -9,7 +8,7 @@ if not API_KEY:
 
 genai.configure(api_key=API_KEY)
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-pro")
 
 
 def generate_explanation(prompt: str) -> str:
