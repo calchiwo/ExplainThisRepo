@@ -1,5 +1,3 @@
-# explain_this/generate.py
-
 import os
 from google import genai
 
@@ -9,7 +7,7 @@ if not API_KEY:
 
 client = genai.Client(api_key=API_KEY)
 
-MODEL = "gemini-1.5-flash"  # THIS works in AI Studio
+MODEL = "gemini-1.0-pro"
 
 
 def generate_explanation(prompt: str) -> str:
