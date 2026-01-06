@@ -42,13 +42,13 @@ def main():
     try:
         output = generate_explanation(prompt)
     except Exception as e:
-        print("Failed to generate explanation")
+        print("Failed to generate explanation. Please try again")
         print(str(e))
         sys.exit(1)
 
     write_output(output)
 
-    print("EXPLAIN.md generated successfully.")
+    print("EXPLAIN.md generated successfully 🎉")
 
 
 if __name__ == "__main__":
