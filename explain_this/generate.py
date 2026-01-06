@@ -7,7 +7,7 @@ if not API_KEY:
 
 client = genai.Client(api_key=API_KEY)
 
-MODEL = "gemini-1.0-pro"
+MODEL = "gemini-2.5-flash-lite"
 
 
 def generate_explanation(prompt: str) -> str:
