@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "explain-this"
+version = "0.1.0"
+description = "CLI tool to explain a GitHub repository in plain English"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+  { name = "Caleb Wodi", email = "calchiwo@gmail.com" }
+]
+
+dependencies = [
+  "requests",
+  "google-genai"
+]
+
+[project.scripts]
+explain-this = "explain_this.cli:main"
+
+[tool.setuptools]
+packages = ["explain_this"]
