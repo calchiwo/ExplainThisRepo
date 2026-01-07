@@ -22,7 +22,7 @@ def main():
         print("Invalid format. Use owner/repo")
         sys.exit(1)
 
-    print(f"Fetching {owner}/{repo}...")
+    print(f"Fetching {owner}/{repo}…")
 
     try:
         repo_data = fetch_repo(owner, repo)
@@ -37,20 +37,24 @@ def main():
         readme=readme,
     )
 
-    print("Generating explanation...")
+    print("Generating explanation…")
 
     try:
         output = generate_explanation(prompt)
     except Exception as e:
-        print("Failed to generate explanation. Please try again")
-        print(str(e))
+        print("Failed to generate explanation.")
+        print("Check your API key or try again later.")
         sys.exit(1)
 
+    print("Writing EXPLAIN.md…")
     write_output(output)
 
+    word_count = len(output.split())
+
     print("EXPLAIN.md generated successfully 🎉")
+    print(f"Words: {word_count}")
+    print("\nOpen EXPLAIN.md to read it.")
 
 
 if __name__ == "__main__":
     main()
-
