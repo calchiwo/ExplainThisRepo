@@ -16,6 +16,24 @@
       background: #000;
       color: #fff;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      position: relative;
+    }
+
+    a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .github-link {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      font-size: 0.95rem;
+      opacity: 0.85;
+    }
+
+    .github-link:hover {
+      opacity: 1;
     }
 
     .container {
@@ -32,31 +50,94 @@
 
     .subtitle {
       font-size: 1.5rem;
-      font-weight: 400;
       opacity: 0.9;
       margin-bottom: 2.5rem;
     }
 
-    .command {
+    .command-box {
+      position: relative;
+      background: #111;
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      display: inline-block;
+      text-align: left;
       font-family: monospace;
       font-size: 1.4rem;
-      background: #111;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      display: inline-block;
+      line-height: 1.8;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #222;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .copy-btn:hover {
+      background: #333;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      text-align: center;
+    }
+
+    footer a {
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
+  <a
+    class="github-link"
+    href="https://github.com/calchiwo/ExplainThisRepo"
+    target="_blank"
+    rel="noopener"
+  >
+    ★ star this project on github
+  </a>
+
   <div class="container">
     <div class="title">ExplainThisRepo</div>
+
     <div class="subtitle">
       a cli that explains github repos in plain english
     </div>
-    <div class="command">
-      pipx install explainthisrepo
+
+    <div class="command-box" id="command">
+      <button class="copy-btn" onclick="copyCommand()">copy</button>
+      pipx install explainthisrepo<br>
       explainthisrepo owner/repo
     </div>
   </div>
+
+  <footer>
+    built by
+    <a href="https://x.com/calchiwo" target="_blank" rel="noopener">
+      Caleb Wodi
+    </a>
+    with love for the open source community
+  </footer>
+
+  <script>
+    function copyCommand() {
+      const text = `pipx install explainthisrepo
+explainthisrepo owner/repo`;
+      navigator.clipboard.writeText(text);
+    }
+  </script>
 </body>
 </html>
