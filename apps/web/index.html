@@ -6,9 +6,7 @@
   <title>ExplainThisRepo: CLI to explain GitHub repositories in plain English</title>
 
   <meta name="description" content="ExplainThisRepo is a CLI tool that explains GitHub repositories in plain English. Install with pipx and generate an EXPLAIN.md for any repo." />
-
   <meta name="keywords" content="github cli, explain github repo, developer tools, open source cli, pipx, explain repository, github documentation" />
-
   <meta name="author" content="Caleb Wodi" />
   <meta name="robots" content="index, follow" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -108,6 +106,11 @@
       background: #333;
     }
 
+    .copy-btn:disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+
     footer {
       position: absolute;
       bottom: 20px;
@@ -124,7 +127,7 @@
       text-decoration: underline;
     }
 
-    /* hidden but crawlable SEO text */
+    /* crawlable but invisible SEO text */
     .seo {
       position: absolute;
       left: -9999px;
@@ -150,8 +153,8 @@
 
     <h2>a cli tool that explains github repos in plain english</h2>
 
-    <div class="command-box" id="command">
-      <button class="copy-btn" onclick="copyCommand()">copy</button>
+    <div class="command-box">
+      <button class="copy-btn" id="copyBtn" onclick="copyCommand()">copy</button>
       pipx install explainthisrepo<br>
       explainthisrepo owner/repo
     </div>
@@ -165,19 +168,28 @@
     with love for the open source community
   </footer>
 
-  <!-- crawlable context for search engines -->
   <div class="seo">
     ExplainThisRepo is an open source CLI tool built by Caleb Wodi.
-    It allows developers to generate plain English explanations for GitHub repositories.
-    The tool fetches repository data and creates an EXPLAIN.md file.
-    Install using pipx and run explainthisrepo owner/repo.
+    It helps developers understand GitHub repositories by generating
+    a plain English explanation into an EXPLAIN.md file.
+    Install it using pipx and run explainthisrepo owner/repo.
   </div>
 
   <script>
     function copyCommand() {
       const text = `pipx install explainthisrepo
 explainthisrepo owner/repo`;
+
       navigator.clipboard.writeText(text);
+
+      const btn = document.getElementById("copyBtn");
+      btn.textContent = "copied";
+      btn.disabled = true;
+
+      setTimeout(() => {
+        btn.textContent = "copy";
+        btn.disabled = false;
+      }, 1500);
     }
   </script>
 </body>
