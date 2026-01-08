@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "explainthis"
+name = "explainthisrepo"
 version = "0.1.0"
 description = "CLI tool to explain a GitHub repository in plain English"
 readme = "README.md"
@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.scripts]
-explain-this = "explain_this.cli:main"
+explainthisrepo = "explain_this_repo.cli:main"
 
 [tool.setuptools]
-packages = ["explain_this"]
+packages = ["explain_this_repo"]

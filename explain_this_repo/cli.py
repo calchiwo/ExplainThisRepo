@@ -1,13 +1,13 @@
 import sys
-from explain_this.github import fetch_repo, fetch_readme
-from explain_this.prompt import build_prompt
-from explain_this.generate import generate_explanation
-from explain_this.writer import write_output
+from explain_this_repo.github import fetch_repo, fetch_readme
+from explain_this_repo.prompt import build_prompt
+from explain_this_repo.generate import generate_explanation
+from explain_this_repo.writer import write_output
 
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: explain-this owner/repo")
+        print("Usage: explainthisrepo owner/repo")
         sys.exit(1)
 
     target = sys.argv[1]
