@@ -1,8 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ExplainThisRepo</title>
+  <meta charset="UTF-8" />
+
+  <title>ExplainThisRepo — CLI to explain GitHub repositories in plain English</title>
+
+  <meta name="description" content="ExplainThisRepo is a CLI tool that explains GitHub repositories in plain English. Install with pipx and generate an EXPLAIN.md for any repo." />
+
+  <meta name="keywords" content="github cli, explain github repo, developer tools, open source cli, pipx, explain repository, github documentation" />
+
+  <meta name="author" content="Caleb Wodi" />
+  <meta name="robots" content="index, follow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="canonical" href="https://explainthisrepo.vercel.app/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="ExplainThisRepo — Explain GitHub repos in plain English" />
+  <meta property="og:description" content="A CLI tool that takes a GitHub repo and generates a plain English explanation into an EXPLAIN.md file." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://explainthisrepo.vercel.app/" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="ExplainThisRepo" />
+  <meta name="twitter:description" content="A CLI tool that explains GitHub repositories in plain English." />
+  <meta name="twitter:creator" content="@calchiwo" />
+
   <style>
     html, body {
       margin: 0;
@@ -42,14 +66,15 @@
       padding: 2rem;
     }
 
-    .title {
+    h1 {
       font-size: 4rem;
       font-weight: 800;
       margin-bottom: 1.5rem;
     }
 
-    .subtitle {
+    h2 {
       font-size: 1.5rem;
+      font-weight: 400;
       opacity: 0.9;
       margin-bottom: 2.5rem;
     }
@@ -98,6 +123,16 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    /* hidden but crawlable SEO text */
+    .seo {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
@@ -110,19 +145,17 @@
     ★ star this project on github
   </a>
 
-  <div class="container">
-    <div class="title">ExplainThisRepo</div>
+  <main class="container">
+    <h1>ExplainThisRepo</h1>
 
-    <div class="subtitle">
-      a cli tool that explains github repos in plain english
-    </div>
+    <h2>a cli tool that explains github repos in plain english</h2>
 
     <div class="command-box" id="command">
       <button class="copy-btn" onclick="copyCommand()">copy</button>
       pipx install explainthisrepo<br>
       explainthisrepo owner/repo
     </div>
-  </div>
+  </main>
 
   <footer>
     built by
@@ -131,6 +164,14 @@
     </a>
     with love for the open source community
   </footer>
+
+  <!-- crawlable context for search engines -->
+  <div class="seo">
+    ExplainThisRepo is an open source CLI tool built by Caleb Wodi.
+    It allows developers to generate plain English explanations for GitHub repositories.
+    The tool fetches repository data and creates an EXPLAIN.md file.
+    Install using pipx and run explainthisrepo owner/repo.
+  </div>
 
   <script>
     function copyCommand() {
