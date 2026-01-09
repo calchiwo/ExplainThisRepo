@@ -157,5 +157,5 @@ Author
 
 Caleb Wodi
 
-- [Twitter] (https://x.com/calchiwo)
-- [LinkedIn] (https://linkedin.com/in/calchiwo)
+- [Twitter](https://x.com/calchiwo)
+- [LinkedIn](https://linkedin.com/in/calchiwo)
