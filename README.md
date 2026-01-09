@@ -6,6 +6,12 @@ ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a pla
 ---
 ![demo](https://github.com/user-attachments/assets/837e0593-db64-4657-8855-bb1915011eb6)
 
+
+![demo](https://github.com/user-attachments/assets/2b4ccf7f-94e0-4c75-a39a-ae13a25c0b5c)
+
+
+
+
 ## Install ExplainThisRepo once and explain any GitHub repo
 
 ### Requirements
