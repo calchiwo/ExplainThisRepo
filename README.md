@@ -64,16 +64,6 @@ EXPLAIN.md
 
 ---
 
-## Limitations
-
-Public repositories only
-
-Output quality depends on available repo information
-
-This tool explains intent, not implementation details.
-
-
----
 
 ## Why this exists
 
