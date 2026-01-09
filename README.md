@@ -148,11 +148,14 @@ ExplainThisRepo exists to answer one question fast:
 
 ## License
 
-MIT
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 
 ---
 
 Author
 
-[Caleb Wodi](https://x.com/calchiwo)
+Caleb Wodi
+
+- [Twitter] (https://x.com/calchiwo)
+- [LinkedIn] (https://linkedin.com/in/calchiwo)
