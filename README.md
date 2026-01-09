@@ -44,10 +44,13 @@ Restart your terminal after running ensurepath.
 python -m pip install explainthisrepo
 ```
 
+or
+
+```
+pip install explainthisrepo
+```
+
 > Note: If the command is not found after installing with pip, ensure your Python Scripts directory is on your PATH.
-
-
-
 
 ---
 
