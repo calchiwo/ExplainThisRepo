@@ -62,35 +62,6 @@ This generates:
 
 EXPLAIN.md
 
-
----
-
-## Output
-
-The generated EXPLAIN.md contains:
-
-What the repository does
-
-Its main purpose
-
-How it’s typically used
-
-High-level structure (based on available information)
-
-
-If a README is missing or weak, ExplainThisRepo still attempts a best-effort explanation.
-
-
----
-## Features
-
-- Explains what a GitHub repository does in plain English
-- Works on any public GitHub repo
-- Generates an `EXPLAIN.md` file automatically
-- Zero setup after install
-- CLI-first. No UI. No accounts.
-
-
 ---
 
 ## Limitations
