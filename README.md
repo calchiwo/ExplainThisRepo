@@ -4,8 +4,9 @@ ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a pla
 
 
 ---
-![demo](https://github.com/user-attachments/assets/3de01574-a52f-43d3-abce-410e4e1d7a2b)
 
+
+![demo](https://github.com/user-attachments/assets/4fe02b94-0f7a-4fc4-bdc8-2f4d259a1f0b)
 
 
 
