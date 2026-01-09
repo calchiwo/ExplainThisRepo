@@ -15,31 +15,15 @@ PyPi: https://pypi.org/project/explainthisrepo
 
 ### Option 1: Install with pipx (recommended)
 ```python
-pipx install explainthisrepo
+pip install explainthisrepo
 ```
-If you don’t have pipx:
-
-```python
-python -m pip install --user pipx
-python -m pipx ensurepath
-```
-
-Restart your terminal after running ensurepath.
-
 
 ---
 
-## Option 2: Install with pip
+## Option 2: Install with pipx
 ```python
-pip install explainthisrepo
+pipx install explainthisrepo
 ```
-or
-
-```python
-python -m pip install explainthisrepo
-```
-
-> Note: If the command is not found after installing with pip, ensure your Python Scripts directory is on your PATH.
 
 ---
 
