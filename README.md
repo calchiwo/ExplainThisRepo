@@ -4,18 +4,18 @@ ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a pla
 
 ---
 
-## Install
+## Install ExplainThisRepo globally once, and use forever
 
 ### Requirements
 - Python 3.9+
 
 ### Option 1: Install with pipx (recommended)
-```bash
+```python
 pipx install explainthisrepo
 ```
 If you don’t have pipx:
 
-```
+```python
 python -m pip install --user pipx
 python -m pipx ensurepath
 ```
@@ -26,12 +26,12 @@ Restart your terminal after running ensurepath.
 ---
 
 ## Option 2: Install with pip
-```
+```python
 pip install explainthisrepo
 ```
 or
 
-```
+```python
 python -m pip install explainthisrepo
 ```
 
@@ -95,11 +95,11 @@ ExplainThisRepo uses Gemini.
 Set your API key as an environment variable.
 
 macOS / Linux
-```
+```linux
 export GEMINI_API_KEY="your_api_key_here"
 ```
 Windows (PowerShell)
-```
+```powershell
 setx GEMINI_API_KEY "your_api_key_here"
 ```
 Restart your terminal after setting the key.
