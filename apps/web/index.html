@@ -6,51 +6,55 @@
   <title>ExplainThisRepo: CLI to explain GitHub repositories in plain English</title>
 
   <meta name="description" content="ExplainThisRepo is a CLI tool that explains GitHub repositories in plain English. Install with pipx and generate an EXPLAIN.md for any repo." />
-  <meta name="keywords" content="github cli, explain github repo, developer tools, open source cli, pipx, explain repository, github documentation" />
+  <meta name="keywords" content="github cli, explain github repo, developer tools, open source cli, pipx" />
   <meta name="author" content="Caleb Wodi" />
   <meta name="robots" content="index, follow" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="canonical" href="https://explainthisrepo.vercel.app/" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="ExplainThisRepo — Explain GitHub repos in plain English" />
-  <meta property="og:description" content="A CLI tool that takes a GitHub repo and generates a plain English explanation into an EXPLAIN.md file." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://explainthisrepo.vercel.app/" />
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="ExplainThisRepo" />
-  <meta name="twitter:description" content="A CLI tool that explains GitHub repositories in plain English." />
-  <meta name="twitter:creator" content="@calchiwo" />
+  <link rel="canonical" href="https://explainthisrepo.com/" />
 
   <style>
+    :root {
+      --bg: #000;
+      --fg: #fff;
+      --muted: rgba(255,255,255,0.8);
+      --box: #111;
+      --btn: #222;
+      --btn-hover: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     html, body {
       margin: 0;
-      height: 100%;
+      padding: 0;
     }
 
     body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      color: #fff;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--fg);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      position: relative;
+      display: flex;
+      flex-direction: column;
     }
 
     a {
-      color: #fff;
+      color: var(--fg);
       text-decoration: none;
     }
 
+    /* top bar */
+    .top {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px 20px;
+    }
+
     .github-link {
-      position: absolute;
-      top: 20px;
-      right: 24px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       opacity: 0.85;
     }
 
@@ -58,52 +62,67 @@
       opacity: 1;
     }
 
+    /* main */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
     .container {
-      text-align: center;
+      width: 100%;
       max-width: 900px;
-      padding: 2rem;
+      text-align: center;
     }
 
     h1 {
-      font-size: 4rem;
+      font-size: clamp(2.2rem, 6vw, 4rem);
       font-weight: 800;
-      margin-bottom: 1.5rem;
+      margin: 0 0 1rem;
     }
 
     h2 {
-      font-size: 1.5rem;
+      font-size: clamp(1.1rem, 3.5vw, 1.5rem);
       font-weight: 400;
-      opacity: 0.9;
-      margin-bottom: 2.5rem;
+      color: var(--muted);
+      margin: 0 0 2rem;
     }
 
     .command-box {
       position: relative;
-      background: #111;
+      background: var(--box);
       border-radius: 10px;
-      padding: 1.5rem 2rem;
-      display: inline-block;
-      text-align: left;
+      padding: 1.25rem 1.25rem 1.5rem;
       font-family: monospace;
-      font-size: 1.4rem;
-      line-height: 1.8;
+      font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+      line-height: 1.6;
+      text-align: left;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .command-box code {
+      display: block;
+      white-space: nowrap;
     }
 
     .copy-btn {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: #222;
-      color: #fff;
+      background: var(--btn);
+      color: var(--fg);
       border: none;
-      padding: 0.4rem 0.6rem;
+      padding: 0.35rem 0.6rem;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
     }
 
     .copy-btn:hover {
-      background: #333;
+      background: var(--btn-hover);
     }
 
     .copy-btn:disabled {
@@ -111,12 +130,12 @@
       cursor: default;
     }
 
+    /* footer */
     footer {
-      position: absolute;
-      bottom: 20px;
-      font-size: 0.9rem;
-      opacity: 0.7;
+      padding: 16px;
       text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.7;
     }
 
     footer a {
@@ -127,7 +146,7 @@
       text-decoration: underline;
     }
 
-    /* crawlable but invisible SEO text */
+    /* hidden SEO text */
     .seo {
       position: absolute;
       left: -9999px;
@@ -139,24 +158,28 @@
   </style>
 </head>
 <body>
-  <a
-    class="github-link"
-    href="https://github.com/calchiwo/ExplainThisRepo"
-    target="_blank"
-    rel="noopener"
-  >
-    ★ star this project on github
-  </a>
 
-  <main class="container">
-    <h1>ExplainThisRepo</h1>
+  <div class="top">
+    <a
+      class="github-link"
+      href="https://github.com/calchiwo/ExplainThisRepo"
+      target="_blank"
+      rel="noopener"
+    >
+      ★ star on github
+    </a>
+  </div>
 
-    <h2>a cli tool that explains github repos in plain english</h2>
+  <main>
+    <div class="container">
+      <h1>ExplainThisRepo</h1>
+      <h2>a cli tool that explains github repos in plain english</h2>
 
-    <div class="command-box">
-      <button class="copy-btn" id="copyBtn" onclick="copyCommand()">copy</button>
-      pipx install explainthisrepo<br>
-      explainthisrepo owner/repo
+      <div class="command-box">
+        <button class="copy-btn" id="copyBtn" onclick="copyCommand()">copy</button>
+        <code>pipx install explainthisrepo</code>
+        <code>explainthisrepo owner/repo</code>
+      </div>
     </div>
   </main>
 
@@ -165,14 +188,12 @@
     <a href="https://x.com/calchiwo" target="_blank" rel="noopener">
       Caleb Wodi
     </a>
-    with love for the open source community
+    for the open source community
   </footer>
 
   <div class="seo">
-    ExplainThisRepo is an open source CLI tool built by Caleb Wodi.
-    It helps developers understand GitHub repositories by generating
-    a plain English explanation into an EXPLAIN.md file.
-    Install it using pipx and run explainthisrepo owner/repo.
+    ExplainThisRepo is an open source CLI tool that explains GitHub repositories
+    in plain English by generating an EXPLAIN.md file.
   </div>
 
   <script>
@@ -192,5 +213,6 @@ explainthisrepo owner/repo`;
       }, 1500);
     }
   </script>
+
 </body>
 </html>
