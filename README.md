@@ -41,12 +41,12 @@ Restart your terminal after running ensurepath.
 
 ---
 
-Usage
+## Usage
 ```
 explainthisrepo owner/repo
 ```
 
-Example:
+## Example:
 
 ```
 explainthisrepo octocat/Hello-World
@@ -59,7 +59,7 @@ EXPLAIN.md
 
 ---
 
-Output
+## Output
 
 The generated EXPLAIN.md contains:
 
@@ -77,7 +77,7 @@ If a README is missing or weak, ExplainThisRepo still attempts a best-effort exp
 
 ---
 
-Configuration
+## Configuration
 
 ExplainThisRepo uses Gemini.
 
@@ -96,7 +96,7 @@ Restart your terminal after setting the key.
 
 ---
 
-Limitations
+## Limitations
 
 Public repositories only
 
@@ -110,7 +110,7 @@ This tool explains intent, not implementation details.
 
 ---
 
-Roadmap
+## Roadmap
 
 Smarter fallback when README is missing
 
@@ -124,7 +124,7 @@ Shorter explanations mode
 
 ---
 
-Why this exists
+## Why this exists
 
 Most repositories don’t explain themselves well.
 
@@ -137,7 +137,7 @@ ExplainThisRepo exists to answer one question fast:
 
 ---
 
-License
+## License
 
 MIT
 
@@ -146,5 +146,5 @@ MIT
 
 Author
 
-Built by Caleb Wodi
-https://x.com/calchiwo
+[Caleb Wodi]
+(https://x.com/calchiwo)
