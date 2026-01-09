@@ -30,11 +30,14 @@ Useful when:
 ### Install with pipx
 ```bash
 pipx install explainthisrepo
+```
 
 If you don’t have pipx:
 
+```
 python -m pip install --user pipx
 python -m pipx ensurepath
+```
 
 Restart your terminal after running ensurepath.
 
@@ -42,12 +45,15 @@ Restart your terminal after running ensurepath.
 ---
 
 Usage
-
+```
 explainthisrepo owner/repo
+```
 
 Example:
 
+```
 explainthisrepo octocat/Hello-World
+```
 
 This will generate:
 
@@ -145,12 +151,3 @@ Author
 
 Built by Caleb Wodi
 https://x.com/calchiwo
-
----
-
-If you want next:
-- A **shorter README for Hacker News / PH**
-- A **README badge section**
-- Or a **one-paragraph README for speed**
-
-Say the word.
