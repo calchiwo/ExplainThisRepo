@@ -4,7 +4,7 @@ ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a pla
 
 ---
 
-## Install ExplainThisRepo globally once, and use forever
+## Install ExplainThisRepo once and explain any GitHub repo
 
 ### Requirements
 - Python 3.9+
@@ -55,12 +55,12 @@ Useful when:
 
 ## Usage
 
-```
+```bash
 explainthisrepo owner/repo
 ```
 
 ## Example
-```
+```bash
 explainthisrepo octocat/Hello-World
 ```
 This generates:
