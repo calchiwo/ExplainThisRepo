@@ -17,7 +17,7 @@
     :root {
       --bg: #000;
       --fg: #fff;
-      --muted: rgba(255,255,255,0.8);
+      --muted: rgba(255,255,255,0.7);
       --box: #111;
       --btn: #222;
       --btn-hover: #333;
@@ -101,6 +101,7 @@
       text-align: left;
       max-width: 100%;
       overflow-x: auto;
+      margin-bottom: 1.5rem;
     }
 
     .command-box code {
@@ -130,19 +131,18 @@
       cursor: default;
     }
 
-    /* footer */
-    footer {
-      padding: 16px;
-      text-align: center;
+    /* inline footer */
+    .inline-footer {
       font-size: 0.85rem;
-      opacity: 0.7;
+      color: var(--muted);
+      margin-top: 0.5rem;
     }
 
-    footer a {
+    .inline-footer a {
       font-weight: 500;
     }
 
-    footer a:hover {
+    .inline-footer a:hover {
       text-decoration: underline;
     }
 
@@ -180,16 +180,16 @@
         <code>pipx install explainthisrepo</code>
         <code>explainthisrepo owner/repo</code>
       </div>
+
+      <div class="inline-footer">
+        built by
+        <a href="https://x.com/calchiwo" target="_blank" rel="noopener">
+          Caleb Wodi
+        </a>
+        for the open source community
+      </div>
     </div>
   </main>
-
-  <footer>
-    built by
-    <a href="https://x.com/calchiwo" target="_blank" rel="noopener">
-      Caleb Wodi
-    </a>
-    for the open source community
-  </footer>
 
   <div class="seo">
     ExplainThisRepo is an open source CLI tool that explains GitHub repositories
