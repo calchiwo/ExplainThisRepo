@@ -144,7 +144,16 @@ ExplainThisRepo exists to answer one question fast:
 > “What does this repo actually do?”
 
 
+## Contributions
 
+Contributions are welcome.
+
+If you find a bug, have an idea, or want to improve the tool:
+- Open an issue
+- Or submit a pull request
+
+Keep changes focused and small.
+Explain the why, not just the what.
 
 ---
 
