@@ -87,6 +87,14 @@ If a README is missing or weak, ExplainThisRepo still attempts a best-effort exp
 
 
 ---
+## Features
+
+- Explains what a GitHub repository does in plain English
+- Works on any public GitHub repo
+- Generates an `EXPLAIN.md` file automatically
+- Zero setup after install
+- CLI-first. No UI. No accounts.
+
 
 ## Configuration
 
