@@ -4,20 +4,6 @@ ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a pla
 
 ---
 
-## What it does
-
-- Fetches a public GitHub repository
-- Reads the README and key repo metadata
-- Generates a clear explanation of what the repo does
-- Writes the result to `EXPLAIN.md` in your current directory
-
-Useful when:
-- You open a repo and don’t know where to start
-- You’re reviewing unfamiliar code
-- You want quick context without digging through files
-
----
-
 ## Install
 
 ### Requirements
@@ -51,6 +37,20 @@ pip install explainthisrepo
 ```
 
 > Note: If the command is not found after installing with pip, ensure your Python Scripts directory is on your PATH.
+
+---
+
+## What it does
+
+- Fetches a public GitHub repository
+- Reads the README and key repo metadata
+- Generates a clear explanation of what the repo does
+- Writes the result to `EXPLAIN.md` in your current directory
+
+Useful when:
+- You open a repo and don’t know where to start
+- You’re reviewing unfamiliar code
+- You want quick context without digging through files
 
 ---
 
