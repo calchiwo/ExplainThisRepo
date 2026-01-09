@@ -5,10 +5,7 @@ ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a pla
 
 ---
 
-
 ![demo](https://github.com/user-attachments/assets/4fe02b94-0f7a-4fc4-bdc8-2f4d259a1f0b)
-
-
 
 ## Install ExplainThisRepo once and explain any GitHub repo
 
@@ -68,10 +65,9 @@ This generates:
 
 EXPLAIN.md
 
-Open the file in your editor to read the explanation.
+Open the file in your editor to read the explanation
 
 ---
-
 
 ## Contributions
 
