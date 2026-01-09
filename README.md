@@ -22,13 +22,11 @@ Useful when:
 
 ### Requirements
 - Python 3.9+
-- pipx (recommended)
 
-### Install with pipx
-```python
+### Option 1: Install with pipx (recommended)
+```bash
 pipx install explainthisrepo
 ```
-
 If you don’t have pipx:
 
 ```
@@ -41,25 +39,36 @@ Restart your terminal after running ensurepath.
 
 ---
 
-## Usage
+Option 2: Install with pip
+```
+python -m pip install explainthisrepo
+```
+
+> Note: If the command is not found after installing with pip, ensure your Python Scripts directory is on your PATH.
+
+
+
+
+---
+
+Usage
+
 ```
 explainthisrepo owner/repo
 ```
 
-## Example:
+Example
 
-```
 explainthisrepo octocat/Hello-World
-```
 
-This will generate:
+This generates:
 
 EXPLAIN.md
 
 
 ---
 
-## Output
+Output
 
 The generated EXPLAIN.md contains:
 
@@ -69,7 +78,7 @@ Its main purpose
 
 How it’s typically used
 
-High-level structure (based on available info)
+High-level structure (based on available information)
 
 
 If a README is missing or weak, ExplainThisRepo still attempts a best-effort explanation.
@@ -77,32 +86,32 @@ If a README is missing or weak, ExplainThisRepo still attempts a best-effort exp
 
 ---
 
-## Configuration
+Configuration
 
 ExplainThisRepo uses Gemini.
 
-Set your API key as an environment variable:
+Set your API key as an environment variable.
 
 macOS / Linux
-
+```
 export GEMINI_API_KEY="your_api_key_here"
-
+```
 Windows (PowerShell)
-
+```
 setx GEMINI_API_KEY "your_api_key_here"
-
+```
 Restart your terminal after setting the key.
 
 
 ---
 
-## Limitations
+Limitations
 
 Public repositories only
 
-Quality depends on available repo information
+Output quality depends on available repo information
 
-Not a code walkthrough or documentation generator
+Not a code walkthrough or full documentation generator
 
 
 This tool explains intent, not implementation details.
@@ -110,21 +119,21 @@ This tool explains intent, not implementation details.
 
 ---
 
-## Roadmap
+Roadmap
 
 Smarter fallback when README is missing
 
 Optional provider switching
 
-Better file selection logic
+Better repo signal extraction
 
-Shorter explanations mode
+Shorter explanation mode
 
 
 
 ---
 
-## Why this exists
+Why this exists
 
 Most repositories don’t explain themselves well.
 
@@ -137,7 +146,7 @@ ExplainThisRepo exists to answer one question fast:
 
 ---
 
-## License
+License
 
 MIT
 
