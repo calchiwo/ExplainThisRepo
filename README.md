@@ -13,7 +13,7 @@ PyPi: https://pypi.org/project/explainthisrepo
 ### Requirements
 - Python 3.9+
 
-### Option 1: Install with pipx (recommended)
+### Option 1: Install with pip (recommended)
 ```python
 pip install explainthisrepo
 ```
