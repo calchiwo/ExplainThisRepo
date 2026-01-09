@@ -68,6 +68,7 @@ This generates:
 
 EXPLAIN.md
 
+Open the file in your editor to read the explanation.
 ---
 
 
@@ -84,7 +85,6 @@ If you find a bug, have an idea, or want to improve the tool:
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
 
 ---
 
