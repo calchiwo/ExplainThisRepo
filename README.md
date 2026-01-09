@@ -46,11 +46,6 @@ python -m pip install explainthisrepo
 - Generates a clear explanation of what the repo does
 - Writes the result to `EXPLAIN.md` in your current directory
 
-Useful when:
-- You open a repo and don’t know where to start
-- You’re reviewing unfamiliar code
-- You want quick context without digging through files
-
 ---
 
 ## Usage
@@ -96,23 +91,6 @@ If a README is missing or weak, ExplainThisRepo still attempts a best-effort exp
 - CLI-first. No UI. No accounts.
 
 
-## Configuration
-
-ExplainThisRepo uses Gemini.
-
-Set your API key as an environment variable.
-
-macOS / Linux
-```linux
-export GEMINI_API_KEY="your_api_key_here"
-```
-Windows (PowerShell)
-```powershell
-setx GEMINI_API_KEY "your_api_key_here"
-```
-Restart your terminal after setting the key.
-
-
 ---
 
 ## Limitations
@@ -121,24 +99,7 @@ Public repositories only
 
 Output quality depends on available repo information
 
-Not a code walkthrough or full documentation generator
-
-
 This tool explains intent, not implementation details.
-
-
----
-
-## Roadmap
-
-Smarter fallback when README is missing
-
-Optional provider switching
-
-Better repo signal extraction
-
-Shorter explanation mode
-
 
 
 ---
