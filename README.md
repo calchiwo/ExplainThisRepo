@@ -1,4 +1,5 @@
 # ExplainThisRepo
+PyPi: https://pypi.org/project/explainthisrepo
 
 ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a plain-English explanation into an `EXPLAIN.md` file.
 
