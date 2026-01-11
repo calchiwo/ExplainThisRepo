@@ -6,6 +6,7 @@ __pycache__/
 .env
 .venv
 venv/
+node_modules/
 
 # Packaging / build
 dist/
