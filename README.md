@@ -4,6 +4,8 @@ ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a pla
 
 PyPi: https://pypi.org/project/explainthisrepo
 
+Website: https://explainthisrepo.com
+
 ---
 
 ![demo](https://github.com/user-attachments/assets/4fe02b94-0f7a-4fc4-bdc8-2f4d259a1f0b)
