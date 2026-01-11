@@ -3,13 +3,23 @@
   "version": "0.1.0",
   "description": "CLI tool to explain a GitHub repository in plain English",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calchiwo/ExplainThisRepo.git"
+  },
   "bin": {
     "explainthisrepo": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node dist/cli.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "format": "prettier --write . --cache",
+    "precommit": "lint-staged",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   },
   "keywords": [
     "explainthisrepo",
@@ -26,6 +36,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4"
   }
 }
