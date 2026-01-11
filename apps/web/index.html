@@ -42,20 +42,6 @@
       box-sizing: border-box;
     }
 
-  <style>
-    :root {
-      --bg: #000;
-      --fg: #fff;
-      --muted: rgba(255,255,255,0.7);
-      --box: #111;
-      --btn: #222;
-      --btn-hover: #333;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     html, body {
       margin: 0;
       padding: 0;
@@ -104,6 +90,17 @@
       width: 100%;
       max-width: 900px;
       text-align: center;
+    }
+
+    /* NEW: downloads badge row */
+    .badges {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .badges img {
+      height: 28px;
     }
 
     h1 {
@@ -201,6 +198,21 @@
 
   <main>
     <div class="container">
+
+      <!-- NEW: PyPI downloads badge -->
+      <div class="badges">
+        <a
+          href="https://pepy.tech/projects/explainthisrepo"
+          target="_blank"
+          rel="noopener"
+        >
+          <img
+            alt="PyPI Downloads"
+            src="https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads"
+          />
+        </a>
+      </div>
+
       <h1>ExplainThisRepo</h1>
       <h2>a cli tool that explains github repos in plain english</h2>
 
