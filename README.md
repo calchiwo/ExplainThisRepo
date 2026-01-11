@@ -6,6 +6,7 @@ PyPi: https://pypi.org/project/explainthisrepo
 
 Website: [explainthisrepo.com](https://https.explainthisrepo.com)
 
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
 ---
 
 ![demo](https://github.com/user-attachments/assets/4fe02b94-0f7a-4fc4-bdc8-2f4d259a1f0b)
