@@ -57,6 +57,26 @@ Open the file in your editor to read the explanation
 
 ---
 
+## Configuration
+
+ExplainThisRepo uses Gemini.
+
+Set your API key as an environment variable.
+
+macOS / Linux
+
+```linux
+export GEMINI_API_KEY="your_api_key_here"
+```
+
+Windows (PowerShell)
+
+```powershell
+setx GEMINI_API_KEY "your_api_key_here"
+```
+
+Restart your terminal after setting the key.
+
 ## Contributions
 
 Contributions are welcome.
