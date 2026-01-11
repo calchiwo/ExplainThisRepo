@@ -1,0 +1,13 @@
+# prettier ignore files
+dist/
+build/
+*.egg-info
+
+venv/
+.venv/
+__pycache__/
+
+.vercel/
+.husky/
+
+package-lock.json

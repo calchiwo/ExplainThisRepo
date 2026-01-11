@@ -1,0 +1,21 @@
+{
+  "name": "explainthisrepo-root",
+  "private": true,
+  "workspaces": [
+    "node_version"
+  ],
+  "scripts": {
+    "format": "prettier --write . --cache",
+    "build": "npm run build -w node_version",
+    "precommit": "lint-staged",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4"
+  }
+}

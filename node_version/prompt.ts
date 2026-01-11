@@ -1,0 +1,35 @@
+export function buildPrompt(
+  repoName: string,
+  description: string | null,
+  readme: string | null,
+): string {
+  return `
+You are a senior software engineer.
+
+Your task is to explain a GitHub repository clearly and concisely for a human reader.
+
+Repository:
+- Name: ${repoName}
+- Description: ${description || "No description provided"}
+
+README content:
+${readme || "No README provided"}
+
+Instructions:
+- Explain what this project does.
+- Say who it is for.
+- Explain how to run or use it.
+- Do not assume missing details.
+- If something is unclear, say so.
+- Avoid hype or marketing language.
+- Be concise and practical.
+- Use clear markdown headings.
+
+Output format:
+# Overview
+# What this project does
+# Who it is for
+# How to run or use it
+# Notes or limitations
+`.trim();
+}
