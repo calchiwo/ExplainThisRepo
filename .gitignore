@@ -27,4 +27,5 @@ Thumbs.db
 .omnicoreagent_config/
 AUDIT.md
 EXPLAIN.md
+.pytest_cache/
 
