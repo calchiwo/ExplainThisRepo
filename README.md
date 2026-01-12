@@ -46,7 +46,7 @@ pipx install explainthisrepo
 
 ---
 
-## Usage
+## 🧪 Usage
 
 ```bash
 explainthisrepo owner/repo
