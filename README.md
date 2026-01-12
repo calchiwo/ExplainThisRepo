@@ -4,6 +4,9 @@ ExplainThisRepo is a CLI tool that takes a GitHub repository and generates a pla
 
 PyPi: https://pypi.org/project/explainthisrepo
 
+Website: [explainthisrepo.com](https://https.explainthisrepo.com)
+
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
 ---
 
 ![demo](https://github.com/user-attachments/assets/4fe02b94-0f7a-4fc4-bdc8-2f4d259a1f0b)
@@ -53,6 +56,26 @@ EXPLAIN.md
 Open the file in your editor to read the explanation
 
 ---
+
+## Configuration
+
+ExplainThisRepo uses Gemini.
+
+Set your API key as an environment variable.
+
+macOS / Linux
+
+```linux
+export GEMINI_API_KEY="your_api_key_here"
+```
+
+Windows (PowerShell)
+
+```powershell
+setx GEMINI_API_KEY "your_api_key_here"
+```
+
+Restart your terminal after setting the key.
 
 ## Contributions
 
