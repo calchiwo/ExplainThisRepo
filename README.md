@@ -52,7 +52,7 @@ pipx install explainthisrepo
 explainthisrepo owner/repo
 ```
 
-##🧾Example
+## 🧾 Example
 ```bash
 explainthisrepo facebook/react
 ```
