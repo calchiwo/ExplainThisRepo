@@ -1,0 +1,6 @@
+# prettier ignore files
+dist/
+build/
+
+# lock file
+package-lock.json
