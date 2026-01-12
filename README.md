@@ -52,7 +52,7 @@ pipx install explainthisrepo
 explainthisrepo owner/repo
 ```
 
-## Example
+##🧾Example
 ```bash
 explainthisrepo facebook/react
 ```
@@ -64,7 +64,7 @@ Open the file in your editor to read the explanation
 
 ---
 
-## Quickstart
+## ⚙️ Quickstart
 
 ```bash
 pip install explainthisrepo
