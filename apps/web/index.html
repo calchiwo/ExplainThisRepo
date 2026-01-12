@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-
-  <title>ExplainThisRepo: CLI to explain GitHub repositories in plain English</title>
-
-  <meta name="description" content="ExplainThisRepo is a CLI tool that explains GitHub repositories in plain English. Install with pipx and generate an EXPLAIN.md for any repo." />
-  <meta name="keywords" content="github cli, explain github repo, developer tools, open source cli, pip" />
+  <title>ExplainThisRepo | AI Code Interrogator</title>
+  <meta name="description"
+    content="The AI Tool that interrogates code. Powered by OmniCoreAgent, 'The Council' of agents audits security, performance, and architecture." />
+  <meta name="keywords"
+    content="github cli, explain github repo, developer tools, open source cli, pip, ai code analysis, security audit" />
   <meta name="author" content="Caleb Wodi" />
   <meta name="robots" content="index, follow" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,7 +16,8 @@
 
   <!-- LINK PREVIEW (Open Graph + Twitter) -->
   <meta property="og:title" content="ExplainThisRepo: Explain GitHub repos in plain English" />
-  <meta property="og:description" content="A CLI tool that explains any GitHub repo in plain English and generates an EXPLAIN.md file." />
+  <meta property="og:description"
+    content="A CLI tool that explains any GitHub repo in plain English and generates an EXPLAIN.md file." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://explainthisrepo.com/" />
   <meta property="og:image" content="https://explainthisrepo.com/og.png" />
@@ -28,232 +30,337 @@
   <meta name="twitter:image" content="https://explainthisrepo.com/og.png" />
   <meta name="twitter:creator" content="@calchiwo" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+
   <style>
     :root {
-      --bg: #000;
-      --fg: #fff;
-      --muted: rgba(255,255,255,0.7);
-      --box: #111;
-      --btn: #222;
-      --btn-hover: #333;
+      --bg: #050505;
+      --surface: #0a0a0a;
+      --border: #222;
+      --text: #ededed;
+      --text-dim: #888;
+      --accent: #fff;
+      --primary-glow: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08), transparent 70%);
+      --code-bg: #111;
+      --font-main: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     * {
       box-sizing: border-box;
     }
 
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      overflow-x: hidden;
     }
 
-    body {
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    /* --- Hero Section --- */
+    .hero {
+      min-height: 90vh;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      background: var(--primary-glow);
+      position: relative;
     }
 
-    a {
-      color: var(--fg);
-      text-decoration: none;
-    }
-
-    /* top bar */
-    .top {
+    .nav {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      padding: 2rem;
       display: flex;
-      justify-content: flex-end;
-      padding: 16px 20px;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .github-link {
+      color: var(--text-dim);
+      text-decoration: none;
       font-size: 0.9rem;
-      opacity: 0.85;
+      transition: color 0.2s;
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 20px;
     }
 
     .github-link:hover {
-      opacity: 1;
-    }
-
-    /* main */
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 16px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 900px;
-      text-align: center;
-    }
-
-    /* NEW: downloads badge row */
-    .badges {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 1.25rem;
-    }
-
-    .badges img {
-      height: 28px;
+      color: var(--text);
+      border-color: var(--text);
     }
 
     h1 {
-      font-size: clamp(2.2rem, 6vw, 4rem);
-      font-weight: 800;
-      margin: 0 0 1rem;
+      font-size: clamp(3rem, 10vw, 6rem);
+      font-weight: 900;
+      margin: 0;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      background: linear-gradient(to bottom, #fff, #666);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     h2 {
-      font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+      font-size: clamp(1.2rem, 4vw, 1.8rem);
       font-weight: 400;
-      color: var(--muted);
-      margin: 0 0 2rem;
+      color: var(--text-dim);
+      margin: 1.5rem 0 3rem;
+      max-width: 600px;
     }
 
-    .command-box {
+    /* --- Badges --- */
+    .badges {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .badges img {
+      height: 24px;
+    }
+
+    /* --- Command Box --- */
+    .command-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 12px;
       position: relative;
-      background: var(--box);
-      border-radius: 10px;
-      padding: 1.25rem 1.25rem 1.5rem;
-      font-family: monospace;
-      font-size: clamp(0.9rem, 3.5vw, 1.2rem);
-      line-height: 1.6;
-      text-align: left;
-      max-width: 100%;
-      overflow-x: auto;
-      margin-bottom: 1.5rem;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+      font-family: var(--font-mono);
+      min-width: 300px;
     }
 
-    .command-box code {
-      display: block;
-      white-space: nowrap;
+    .command {
+      color: #a5f3fc;
+      font-size: 1.1rem;
+    }
+
+    .flag {
+      color: #fba919;
+    }
+
+    /* --audit */
+    .arg {
+      color: #999;
     }
 
     .copy-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: var(--btn);
-      color: var(--fg);
-      border: none;
-      padding: 0.35rem 0.6rem;
-      border-radius: 6px;
+      background: #222;
+      border: 1px solid #333;
+      color: #fff;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 0.75rem;
+      position: absolute;
+      right: 15px;
+      top: 15px;
     }
 
     .copy-btn:hover {
-      background: var(--btn-hover);
+      background: #333;
     }
 
-    .copy-btn:disabled {
-      opacity: 0.7;
-      cursor: default;
+    /* --- Features Grid --- */
+    .features {
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
     }
 
-    /* inline footer */
-    .inline-footer {
-      font-size: 0.85rem;
-      color: var(--muted);
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      border-radius: 12px;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #444;
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.3rem;
+    }
+
+    .card p {
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* --- The Council Section --- */
+    .council-section {
+      text-align: center;
+      padding: 6rem 2rem;
+      background: linear-gradient(to bottom, var(--bg), #0f0f0f);
+      border-top: 1px solid var(--border);
+    }
+
+    .intro-label {
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .agent-grid {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 3rem;
+    }
+
+    .agent {
+      background: #000;
+      border: 1px solid #333;
+      padding: 1.5rem;
+      width: 280px;
+      text-align: left;
+      border-radius: 8px;
+    }
+
+    .agent-title {
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .agent-desc {
+      font-size: 0.9rem;
+      color: #666;
       margin-top: 0.5rem;
     }
 
-    .inline-footer a {
-      font-weight: 500;
+    /* --- Footer --- */
+    footer {
+      text-align: center;
+      padding: 4rem;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
     }
 
-    .inline-footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* hidden SEO text */
-    .seo {
-      position: absolute;
-      left: -9999px;
-      top: -9999px;
-      height: 1px;
-      width: 1px;
-      overflow: hidden;
+    footer a {
+      color: var(--text);
+      text-decoration: none;
     }
   </style>
 </head>
+
 <body>
 
-  <div class="top">
-    <a
-      class="github-link"
-      href="https://github.com/calchiwo/ExplainThisRepo"
-      target="_blank"
-      rel="noopener"
-    >
-      ⭐star this project on github
-    </a>
+  <div class="nav">
+    <!-- Badges moved to top left for balanced nav -->
+    <div class="badges">
+      <a href="https://pepy.tech/projects/explainthisrepo" target="_blank" rel="noopener">
+        <img alt="PyPI Downloads"
+          src="https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads" />
+      </a>
+    </div>
+    <a href="https://github.com/calchiwo/ExplainThisRepo" class="github-link">Star on GitHub ★</a>
   </div>
 
-  <main>
-    <div class="container">
+  <section class="hero">
+    <h1>ExplainThisRepo</h1>
+    <h2>Don't just read code. Interrogate it.</h2>
 
-      <!-- NEW: PyPI downloads badge -->
-      <div class="badges">
-        <a
-          href="https://pepy.tech/projects/explainthisrepo"
-          target="_blank"
-          rel="noopener"
-        >
-          <img
-            alt="PyPI Downloads"
-            src="https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads"
-          />
-        </a>
+    <div class="command-wrapper">
+      <button class="copy-btn" onclick="copyCmd()">Copy</button>
+      <div class="cmd-line">
+        <span class="command">pip install explainthisrepo</span>
       </div>
-
-      <h1>ExplainThisRepo</h1>
-      <h2>a cli tool that explains github repos in plain english</h2>
-
-      <div class="command-box">
-        <button class="copy-btn" id="copyBtn" onclick="copyCommand()">copy</button>
-        <code>pip install explainthisrepo</code>
-        <code>explainthisrepo owner/repo</code>
-      </div>
-
-      <div class="inline-footer">
-        built by
-        <a href="https://x.com/calchiwo" target="_blank" rel="noopener">
-          Caleb Wodi
-        </a>
-        with ❤️ for the open source community
+      <div class="cmd-line" style="margin-top:10px; padding-top:10px; border-top:1px dashed #333;">
+        <span class="command">explainthisrepo owner/repo <span class="flag">--audit</span></span>
       </div>
     </div>
-  </main>
+  </section>
 
-  <div class="seo">
-    ExplainThisRepo is an open source CLI tool that explains GitHub repositories
-    in plain English by generating an EXPLAIN.md file.
-  </div>
+  <section class="council-section">
+    <span class="intro-label">Introducing Audit Mode</span>
+    <h3 style="font-size: 2.5rem; margin: 0;">Meet The Council 🏛️</h3>
+    <p style="color: #666; max-width: 500px; margin: 1rem auto;">
+      Three specialized AI agents working in parallel to roast your codebase.
+    </p>
+
+    <div class="agent-grid">
+      <div class="agent">
+        <div class="agent-title">🛡️ Security Auditor</div>
+        <div class="agent-desc">Hunts for hardcoded secrets, injection risks, and bad auth patterns.</div>
+      </div>
+      <div class="agent">
+        <div class="agent-title">⚡ Performance Optimizer</div>
+        <div class="agent-desc">Identifies N+1 queries, blocking I/O, and scalability bottlenecks.</div>
+      </div>
+      <div class="agent">
+        <div class="agent-title">🎨 Code Critic</div>
+        <div class="agent-desc">Judges your variable naming, spaghetti code, and maintainability.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="card">
+      <div class="card-icon">💬</div>
+      <h3>Interactive Chat</h3>
+      <p>Talk to the repo. "Walk me through the login flow." "Where is the bug in utils.py?" The agent remembers
+        everything.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗺️</div>
+      <h3>Visual Maps</h3>
+      <p>Automatically generates Mermaid.js diagrams to visualize your architecture without reading a single file.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧠</div>
+      <h3>OmniCoreAgent</h3>
+      <p>Powered by the most advanced Python agent framework. Context-aware, multi-provider, and production ready.</p>
+    </div>
+  </section>
+
+  <footer>
+    Built by <a href="https://x.com/calchiwo">Caleb Wodi</a> with simple curiosity.
+  </footer>
 
   <script>
-    function copyCommand() {
-      const text = `pip install explainthisrepo
-explainthisrepo owner/repo`;
-
-      navigator.clipboard.writeText(text);
-
-      const btn = document.getElementById("copyBtn");
-      btn.textContent = "copied";
-      btn.disabled = true;
-
+    function copyCmd() {
+      navigator.clipboard.writeText("pip install explainthisrepo");
+      document.querySelector('.copy-btn').textContent = "Copied!";
       setTimeout(() => {
-        btn.textContent = "copy";
-        btn.disabled = false;
-      }, 1500);
+        document.querySelector('.copy-btn').textContent = "Copy";
+      }, 2000);
     }
   </script>
 
 </body>
+
 </html>

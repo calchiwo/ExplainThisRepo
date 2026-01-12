@@ -7,15 +7,15 @@ name = "explainthisrepo"
 version = "0.1.0"
 description = "CLI tool to explain a GitHub repository in plain English"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
   { name = "Caleb Wodi", email = "calebwodi33@gmail.com" }
 ]
 
 dependencies = [
+  "omnicoreagent>=0.3.3",
   "requests",
-  "google-genai"
 ]
 
 [project.scripts]
