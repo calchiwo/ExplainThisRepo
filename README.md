@@ -7,8 +7,6 @@ ExplainThisRepo is a CLI (Command Line Interface) tool that automatically genera
 [![Python](https://img.shields.io/pypi/pyversions/explainthisrepo)](https://pypi.org/project/explainthisrepo/)
 [![Docs](https://img.shields.io/badge/docs-explainthisrepo.com-black)](https://explainthisrepo.com)
 
-![demo](https://github.com/user-attachments/assets/4fe02b94-0f7a-4fc4-bdc8-2f4d259a1f0b)
-
 ---
 
 ## 🎯 Purpose
