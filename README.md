@@ -35,12 +35,12 @@ Requirements: Python 3.9+
 
 ## Option 1: You can install via pip (recommended):
 
-```python
+```bash
 pip install explainthisrepo
 ```
 
 ## Option 2: Install with pipx
-```python
+```bash
 pipx install explainthisrepo
 ```
 
@@ -64,7 +64,14 @@ Open the file in your editor to read the explanation
 
 ---
 
-## Configuration
+## Quickstart
+
+```bash
+pip install explainthisrepo
+explainthisrepo
+```
+
+## 🔑 Configuration
 
 ExplainThisRepo uses Gemini.
 
