@@ -2,6 +2,8 @@
 
 ExplainThisRepo is a CLI (Command Line Interface) tool that automatically generates plain-English explanations of GitHub repositories. It's designed to help developers quickly understand what any public GitHub repository does by analyzing its contents and creating an `EXPLAIN.md` file.
 
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
+
 ![demo](https://github.com/user-attachments/assets/4fe02b94-0f7a-4fc4-bdc8-2f4d259a1f0b)
 
 ---
@@ -45,8 +47,6 @@ PyPi: https://pypi.org/project/explainthisrepo
 
 Website: [explainthisrepo.com](https://https.explainthisrepo.com)
 
-[![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
-
 ---
 
 ## Usage
@@ -57,11 +57,11 @@ explainthisrepo owner/repo
 
 ## Example
 ```bash
-explainthisrepo octocat/Hello-World
+explainthisrepo facebook/react
 ```
 This generates:
 
-EXPLAIN.md
+`EXPLAIN.md`
 
 Open the file in your editor to read the explanation
 
@@ -109,3 +109,4 @@ Caleb Wodi
 
 - [Twitter](https://x.com/calchiwo)
 - [LinkedIn](https://linkedin.com/in/calchiwo)
+- [Portfolio](https://calebwodi.vercel.app)
