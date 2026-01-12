@@ -68,7 +68,7 @@ Open the file in your editor to read the explanation
 
 ```bash
 pip install explainthisrepo
-explainthisrepo
+explainthisrepo owner/repo
 ```
 
 ## 🔑 Configuration
