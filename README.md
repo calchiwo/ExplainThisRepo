@@ -2,8 +2,8 @@
 
 ExplainThisRepo is a CLI (Command Line Interface) tool that automatically generates plain-English explanations of GitHub repositories. It's designed to help developers quickly understand what any public GitHub repository does by analyzing its contents and creating an `EXPLAIN.md` file.
 
-
-[![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)] [![PyPi Package]( https://pypi.org/project/explainthisrepo)
+[![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)][![Python](https://img.shields.io/pypi/pyversions/explainthisrepo)](https://pypi.org/project/explainthisrepo/)[![Docs](https://img.shields.io/badge/docs-explainthisrepo.com-black)](https://explainthisrepo.com)
 
 ![demo](https://github.com/user-attachments/assets/4fe02b94-0f7a-4fc4-bdc8-2f4d259a1f0b)
 
@@ -43,9 +43,6 @@ pip install explainthisrepo
 ```python
 pipx install explainthisrepo
 ```
-
-
-Website: [explainthisrepo.com](https://https.explainthisrepo.com)
 
 ---
 
