@@ -1,3 +1,5 @@
+import CopyCommand from "./CopyCommand";
+
 export default function Page() {
   return (
     <>
@@ -30,37 +32,7 @@ export default function Page() {
           <h1>ExplainThisRepo</h1>
           <h2>a cli tool that explains github repos in plain english</h2>
 
-          <div className="command-box">
-            <button
-              className="copy-btn"
-              id="copyBtn"
-              onClick={() => {
-                const text = `pip install explainthisrepo
-explainthisrepo owner/repo`;
-
-                navigator.clipboard.writeText(text);
-
-                const btn = document.getElementById(
-                  "copyBtn"
-                ) as HTMLButtonElement | null;
-
-                if (!btn) return;
-
-                btn.textContent = "copied";
-                btn.disabled = true;
-
-                setTimeout(() => {
-                  btn.textContent = "copy";
-                  btn.disabled = false;
-                }, 1500);
-              }}
-            >
-              copy
-            </button>
-
-            <code>pip install explainthisrepo</code>
-            <code>explainthisrepo owner/repo</code>
-          </div>
+          <CopyCommand />
 
           <div className="inline-footer">
             built by{" "}
