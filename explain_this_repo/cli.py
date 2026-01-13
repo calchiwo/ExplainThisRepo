@@ -57,7 +57,7 @@ def run_doctor() -> int:
 
     print("\nnotes:")
     if is_termux:
-        print("- termux detected. if installs fail, run:")
+        print("- Termux detected. If installs fail, run:")
         print("  pkg update")
         print("  pkg install python git clang rust make")
         print("  pip install -U pip setuptools wheel")
@@ -97,7 +97,7 @@ def main():
         print("invalid format. use owner/repo")
         raise SystemExit(1)
 
-    print(f"fetching {owner}/{repo}...")
+    print(f"Fetching {owner}/{repo}...")
 
     try:
         repo_data = fetch_repo(owner, repo)
@@ -112,25 +112,25 @@ def main():
         readme=readme,
     )
 
-    print("generating explanation...")
+    print("Generating explanation...")
 
     try:
         output = generate_explanation(prompt)
     except Exception as e:
-        print("failed to generate explanation.")
+        print("Failed to generate explanation.")
         print(f"error: {e}")
         print("\nfix:")
-        print("- ensure GEMINI_API_KEY is set")
-        print("- or run: explainthisrepo --doctor")
+        print("- Ensure GEMINI_API_KEY is set")
+        print("- Or run: explainthisrepo --doctor")
         raise SystemExit(1)
 
-    print("writing EXPLAIN.md...")
+    print("Writing EXPLAIN.md...")
     write_output(output)
 
     word_count = len(output.split())
-    print("EXPLAIN.md generated successfully")
-    print(f"words: {word_count}")
-    print("open EXPLAIN.md to read it.")
+    print("EXPLAIN.md generated successfully 🎉")
+    print(f"Words: {word_count}")
+    print("Open EXPLAIN.md to read it.")
 
 
 if __name__ == "__main__":
