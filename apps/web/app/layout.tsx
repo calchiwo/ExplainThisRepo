@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: "ExplainThisRepo: CLI to explain GitHub repositories in plain English",
