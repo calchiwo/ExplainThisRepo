@@ -14,9 +14,11 @@ authors = [
 ]
 
 dependencies = [
-  "requests",
-  "google-genai"
+  "requests"
 ]
+
+[project.optional-dependencies]
+gemini = ["google-genai>=1.0.0"]
 
 [project.scripts]
 explainthisrepo = "explain_this_repo.cli:main"
