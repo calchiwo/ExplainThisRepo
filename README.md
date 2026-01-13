@@ -9,6 +9,8 @@ ExplainThisRepo is a CLI (Command Line Interface) tool that automatically genera
 
 ---
 
+![demo](https://github.com/user-attachments/assets/837e0593-db64-4657-8855-bb1915011eb6)
+
 ## 🎯 Purpose
 
 This tool solves the problem of understanding unfamiliar codebases. Instead of manually reading through code and documentation, developers can use this CLI to generate a clear, readable explanation of any GitHub repository.
