@@ -112,14 +112,15 @@ export PATH="$HOME/.local/bin:$PATH"
 Alternative (No PATH changes)
 
 If you do not want to modify PATH, you can run ExplainThisRepo as a module:
+
 ```bash
 python -m explain_this_repo owner/repo
 ```
 
 Gemini support on Termux (Optional)
-```bash
+
 Installing Gemini support may require building Rust-based dependencies on Android, which can take time on first install:
-```
+
 ```bash
 pip install --user -U "explainthisrepo[gemini]"
 ```
