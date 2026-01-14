@@ -93,6 +93,36 @@ setx GEMINI_API_KEY "your_api_key_here"
 
 Restart your terminal after setting the key.
 
+## Termux (Android) install notes
+
+Termux has some environment limitations that can make `pip install explainthisrepo` fail to create the `explainthisrepo` command in `$PREFIX/bin`.
+
+### Recommended install (Termux)
+
+```bash
+pip install --user -U explainthisrepo
+```
+
+Make sure your user bin directory is on your PATH:
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+> Tip: Add the PATH export to your ~/.bashrc or ~/.zshrc so it persists.
+
+Alternative (No PATH changes)
+
+If you do not want to modify PATH, you can run ExplainThisRepo as a module:
+```bash
+python -m explain_this_repo owner/repo
+```
+
+Gemini support on Termux (Optional)
+```bash
+Installing Gemini support may require building Rust-based dependencies on Android, which can take time on first install:
+```
+```bash
+pip install --user -U "explainthisrepo[gemini]"
+```
 ## Contributions
 
 Contributions are welcome.
