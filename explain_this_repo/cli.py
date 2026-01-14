@@ -17,6 +17,10 @@ def _pkg_version(name: str) -> str:
         return "not installed"
 
 
+def print_version() -> None:
+    print(_pkg_version("explainthisrepo"))
+
+
 def _has_env(key: str) -> bool:
     v = os.getenv(key)
     return bool(v and v.strip())
@@ -61,7 +65,7 @@ def run_doctor() -> int:
         print("- Install using:")
         print("  pip install --user -U explainthisrepo")
         print("- Ensure script PATH is available:")
-        print('  Export PATH="$HOME/.local/bin:$PATH"')
+        print('  export PATH="$HOME/.local/bin:$PATH"')
         print("- If PATH is annoying, run:")
         print("  python -m explain_this_repo owner/repo")
 
@@ -73,6 +77,7 @@ def usage() -> None:
     print("  explainthisrepo owner/repo")
     print("  explainthisrepo owner/repo --detailed")
     print("  explainthisrepo --doctor")
+    print("  explainthisrepo --version")
     print("  python -m explain_this_repo owner/repo")
 
 
@@ -85,6 +90,10 @@ def main():
 
     if args[0] == "--doctor":
         raise SystemExit(run_doctor())
+
+    if args[0] == "--version":
+        print_version()
+        return
 
     detailed = False
 
