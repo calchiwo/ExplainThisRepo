@@ -71,6 +71,7 @@ def run_doctor() -> int:
 def usage() -> None:
     print("usage:")
     print("  explainthisrepo owner/repo")
+    print("  explainthisrepo owner/repo --detailed")
     print("  explainthisrepo --doctor")
     print("  python -m explain_this_repo owner/repo")
 
@@ -85,7 +86,14 @@ def main():
     if args[0] == "--doctor":
         raise SystemExit(run_doctor())
 
-    if len(args) != 1:
+    detailed = False
+
+    if len(args) == 2:
+        if args[1] != "--detailed":
+            usage()
+            raise SystemExit(1)
+        detailed = True
+    elif len(args) != 1:
         usage()
         raise SystemExit(1)
 
@@ -113,6 +121,7 @@ def main():
         repo_name=repo_data.get("full_name"),
         description=repo_data.get("description"),
         readme=readme,
+        detailed=detailed,
     )
 
     print("Generating explanation...")
