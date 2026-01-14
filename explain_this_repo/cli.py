@@ -57,10 +57,13 @@ def run_doctor() -> int:
 
     print("\nnotes:")
     if is_termux:
-        print("- Termux detected. If installs fail, run:")
-        print("  pkg update")
-        print("  pkg install python git clang rust make")
-        print("  pip install -U pip setuptools wheel")
+        print("- Termux detected")
+        print("- Install using:")
+        print("  pip install --user -U explainthisrepo")
+        print("- Ensure script PATH is available:")
+        print('  Export PATH="$HOME/.local/bin:$PATH"')
+        print("- If PATH is annoying, run:")
+        print("  python -m explain_this_repo owner/repo")
 
     return 0 if ok1 else 1
 
