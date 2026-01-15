@@ -1,18 +1,106 @@
 #!/usr/bin/env node
+
+import os from "node:os";
+import process from "node:process";
 import { fetchRepo, fetchReadme } from "./github.js";
 import { buildPrompt } from "./prompt.js";
 import { generateExplanation } from "./generate.js";
 import { writeOutput } from "./writer.js";
 
-async function main(): Promise<void> {
-  const args: string[] = process.argv.slice(2);
+function usage(): void {
+  console.log("usage:");
+  console.log("  explainthisrepo owner/repo");
+  console.log("  explainthisrepo owner/repo --detailed");
+  console.log("  explainthisrepo --doctor");
+  console.log("  explainthisrepo --version");
+}
 
-  if (args.length !== 1) {
-    console.log("Usage: explainthisrepo owner/repo");
+function getPkgVersion(): string {
+  return process.env.npm_package_version || "unknown";
+}
+
+function printVersion(): void {
+  console.log(getPkgVersion());
+}
+
+function hasEnv(key: string): boolean {
+  const v = process.env[key];
+  return Boolean(v && v.trim());
+}
+
+async function checkUrl(url: string, timeoutMs = 6000): Promise<{ ok: boolean; msg: string }> {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { "User-Agent": "explainthisrepo" },
+      signal: controller.signal,
+    });
+
+    clearTimeout(t);
+    return { ok: res.ok, msg: `ok (${res.status})` };
+  } catch (e: any) {
+    clearTimeout(t);
+    return { ok: false, msg: `failed (${e?.name || "Error"}: ${e?.message || e})` };
+  }
+}
+
+async function runDoctor(): Promise<number> {
+  console.log("explainthisrepo doctor report\n");
+
+  console.log(`node: ${process.version}`);
+  console.log(`os: ${os.type()} ${os.release()}`);
+  console.log(`platform: ${process.platform} ${process.arch}`);
+  console.log(`version: ${getPkgVersion()}`);
+
+  console.log("\nenvironment:");
+  console.log(`- GEMINI_API_KEY set: ${hasEnv("GEMINI_API_KEY")}`);
+  console.log(`- GITHUB_TOKEN set: ${hasEnv("GITHUB_TOKEN")}`);
+
+  console.log("\nnetwork checks:");
+  const gh = await checkUrl("https://api.github.com");
+  console.log(`- github api: ${gh.msg}`);
+
+  const gem = await checkUrl("https://generativelanguage.googleapis.com");
+  console.log(`- gemini endpoint: ${gem.msg}`);
+
+  return gh.ok ? 0 : 1;
+}
+
+async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+
+  if (args.length === 0 || args[0] === "-h" || args[0] === "--help") {
+    usage();
+    process.exit(0);
+  }
+
+  if (args[0] === "--version") {
+    printVersion();
+    process.exit(0);
+  }
+
+  if (args[0] === "--doctor") {
+    const code = await runDoctor();
+    process.exit(code);
+  }
+
+  let detailed = false;
+
+  if (args.length === 2) {
+    if (args[1] !== "--detailed") {
+      usage();
+      process.exit(1);
+    }
+    detailed = true;
+  } else if (args.length !== 1) {
+    usage();
     process.exit(1);
   }
 
-  const target: string = args[0];
+  const target = args[0];
 
   if (!target.includes("/") || target.split("/").length !== 2) {
     console.log("Invalid format. Use owner/repo");
@@ -20,37 +108,38 @@ async function main(): Promise<void> {
   }
 
   const [owner, repo] = target.split("/");
-
   if (!owner || !repo) {
     console.log("Invalid format. Use owner/repo");
     process.exit(1);
   }
 
-  console.log(`Fetching ${owner}/${repo}…`);
+  console.log(`Fetching ${owner}/${repo}...`);
 
   try {
     const repoData = await fetchRepo(owner, repo);
     const readme = await fetchReadme(owner, repo);
 
-    const prompt = buildPrompt(
-      repoData.full_name,
-      repoData.description,
-      readme,
-    );
+    const prompt = buildPrompt(repoData.full_name, repoData.description, readme, detailed);
 
-    console.log("Generating explanation…");
+    console.log("Generating explanation...");
     const output = await generateExplanation(prompt);
 
-    console.log("Writing EXPLAIN.md…");
+    console.log("Writing EXPLAIN.md...");
     writeOutput(output);
 
-    const wordCount = output.split(/\s+/).length;
+    const wordCount = output.split(/\s+/).filter(Boolean).length;
 
     console.log("EXPLAIN.md generated successfully 🎉");
     console.log(`Words: ${wordCount}`);
-    console.log("\nOpen EXPLAIN.md to read it.");
-  } catch (error: any) {
-    console.error(error.message || "An unexpected error occurred.");
+    console.log("Open EXPLAIN.md to read it.");
+  } catch (e: any) {
+    console.log("Failed to generate explanation.");
+    console.log(`error: ${e?.message || e}`);
+
+    console.log("\nfix:");
+    console.log("- Ensure GEMINI_API_KEY is set");
+    console.log("- Or run: explainthisrepo --doctor");
+
     process.exit(1);
   }
 }
