@@ -2,33 +2,46 @@
   "name": "explainthisrepo",
   "version": "0.1.0",
   "description": "CLI tool to explain a GitHub repository in plain English",
+  "license": "MIT",
   "type": "module",
+  "author": "Caleb Wodi <calebwodi33@gmail.com>",
+  "homepage": "https://explainthisrepo.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/calchiwo/ExplainThisRepo.git"
+    "url": "git+https://github.com/calchiwo/ExplainThisRepo.git",
+    "directory": "node_version"
   },
+  "bugs": {
+    "url": "https://github.com/calchiwo/ExplainThisRepo/issues"
+  },
+  "keywords": [
+    "github",
+    "cli",
+    "explain",
+    "repository",
+    "ai",
+    "developer-tools"
+  ],
   "bin": {
     "explainthisrepo": "./dist/cli.js"
   },
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "node dist/cli.js",
-    "prepublishOnly": "npm run build",
-    "format": "prettier --write . --cache",
-    "precommit": "lint-staged",
-    "prepare": "husky"
+    "prepublishOnly": "npm run build"
   },
-  "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown"
+  "engines": {
+    "node": ">=18"
   },
-  "keywords": [
-    "explainthisrepo",
-    "ExplainRepo",
-    "EXPLAIN.md",
-    "developer tools"
-  ],
-  "author": "Spectra010s <Spectra010s@gmail.com>",
-  "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.13.2",
@@ -36,9 +49,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "typescript": "^5.0.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "prettier": "^3.7.4"
+    "typescript": "^5.0.0"
   }
 }
