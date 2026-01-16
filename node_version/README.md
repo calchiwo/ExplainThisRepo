@@ -86,4 +86,4 @@ This project is licensed under the MIT License as specified in the package confi
 - [GitHub](https://github.com/calchiwo)
 - [Twitter/X](https://x.com/calchiwo)
 
-Node version contibuted by [@Spectra010s](https://github.com/spectra10s)
+Node version contibuted by [@Spectra010s](https://github.com/spectra010s)
