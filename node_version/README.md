@@ -16,7 +16,7 @@ Follow these steps to set up the project locally on your machine:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/Spectra010s/ExplainThisRepo.git
+   git clone https://github.com/calchiwo/ExplainThisRepo.git
    cd ExplainThisRepo/node_version
    ```
 
@@ -82,6 +82,6 @@ This project is licensed under the MIT License as specified in the package confi
 
 ## Author Info
 
-**Spectra010s**
-- [Portfolio](https://spectra010s.vercel.app)
-- [Twitter/X](https://x.com/Spectra010s)
+**Caleb Wodi**
+- [Portfolio](https://calebwodi.vercel.app)
+- [Twitter/X](https://x.com/calchiwo)
