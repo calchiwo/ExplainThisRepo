@@ -83,5 +83,7 @@ This project is licensed under the MIT License as specified in the package confi
 ## Author Info
 
 **Caleb Wodi**
-- [Portfolio](https://calebwodi.vercel.app)
+- [GitHub](https://github.com/calchiwo)
 - [Twitter/X](https://x.com/calchiwo)
+
+Node version contibuted by [@Spectra010s](https://github.com/spectra10s)
