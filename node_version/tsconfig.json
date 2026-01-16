@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    /* Base Options */
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": ".",
     "noEmit": false,
     "declaration": true,
     "sourceMap": false,
@@ -17,6 +16,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["*.ts"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
