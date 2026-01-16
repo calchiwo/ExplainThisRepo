@@ -2,8 +2,9 @@ export function buildPrompt(
   repoName: string,
   description: string | null,
   readme: string | null,
+  detailed: boolean = false,
 ): string {
-  return `
+  let prompt = `
 You are a senior software engineer.
 
 Your task is to explain a GitHub repository clearly and concisely for a human reader.
@@ -24,6 +25,19 @@ Instructions:
 - Avoid hype or marketing language.
 - Be concise and practical.
 - Use clear markdown headings.
+`.trim();
+
+  if (detailed) {
+    prompt += `
+
+Additional instructions:
+- Explain the high-level architecture.
+- Describe the folder structure.
+- Mention important files and their roles.
+`;
+  }
+
+  prompt += `
 
 Output format:
 # Overview
@@ -31,5 +45,7 @@ Output format:
 # Who it is for
 # How to run or use it
 # Notes or limitations
-`.trim();
+`;
+
+  return prompt.trim();
 }
