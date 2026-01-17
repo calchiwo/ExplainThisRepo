@@ -257,6 +257,7 @@
                 <a href="#installation">Installation</a>
                 <a href="#usage">Basic Usage</a>
                 <a href="#config">Configuration</a>
+                <a href="#termux">Termux (Android) install notes</a>
             </nav>
         </aside>
 
@@ -420,6 +421,73 @@
                 <div class="alert-box">
                     <strong>Restart Required:</strong> You must restart your terminal (close and reopen the window) after setting the key for changes to take effect.
                 </div>
+            </section>
+            
+            <section id="termux" class="technical-wrapper">
+                <hr class="divider">
+            
+                <div class="tech-header" id="termux">
+                    <h2>📱 Termux (Android) Notes</h2>
+                    <span class="tag">Mobile</span>
+                </div>
+            
+                <p>
+                    Termux has environment limitations that may prevent <code>pip install</code> from automatically linking the command to <code>$PREFIX/bin</code>.
+                </p>
+            
+                <div class="install-option">
+                    <h3>Recommended Install</h3>
+                    <p>Install to your user directory and update your PATH.</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                            <span class="terminal-title">termux</span>
+                        </div>
+                        <div class="terminal-content">
+                            <span class="prompt">$</span> pip install --user -U explainthisrepo<br><br>
+                            <span class="comment"># Add user bin to PATH</span><br>
+                            <span class="prompt">$</span> export PATH="$HOME/.local/bin:$PATH"
+                        </div>
+                    </div>
+            
+                    <div class="alert-box">
+                        <strong>Tip:</strong> Add the export command above to your <code>~/.bashrc</code> or <code>~/.zshrc</code> file so it persists after you close the app.
+                    </div>
+                </div>
+            
+                <div class="install-option">
+                    <h3>Alternative (No PATH changes)</h3>
+                    <p>If you don't want to modify your PATH, you can run the tool as a Python module:</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                            <span class="terminal-title">termux</span>
+                        </div>
+                        <div class="terminal-content">
+                            <span class="prompt">$</span> python -m explain_this_repo owner/repo
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="install-option">
+                    <h3>Gemini Support (Optional)</h3>
+                    <p>
+                        Installing full Gemini support may require building Rust-based dependencies, which can take several minutes on a mobile device.
+                    </p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                            <span class="terminal-title">termux</span>
+                        </div>
+                        <div class="terminal-content">
+                            <span class="prompt">$</span> pip install --user -U "explainthisrepo[gemini]"
+                        </div>
+                    </div>
+                </div>
+            
             </section>
         </main>
     </div>
