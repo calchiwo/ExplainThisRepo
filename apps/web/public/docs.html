@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExplainThisRepo - Docs</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+    /* --- RESET & VARIABLES --- */
+    :root {
+        --bg-sidebar: #f8fafc;
+        --border-color: #e2e8f0;
+        --primary: #3b82f6;
+        --text-dark: #0f172a;
+        --text-gray: #475569;
+        --code-bg: #1e293b;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+        font-family: 'Inter', sans-serif;
+        color: var(--text-dark);
+        line-height: 1.6;
+        display: flex;
+        min-height: 100vh;
+    }
+    
+    /* --- LAYOUT --- */
+    .docs-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr; /* Sidebar fixed width, Content fluid */
+        width: 100%;
+    }
+    
+    /* --- SIDEBAR --- */
+    .sidebar {
+        background: var(--bg-sidebar);
+        border-right: 1px solid var(--border-color);
+        padding: 2rem;
+        position: fixed;
+        height: 100vh;
+        width: 260px;
+        overflow-y: auto;
+    }
+    
+    .brand {
+        font-weight: 800;
+        font-size: 1.2rem;
+        margin-bottom: 2.5rem;
+        color: var(--primary);
+    }
+    
+    .nav-label {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #94a3b8;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.05em;
+    }
+    
+    .sidebar a {
+        display: block;
+        text-decoration: none;
+        color: var(--text-gray);
+        font-size: 0.95rem;
+        padding: 0.4rem 0;
+        transition: color 0.2s;
+    }
+    
+    .sidebar a:hover, .sidebar a.active {
+        color: var(--primary);
+        font-weight: 500;
+    }
+    
+    /* --- MAIN CONTENT AREA --- */
+    .main-content {
+        grid-column: 2;
+        padding: 4rem 6rem;
+        max-width: 1000px; /* Readability limit */
+    }
+    
+    .divider {
+        border: 0;
+        border-top: 1px solid var(--border-color);
+        margin: 4rem 0;
+    }
+    
+    /* =========================================
+       STYLE 1: INTRODUCTION (Editorial Style)
+       ========================================= */
+    .intro-wrapper h1 {
+        font-size: 3rem;
+        letter-spacing: -0.03em;
+        margin-bottom: 1.5rem;
+    }
+    
+    .intro-wrapper .lead {
+        font-size: 1.3rem;
+        font-weight: 400;
+        color: #334155;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+    }
+    
+    /* Cards for conceptual features */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .feature-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    
+    .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.9rem; color: var(--text-gray); }
+    
+    
+    /* =========================================
+       STYLE 2: INSTALLATION (Technical Style)
+       ========================================= */
+    .technical-wrapper .tech-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .technical-wrapper h2 {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .tag {
+        background: #eff6ff;
+        color: var(--primary);
+        padding: 0.2rem 0.6rem;
+        border-radius: 99px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* The Fake Terminal */
+    .terminal {
+        background: var(--code-bg);
+        border-radius: 8px;
+        margin: 1.5rem 0;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .terminal-bar {
+        background: #334155;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; }
+    .red { background: #ef4444; } .yellow { background: #fbbf24; } .green { background: #22c55e; }
+    
+    .terminal-title {
+        margin-left: auto;
+        color: #94a3b8;
+        font-size: 0.75rem;
+    }
+    
+    .terminal-content {
+        padding: 1.5rem;
+        color: #f1f5f9;
+        font-size: 1rem;
+    }
+    
+    .prompt { color: #c084fc; margin-right: 0.5rem; user-select: none; }
+    
+    /* Alert Box */
+    .alert-box {
+        background: #ffffff;
+        border-left: 4px solid #f59e0b; /* Amber warning color */
+        padding: 1rem;
+        background: #fffbeb;
+        color: #92400e;
+        font-size: 0.95rem;
+        border-radius: 4px;
+    }
+    
+    /* --- INSTALLATION SPECIFIC --- */
+    .install-option {
+        margin-bottom: 2.5rem;
+    }
+    
+    .install-option h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .badge {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+    }
+    
+    .badge.recommended {
+        background-color: #dcfce7; /* Light green bg */
+        color: #166534;           /* Dark green text */
+        border: 1px solid #bbf7d0;
+    }
+    
+   
+    
+    /* Terminal Comments (e.g. # Run immediately...) */
+    .terminal-content .comment {
+        color: #64748b; /* Muted grey */
+        font-style: italic;
+    }
+    
+    /* Python Badge Style */
+    .badge.py-badge {
+        background-color: #fffae0; /* Light yellow bg */
+        color: #b45309;           /* Dark yellow/orange text */
+        border: 1px solid #fde68a;
+    }
+    </style>
+</head>
+<body>
+
+    <div class="docs-layout">
+        
+        <aside class="sidebar">
+            <div class="brand">ExplainThisRepo</div>
+            <nav>
+                <p class="nav-label">Overview</p>
+                <a href="#introduction" class="active">Introduction</a>
+                <a href="#features">Key Features</a>
+                
+                <p class="nav-label">Get Started</p>
+                <a href="#installation">Installation</a>
+                <a href="#usage">Basic Usage</a>
+                <a href="#config">Configuration</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+
+            <section id="introduction" class="intro-wrapper">
+                <h1>Introduction</h1>
+                <p class="lead">
+                    ExplainThisRepo is a developer tool designed to bridge the gap between complex codebases and human understanding.
+                </p>
+                <p>
+                    When exploring a new open-source project, the biggest bottleneck is often context. This tool analyzes the repository structure, reads the source code, and generates a plain-English guide (`EXPLAIN.md`) that walks you through the project's logic.
+                </p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>⚡ Fast Analysis</h3>
+                        <p>Parses file trees instantly to give you a structural overview.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🧠 AI Summaries</h3>
+                        <p>Uses LLMs to decode complex logic into simple summaries.</p>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="divider">
+
+           
+            <section id="installation" class="technical-wrapper">
+                <div class="tech-header">
+                    <h2>Installation</h2>
+                </div>
+                
+                <p>Choose the installation method that fits your environment.</p>
+            
+                <div class="install-option">
+                    <h3>Option 1: Run with npm / npx  (recommended for most devs)</h3>
+                    <p>No Python setup required. Runs anywhere Node runs.</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                            <span class="terminal-title">bash</span>
+                        </div>
+                        <div class="terminal-content">
+                            <span class="comment"># Run immediately without installing</span><br>
+                            <span class="prompt">$</span> npx explainthisrepo owner/repo<br><br>
+                            <span class="comment"># Or install globally</span><br>
+                            <span class="prompt">$</span> npm install -g explainthisrepo
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="install-option">
+                    <h3>Option 2: Install via pip <span class="badge py-badge">Python</span></h3>
+                    <p>Recommended for most Python developers.</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                            <span class="terminal-title">bash</span>
+                        </div>
+                        <div class="terminal-content">
+                            <span class="prompt">$</span> pip install explainthisrepo
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="install-option">
+                    <h3>Option 3: Install with pipx <span class="badge py-badge">Python</span></h3>
+                    <p>Best for isolating CLI tools from your system dependencies.</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                            <span class="terminal-title">bash</span>
+                        </div>
+                        <div class="terminal-content">
+                            <span class="prompt">$</span> pipx install explainthisrepo
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="usage" class="technical-wrapper">
+                <hr class="divider">
+                
+                <div class="tech-header">
+                    <h2>🧪 Usage</h2>
+                </div>
+            
+                <p>The basic command structure is straightforward:</p>
+            
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                        <span class="terminal-title">bash</span>
+                    </div>
+                    <div class="terminal-content">
+                        <span class="prompt">$</span> explainthisrepo owner/repo
+                    </div>
+                </div>
+            
+                <br>
+            
+                <div class="tech-header">
+                    <h2>🧾 Example</h2>
+                </div>
+            
+                <p>Here is how you would explain the React repository:</p>
+            
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                        <span class="terminal-title">bash</span>
+                    </div>
+                    <div class="terminal-content">
+                        <span class="prompt">$</span> explainthisrepo facebook/react
+                    </div>
+                </div>
+            </section>
+            <section id="configuration" class="technical-wrapper">
+                <hr class="divider">
+            
+                <div class="tech-header" id="config">
+                    <h2>⚙️ Configuration</h2>
+                </div>
+            
+                <p>
+                    ExplainThisRepo relies on Google's Gemini models to generate explanations. 
+                    You must set your API key as an environment variable before running the tool.
+                </p>
+            
+                <div class="install-option">
+                    <h3>macOS / Linux</h3>
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                            <span class="terminal-title">bash</span>
+                        </div>
+                        <div class="terminal-content">
+                            <span class="prompt">$</span> export GEMINI_API_KEY="your_api_key_here"
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="install-option">
+                    <h3>Windows (PowerShell)</h3>
+                    <div class="terminal">
+                        <div class="terminal-bar">
+                            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                            <span class="terminal-title">powershell</span>
+                        </div>
+                        <div class="terminal-content">
+                            <span class="prompt">></span> setx GEMINI_API_KEY "your_api_key_here"
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="alert-box">
+                    <strong>Restart Required:</strong> You must restart your terminal (close and reopen the window) after setting the key for changes to take effect.
+                </div>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>
