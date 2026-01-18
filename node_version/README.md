@@ -82,8 +82,6 @@ This project is licensed under the MIT License as specified in the package confi
 
 ## Author Info
 
-**Caleb Wodi**
-- [GitHub](https://github.com/calchiwo)
-- [Twitter/X](https://x.com/calchiwo)
+[**Caleb Wodi**](https://github.com/calchiwo)
 
 Node version contibuted by [@Spectra010s](https://github.com/spectra010s)
