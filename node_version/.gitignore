@@ -15,6 +15,7 @@ pnpm-debug.log*
 
 # typescript cache
 *.tsbuildinfo
+*.tgz
 
 # os
 .DS_Store

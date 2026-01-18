@@ -23,8 +23,7 @@
     "developer-tools"
   ],
   "bin": {
-    "explainthisrepo": "./dist/cli.js"
-  
+    "explainthisrepo": "dist/cli.js"
   },
   "files": [
     "dist",
