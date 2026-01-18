@@ -2,6 +2,10 @@
 
 import os from "node:os";
 import process from "node:process";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { fetchRepo, fetchReadme } from "./github.js";
 import { buildPrompt } from "./prompt.js";
 import { generateExplanation } from "./generate.js";
@@ -16,7 +20,18 @@ function usage(): void {
 }
 
 function getPkgVersion(): string {
-  return process.env.npm_package_version || "unknown";
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    // dist/cli.js -> dist -> package root
+    const pkgPath = path.join(__dirname, "..", "package.json");
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+
+    return pkg.version ?? "unknown";
+  } catch {
+    return "unknown";
+  }
 }
 
 function printVersion(): void {
@@ -28,7 +43,10 @@ function hasEnv(key: string): boolean {
   return Boolean(v && v.trim());
 }
 
-async function checkUrl(url: string, timeoutMs = 6000): Promise<{ ok: boolean; msg: string }> {
+async function checkUrl(
+  url: string,
+  timeoutMs = 6000
+): Promise<{ ok: boolean; msg: string }> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -43,7 +61,10 @@ async function checkUrl(url: string, timeoutMs = 6000): Promise<{ ok: boolean; m
     return { ok: res.ok, msg: `ok (${res.status})` };
   } catch (e: any) {
     clearTimeout(t);
-    return { ok: false, msg: `failed (${e?.name || "Error"}: ${e?.message || e})` };
+    return {
+      ok: false,
+      msg: `failed (${e?.name || "Error"}: ${e?.message || e})`,
+    };
   }
 }
 
@@ -119,7 +140,12 @@ async function main(): Promise<void> {
     const repoData = await fetchRepo(owner, repo);
     const readme = await fetchReadme(owner, repo);
 
-    const prompt = buildPrompt(repoData.full_name, repoData.description, readme, detailed);
+    const prompt = buildPrompt(
+      repoData.full_name,
+      repoData.description,
+      readme,
+      detailed
+    );
 
     console.log("Generating explanation...");
     const output = await generateExplanation(prompt);
