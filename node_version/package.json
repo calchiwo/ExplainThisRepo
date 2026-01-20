@@ -1,7 +1,7 @@
 {
   "name": "explainthisrepo",
   "version": "0.1.1",
-  "description": "CLI tool to explain a GitHub repository in plain English",
+  "description": "ExplainThisRepo is a CLI developer tool to explain any GitHub repository in plain English",
   "license": "MIT",
   "type": "module",
   "author": "Caleb Wodi <calebwodi33@gmail.com>",
@@ -20,6 +20,10 @@
     "explain",
     "repository",
     "ai",
+    "repo-analysis",
+    "code-explanater",
+    "documentation",
+    "developer-productivity",
     "developer-tools"
   ],
   "bin": {
