@@ -144,9 +144,9 @@ pip install --user -U "explainthisrepo[gemini]"
 Contributions are welcome!
 
 If you find a bug, have an idea, or want to improve the tool:
-- See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines
+- See [CONTRIBUTING](CONTRIBUTING.md) for setup and guidelines
 - Open an issue for bugs/feature requests
-- Submit a pull request for fixes/improvements
+- Or submit a pull request for fixes/improvements
 
 ---
 
