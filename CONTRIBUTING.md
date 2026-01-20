@@ -1,6 +1,6 @@
 # Contributing to ExplainThisRepo
 
-Thanks for contributing to ExplainThisRepo!
+Thanks for wanting to contribute.
 
 This project is a CLI tool that explains GitHub repositories in plain English by analyzing repo structure, README content, and selected code files.
 
