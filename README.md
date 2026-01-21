@@ -65,22 +65,55 @@ pipx install explainthisrepo
 
 ## 🧪 Usage
 
+### Basic
+Generate a full explanation and saves it to `EXPLAIN.md`:
+
 ```bash
 explainthisrepo owner/repo
 ```
-
-## 🧾 Example
+Example:
 ```bash
 explainthisrepo facebook/react
 ```
-This generates:
+---
 
-`EXPLAIN.md`
+### Quick mode
 
-Open the file in your editor to read the explanation
+Get a one-sentence definition (prints only, no file created):
+```bash
+explainthisrepo owner/repo --quick
+```
+Example:
+```bash
+explainthisrepo facebook/react --quick
+```
 
 ---
 
+### Detailed mode
+
+Generate a more detailed explanation (includes architecture / folder structure):
+```bash
+explainthisrepo owner/repo --detailed
+```
+
+---
+
+### Version
+
+Print the installed version:
+```bash
+explainthisrepo --version
+```
+
+---
+
+### Doctor
+
+Check environment + connectivity (useful for debugging):
+```bash
+explainthisrepo --doctor
+```
 ## ⚙️ Quickstart
 
 ```bash
