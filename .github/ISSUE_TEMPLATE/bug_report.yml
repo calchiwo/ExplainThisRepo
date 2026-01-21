@@ -1,0 +1,108 @@
+name: Bug report
+description: Report a problem with ExplainThisRepo
+title: "bug: <short summary>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please fill this out so I can reproduce it fast.
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: Which version are you using?
+      options:
+        - npm (Node)
+        - PyPI (Python)
+        - both
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - normal
+        - --quick
+        - --detailed
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api_key
+    attributes:
+      label: GEMINI_API_KEY set?
+      options:
+        - yes
+        - no
+        - not sure
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS / Environment
+      placeholder: "Windows 11 / macOS / Ubuntu / Termux (Android)"
+    validations:
+      required: true
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime version
+      placeholder: "node -v / python --version"
+    validations:
+      required: true
+
+  - type: input
+    id: install
+    attributes:
+      label: Install method
+      placeholder: "npx explainthisrepo..., npm i -g..., pip install..., pipx install..."
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Command you ran
+      placeholder: "explainthisrepo owner/repo --detailed"
+    validations:
+      required: true
+
+  - type: input
+    id: repo
+    attributes:
+      label: Repo used to reproduce
+      placeholder: "owner/repo"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      placeholder: "What should have happened?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      placeholder: "Paste the full output / error."
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Doctor output (if available)
+      description: "Run: explainthisrepo --doctor"
+      render: shell
+    validations:
+      required: false
