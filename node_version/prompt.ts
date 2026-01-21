@@ -3,7 +3,36 @@ export function buildPrompt(
   description: string | null,
   readme: string | null,
   detailed: boolean = false,
+  quick: boolean = false,
 ): string {
+  // QUICK MODE: one sentence definition only
+  if (quick) {
+    const readmeSnippet = (readme || "").slice(0, 2000);
+
+    return `
+You are a senior software engineer.
+
+Write a ONE-SENTENCE plain-English definition of what this GitHub repository is.
+
+Repository:
+- Name: ${repoName}
+- Description: ${description || "No description provided"}
+
+README snippet:
+${readmeSnippet || "No README provided"}
+
+Rules:
+- Output MUST be exactly 1 sentence.
+- Plain English.
+- No markdown.
+- No quotes.
+- No bullet points.
+- No extra text.
+- Do not add features not stated in the description/README.
+`.trim();
+  }
+
+  // NORMAL / DETAILED MODE (unchanged)
   let prompt = `
 You are a senior software engineer.
 
