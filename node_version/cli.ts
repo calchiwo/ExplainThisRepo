@@ -15,6 +15,7 @@ function usage(): void {
   console.log("usage:");
   console.log("  explainthisrepo owner/repo");
   console.log("  explainthisrepo owner/repo --detailed");
+  console.log("  explainthisrepo owner/repo --quick");
   console.log("  explainthisrepo --doctor");
   console.log("  explainthisrepo --version");
 }
@@ -109,13 +110,19 @@ async function main(): Promise<void> {
   }
 
   let detailed = false;
+  let quick = false;
 
+  // Accept:
+  // - explainthisrepo owner/repo
+  // - explainthisrepo owner/repo --detailed
+  // - explainthisrepo owner/repo --quick
   if (args.length === 2) {
-    if (args[1] !== "--detailed") {
+    if (args[1] === "--detailed") detailed = true;
+    else if (args[1] === "--quick") quick = true;
+    else {
       usage();
       process.exit(1);
     }
-    detailed = true;
   } else if (args.length !== 1) {
     usage();
     process.exit(1);
@@ -144,11 +151,19 @@ async function main(): Promise<void> {
       repoData.full_name,
       repoData.description,
       readme,
-      detailed
+      detailed,
+      quick
     );
 
     console.log("Generating explanation...");
     const output = await generateExplanation(prompt);
+
+    // QUICK MODE: print only, no file write
+    if (quick) {
+      console.log("Quick summary 🎉");
+      console.log(output.trim());
+      return;
+    }
 
     console.log("Writing EXPLAIN.md...");
     writeOutput(output);

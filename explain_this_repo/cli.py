@@ -76,6 +76,7 @@ def usage() -> None:
     print("usage:")
     print("  explainthisrepo owner/repo")
     print("  explainthisrepo owner/repo --detailed")
+    print("  explainthisrepo owner/repo --quick")
     print("  explainthisrepo --doctor")
     print("  explainthisrepo --version")
     print("  python -m explain_this_repo owner/repo")
@@ -96,12 +97,16 @@ def main():
         return
 
     detailed = False
+    quick = False
 
     if len(args) == 2:
-        if args[1] != "--detailed":
+        if args[1] == "--detailed":
+            detailed = True
+        elif args[1] == "--quick":
+            quick = True
+        else:
             usage()
             raise SystemExit(1)
-        detailed = True
     elif len(args) != 1:
         usage()
         raise SystemExit(1)
@@ -125,6 +130,47 @@ def main():
     except Exception as e:
         print(f"error: {e}")
         raise SystemExit(1)
+
+    if quick:
+        readme_snippet = (readme or "No README provided")[:2000]
+
+        prompt = f"""
+You are a senior software engineer.
+
+Write a ONE-SENTENCE plain-English definition of what this GitHub repository is.
+
+Repository:
+- Name: {repo_data.get("full_name")}
+- Description: {repo_data.get("description") or "No description provided"}
+
+README snippet:
+{readme_snippet}
+
+Rules:
+- Output MUST be exactly 1 sentence.
+- Plain English.
+- No markdown.
+- No quotes.
+- No bullet points.
+- No extra text.
+- Do not add features not stated in the description/README.
+""".strip()
+
+        print("Generating explanation...")
+
+        try:
+            output = generate_explanation(prompt)
+        except Exception as e:
+            print("Failed to generate explanation.")
+            print(f"error: {e}")
+            print("\nfix:")
+            print("- Ensure GEMINI_API_KEY is set")
+            print("- Or run: explainthisrepo --doctor")
+            raise SystemExit(1)
+
+        print("Quick summary 🎉")
+        print(output.strip())
+        return
 
     prompt = build_prompt(
         repo_name=repo_data.get("full_name"),
