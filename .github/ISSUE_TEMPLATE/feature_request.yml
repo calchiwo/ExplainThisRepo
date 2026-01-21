@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest an improvement
+title: "feat: <short summary>"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Keep it simple and concrete.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      placeholder: "What problem are you facing?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      placeholder: "What should ExplainThisRepo do?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      placeholder: "Any other approaches you considered?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra context
+      placeholder: "Screenshots, examples, links."
+    validations:
+      required: false
