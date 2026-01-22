@@ -4,6 +4,8 @@ export function buildPrompt(
   readme: string | null,
   detailed: boolean = false,
   quick: boolean = false,
+  treeText: string | null = null,
+  filesText: string | null = null
 ): string {
   // QUICK MODE: one sentence definition only
   if (quick) {
@@ -45,6 +47,12 @@ Repository:
 README content:
 ${readme || "No README provided"}
 
+Repository structure:
+${treeText || "No tree rovided"}
+
+Key files (snippets):
+${filesText || "No code files provided"}
+
 Instructions:
 - Explain what this project does.
 - Say who it is for.
@@ -55,7 +63,6 @@ Instructions:
 - Be concise and practical.
 - Use clear markdown headings.
 `.trim();
-
   if (detailed) {
     prompt += `
 

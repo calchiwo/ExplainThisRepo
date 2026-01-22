@@ -116,3 +116,35 @@ export async function fetchReadme(
     throw err;
   }
 }
+export async function fetchTree(owner: string, repo: string): Promise<any[]> {
+  return requestWithRetry(async () => {
+    const repoRes = await github.get(`/repos/${owner}/${repo}`);
+    const defaultBranch = repoRes.data?.default_branch;
+
+    const res = await github.get(`/repos/${owner}/${repo}/git/trees/${defaultBranch}`, {
+      params: { recursive: 1 },
+    });
+
+    return (res.data?.tree || []).map((item: any) => ({
+      path: item.path,
+      type: item.type,
+      size: item.size,
+    }));
+  });
+}
+
+export async function fetchFile(
+  owner: string,
+  repo: string,
+  filePath: string
+): Promise<string> {
+  return requestWithRetry(async () => {
+    const res = await github.get(`/repos/${owner}/${repo}/contents/${filePath}`, {
+      headers: {
+        ...getGithubHeaders(),
+        Accept: "application/vnd.github.v3.raw",
+      },
+    });
+    return res.data as string;
+  });
+}

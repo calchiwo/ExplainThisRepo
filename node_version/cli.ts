@@ -10,6 +10,7 @@ import { fetchRepo, fetchReadme } from "./github.js";
 import { buildPrompt } from "./prompt.js";
 import { generateExplanation } from "./generate.js";
 import { writeOutput } from "./writer.js";
+import { readRepoSignalFiles } from "./repo_reader.js";
 
 function usage(): void {
   console.log("usage:");
@@ -146,13 +147,16 @@ async function main(): Promise<void> {
   try {
     const repoData = await fetchRepo(owner, repo);
     const readme = await fetchReadme(owner, repo);
+    const readResult = await readRepoSignalFiles(owner, repo);
 
     const prompt = buildPrompt(
       repoData.full_name,
       repoData.description,
       readme,
       detailed,
-      quick
+      quick,
+      readResult.treeText,
+      readResult.filesText
     );
 
     console.log("Generating explanation...");
