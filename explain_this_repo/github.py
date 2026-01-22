@@ -206,3 +206,34 @@ def fetch_readme(owner: str, repo: str) -> str | None:
                 return raw
 
     return None
+def fetch_tree(owner: str, repo: str) -> list[dict]:
+    """
+    Uses Git Trees API to fetch full file tree.
+    """
+    session = _make_session()
+    # get default branch first
+    repo_meta = fetch_repo(owner, repo)
+    branch = repo_meta.get("default_branch") or "main"
+
+    url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
+    data = _request_json(session, url)
+
+    tree = data.get("tree", [])
+    if not isinstance(tree, list):
+        return []
+    return tree
+
+
+def fetch_file(owner: str, repo: str, file_path: str) -> str | None:
+    """
+    Fetch raw file content for a given path.
+    """
+    session = _make_session()
+    url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/contents/{file_path}"
+    return _request_text(
+        session,
+        url,
+        accept="application/vnd.github.v3.raw",
+        timeout=10,
+        retries=2,
+    )

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "explainthisrepo"
-version = "0.1.7"
+version = "0.1.8"
 description = "ExplainThisRepo is a CLI developer tool to quickly explain GitHub repository in plain English"
 readme = "README.md"
 requires-python = ">=3.9"

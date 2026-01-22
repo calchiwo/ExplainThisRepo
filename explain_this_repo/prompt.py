@@ -3,6 +3,8 @@ def build_prompt(
     description: str | None,
     readme: str | None,
     detailed: bool = False,
+    tree_text: str | None = None,
+    files_text: str | None = None,
 ) -> str:
     prompt = f"""
 You are a senior software engineer.
@@ -15,6 +17,12 @@ Repository:
 
 README content:
 {readme or "No README provided"}
+
+Repo structure:
+{tree_text or "No file tree provided"}
+
+Key code files:
+{files_text or "No code files provided"}
 
 Instructions:
 - Explain what this project does.

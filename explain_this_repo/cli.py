@@ -8,6 +8,7 @@ from explain_this_repo.github import fetch_repo, fetch_readme
 from explain_this_repo.prompt import build_prompt, build_quick_prompt
 from explain_this_repo.generate import generate_explanation
 from explain_this_repo.writer import write_output
+from explain_this_repo.repo_reader import read_repo_signal_files
 
 
 def _pkg_version(name: str) -> str:
@@ -154,11 +155,19 @@ def main():
         print(output.strip())
         return
 
+    # NORMAL/DETAILED path: repo reader (safe)
+    try:
+        read_result = read_repo_signal_files(owner, repo)
+    except Exception:
+        read_result = None
+
     prompt = build_prompt(
         repo_name=repo_data.get("full_name"),
         description=repo_data.get("description"),
         readme=readme,
         detailed=detailed,
+        tree_text=read_result.tree_text if read_result else None,
+        files_text=read_result.files_text if read_result else None,
     )
 
     print("Generating explanation...")
