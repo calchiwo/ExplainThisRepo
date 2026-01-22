@@ -47,3 +47,33 @@ Output format:
 """
 
     return prompt.strip()
+
+def build_quick_prompt(
+    repo_name: str,
+    description: str | None,
+    readme: str | None,
+) -> str:
+    readme_snippet = (readme or "No README provided")[:2000]
+
+    prompt = f"""
+You are a senior software engineer.
+
+Write a ONE-SENTENCE plain-English definition of what this GitHub repository is.
+
+Repository:
+- Name: {repo_name}
+- Description: {description or "No description provided"}
+
+README snippet:
+{readme_snippet}
+
+Rules:
+- Output MUST be exactly 1 sentence.
+- Plain English.
+- No markdown.
+- No quotes.
+- No bullet points.
+- No extra text.
+- Do not add features not stated in the description/README.
+"""
+    return prompt.strip()

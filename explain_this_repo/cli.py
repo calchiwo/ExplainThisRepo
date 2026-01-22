@@ -5,7 +5,7 @@ import urllib.request
 from importlib.metadata import version, PackageNotFoundError
 
 from explain_this_repo.github import fetch_repo, fetch_readme
-from explain_this_repo.prompt import build_prompt
+from explain_this_repo.prompt import build_prompt, build_quick_prompt
 from explain_this_repo.generate import generate_explanation
 from explain_this_repo.writer import write_output
 
@@ -132,29 +132,11 @@ def main():
         raise SystemExit(1)
 
     if quick:
-        readme_snippet = (readme or "No README provided")[:2000]
-
-        prompt = f"""
-You are a senior software engineer.
-
-Write a ONE-SENTENCE plain-English definition of what this GitHub repository is.
-
-Repository:
-- Name: {repo_data.get("full_name")}
-- Description: {repo_data.get("description") or "No description provided"}
-
-README snippet:
-{readme_snippet}
-
-Rules:
-- Output MUST be exactly 1 sentence.
-- Plain English.
-- No markdown.
-- No quotes.
-- No bullet points.
-- No extra text.
-- Do not add features not stated in the description/README.
-""".strip()
+        prompt = build_quick_prompt(
+            repo_name=repo_data.get("full_name"),
+            description=repo_data.get("description"),
+            readme=readme,
+        )
 
         print("Generating explanation...")
 
