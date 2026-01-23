@@ -5,7 +5,7 @@ import urllib.request
 from importlib.metadata import version, PackageNotFoundError
 
 from explain_this_repo.github import fetch_repo, fetch_readme
-from explain_this_repo.prompt import build_prompt, build_quick_prompt
+from explain_this_repo.prompt import build_prompt, build_quick_prompt, build_simple_prompt
 from explain_this_repo.generate import generate_explanation
 from explain_this_repo.writer import write_output
 from explain_this_repo.repo_reader import read_repo_signal_files
@@ -78,6 +78,7 @@ def usage() -> None:
     print("  explainthisrepo owner/repo")
     print("  explainthisrepo owner/repo --detailed")
     print("  explainthisrepo owner/repo --quick")
+    print("  explainthisrepo owner/repo --simple")
     print("  explainthisrepo --doctor")
     print("  explainthisrepo --version")
     print("  python -m explain_this_repo owner/repo")
@@ -99,16 +100,24 @@ def main():
 
     detailed = False
     quick = False
+    simple = False
 
     if len(args) == 2:
         if args[1] == "--detailed":
             detailed = True
         elif args[1] == "--quick":
             quick = True
+        elif args[1] == "--simple":
+            simple = True
         else:
             usage()
             raise SystemExit(1)
     elif len(args) != 1:
+        usage()
+        raise SystemExit(1)
+
+    # mutually exclusive flags
+    if (quick and simple) or (detailed and simple) or (detailed and quick):
         usage()
         raise SystemExit(1)
 
@@ -132,6 +141,7 @@ def main():
         print(f"error: {e}")
         raise SystemExit(1)
 
+    # QUICK MODE
     if quick:
         prompt = build_quick_prompt(
             repo_name=repo_data.get("full_name"),
@@ -182,6 +192,26 @@ def main():
         print("- Or run: explainthisrepo --doctor")
         raise SystemExit(1)
 
+    # SIMPLE MODE: summarize the long output, no file write
+    if simple:
+        print("Summarizing...")
+        simple_prompt = build_simple_prompt(output)
+
+        try:
+            simple_output = generate_explanation(simple_prompt)
+        except Exception as e:
+            print("Failed to generate explanation.")
+            print(f"error: {e}")
+            print("\nfix:")
+            print("- Ensure GEMINI_API_KEY is set")
+            print("- Or run: explainthisrepo --doctor")
+            raise SystemExit(1)
+
+        print("Simple summary 🎉")
+        print(simple_output.strip())
+        return
+
+    # NORMAL / DETAILED: write EXPLAIN.md
     print("Writing EXPLAIN.md...")
     write_output(output)
 
