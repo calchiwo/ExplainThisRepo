@@ -7,7 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { fetchRepo, fetchReadme } from "./github.js";
-import { buildPrompt } from "./prompt.js";
+import { buildPrompt, buildSimplePrompt } from "./prompt.js";
 import { generateExplanation } from "./generate.js";
 import { writeOutput } from "./writer.js";
 import { readRepoSignalFiles } from "./repo_reader.js";
@@ -17,6 +17,7 @@ function usage(): void {
   console.log("  explainthisrepo owner/repo");
   console.log("  explainthisrepo owner/repo --detailed");
   console.log("  explainthisrepo owner/repo --quick");
+  console.log("  explainthisrepo owner/repo --simple");
   console.log("  explainthisrepo --doctor");
   console.log("  explainthisrepo --version");
 }
@@ -112,19 +113,28 @@ async function main(): Promise<void> {
 
   let detailed = false;
   let quick = false;
+  let simple = false;
 
   // Accept:
   // - explainthisrepo owner/repo
   // - explainthisrepo owner/repo --detailed
   // - explainthisrepo owner/repo --quick
+  // - explainthisrepo owner/repo --simple
   if (args.length === 2) {
     if (args[1] === "--detailed") detailed = true;
     else if (args[1] === "--quick") quick = true;
+    else if (args[1] === "--simple") simple = true;
     else {
       usage();
       process.exit(1);
     }
   } else if (args.length !== 1) {
+    usage();
+    process.exit(1);
+  }
+
+  // mutually exclusive flags
+  if ((quick && simple) || (detailed && simple) || (detailed && quick)) {
     usage();
     process.exit(1);
   }
@@ -169,6 +179,18 @@ async function main(): Promise<void> {
       return;
     }
 
+    // SIMPLE MODE: generate long internally then summarize, no file write
+    if (simple) {
+      console.log("Summarizing...");
+      const simplePrompt = buildSimplePrompt(output);
+      const simpleOutput = await generateExplanation(simplePrompt);
+
+      console.log("Simple summary 🎉");
+      console.log(simpleOutput.trim());
+      return;
+    }
+
+    // NORMAL / DETAILED: write EXPLAIN.md
     console.log("Writing EXPLAIN.md...");
     writeOutput(output);
 
