@@ -33,7 +33,7 @@ Instructions:
 - Avoid hype or marketing language.
 - Be concise and practical.
 - Use clear markdown headings.
-"""
+""".strip()
 
     if detailed:
         prompt += """
@@ -42,7 +42,7 @@ Additional instructions:
 - Explain the high-level architecture.
 - Describe the folder structure.
 - Mention important files and their roles.
-"""
+""".rstrip()
 
     prompt += """
 
@@ -52,9 +52,10 @@ Output format:
 # Who it is for
 # How to run or use it
 # Notes or limitations
-"""
+""".rstrip()
 
     return prompt.strip()
+
 
 def build_quick_prompt(
     repo_name: str,
@@ -85,3 +86,33 @@ Rules:
 - Do not add features not stated in the description/README.
 """
     return prompt.strip()
+
+
+def build_simple_prompt(long_explanation: str) -> str:
+    return f"""
+You are a senior software engineer.
+
+Rewrite the long repository explanation below into a SIMPLE version in the exact style specified.
+
+Input explanation:
+{long_explanation}
+
+Output style rules:
+- Plain English.
+- No markdown.
+- Do NOT use headings like "Overview", "What this project does", etc.
+- Start with exactly this line:
+Key points from the repo:
+- Then output 4 to 7 bullets only.
+- Each bullet MUST start with: ⬤
+- Each bullet title should be 1–3 words only (example: "Purpose", "Stack", "Entrypoints", "How it works", "Usage", "Structure").
+- Each bullet body should be 1–2 lines max.
+- If the input contains architecture/pipeline steps, capture them naturally.
+- If the input does NOT contain architecture/pipeline steps, do NOT invent them.
+- Optional: end with one extra line starting with:
+Also interesting:
+- Do NOT add features not present in the input.
+- No quotes.
+
+Make it feel like a human developer explaining to another developer in simple terms.
+""".strip()
