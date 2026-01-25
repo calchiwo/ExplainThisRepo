@@ -129,7 +129,7 @@ explainthisrepo --doctor
 
 ## 🔑 Configuration
 
-ExplainThisRepo uses Gemini.
+ExplainThisRepo uses Gemini 2.5 Flash Lite model for code analysis.
 
 Set your API key as an environment variable.
 
