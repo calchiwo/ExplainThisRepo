@@ -102,6 +102,13 @@ explainthisrepo owner/repo --detailed
 
 ---
 
+### Simple mode
+
+Prints only the simple output (no EXPLAIN.md)
+```bash
+explainthisrepo owner/repo --simple
+```
+
 ### Version
 
 Print the installed version:
