@@ -39,21 +39,21 @@ This tool solves the problem of understanding unfamiliar codebases. Instead of m
 
 ## Option 1: Run with npm (recommended for most devs)
 
-No Python setup required. Runs anywhere Node runs.
-
-```bash
-npx explainthisrepo owner/repo
-```
-
-If you want it installed globally:
+Install globally and use forever:
 ```bash
 npm install -g explainthisrepo
 explainthisrepo owner/repo
 ```
 
-Requirements: Python 3.9+
+Or
+
+```bash
+npx explainthisrepo owner/repo
+```
 
 ## Option 2: You can install via pip (recommended):
+
+Requirements: Python 3.9+
 
 ```bash
 pip install explainthisrepo
