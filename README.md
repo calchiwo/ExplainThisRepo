@@ -57,11 +57,13 @@ Requirements: Python 3.9+
 
 ```bash
 pip install explainthisrepo
+explainthisrepo owner/repo
 ```
 
 ## Option 3: Install with pipx
 ```bash
 pipx install explainthisrepo
+explainthisrepo owner/repo
 ```
 
 ---
@@ -123,12 +125,6 @@ explainthisrepo --version
 Check environment + connectivity (useful for debugging):
 ```bash
 explainthisrepo --doctor
-```
-## ⚙️ Quickstart
-
-```bash
-pip install explainthisrepo
-explainthisrepo owner/repo
 ```
 
 ## 🔑 Configuration
