@@ -1,29 +1,20 @@
+# =========================
 # Python
+# =========================
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-.env
-.next
-.venv
+*.so
+*.dylib
+*.dll
+.python-version
+
+# Virtual environments
+.venv/
 venv/
-node_modules/
-
-# Packaging / build
-dist/
-build/
-*.egg-info/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Editor
-.vscode/
-.idea/
-
-# Logs
-*.log
+env/
+ENV/
 
 # Python tooling caches
 .mypy_cache/
@@ -34,29 +25,130 @@ Thumbs.db
 .coverage
 coverage/
 htmlcov/
-
-# Python builds (extra safety)
-*.whl
 pip-wheel-metadata/
 
-# Node / TS tooling
+# Python builds
+dist/
+build/
+*.egg-info/
+*.whl
+
+
+# =========================
+# Node / JavaScript / TypeScript
+# =========================
+node_modules/
+.pnpm-store/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+*.log
+
+# TypeScript
 *.tsbuildinfo
 
-# Vercel / Next / Turbopack
+# Bundlers and caches
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.nyc_output/
+coverage-final.json
+coverage.xml
+
+
+# =========================
+# Next.js / Vercel / Turbopack
+# =========================
+.next/
 .vercel/
 .turbo/
 out/
 
-# Env files (extra safety)
+
+# =========================
+# Environment files
+# =========================
+.env
 .env.*
 !.env.example
 
-# IDE extras
-*.iml
 
-# System junk
+# =========================
+# CLI / Binaries
+# =========================
+bin/
+*.exe
+*.out
+*.app
+
+
+# =========================
+# Docker
+# =========================
+docker-data/
+
+
+# =========================
+# Repo analysis cache (future proof)
+# =========================
+.cache_repo/
+repo_cache/
+
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+temp/
+*.tmp
+
+
+# =========================
+# Editors / IDE
+# =========================
+.vscode/
+.idea/
+*.iml
+.history/
 *.swp
+
+
+# =========================
+# OS junk
+# =========================
+.DS_Store
+Thumbs.db
+
+# Runtime / process artifacts
+pids/
+*.pid
+*.pid.lock
+report.*.json
+.node_repl_history
+
+# Extra coverage formats
+*.lcov
+
+# Package archives
+*.tgz
+
+# CI artifacts
+artifacts/
+
+# Local database files (sometimes used in tooling)
+*.sqlite
+*.db
+
+# macOS debug
+*.dSYM
