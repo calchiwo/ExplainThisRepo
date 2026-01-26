@@ -111,6 +111,8 @@ Prints only the simple output (no EXPLAIN.md)
 explainthisrepo owner/repo --simple
 ```
 
+![Simple Mode Output](assets/simple-command-output.png)
+
 ### Version
 
 Print the installed version:
