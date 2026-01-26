@@ -148,3 +148,14 @@ export async function fetchFile(
     return res.data as string;
   });
 }
+export type RepoLanguageMap = Record<string, number>;
+
+export async function fetchLanguages(
+  owner: string,
+  repo: string
+): Promise<RepoLanguageMap> {
+  return requestWithRetry(async () => {
+    const res = await github.get(`/repos/${owner}/${repo}/languages`);
+    return res.data as RepoLanguageMap;
+  });
+}
