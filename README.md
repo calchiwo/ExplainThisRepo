@@ -93,6 +93,7 @@ Example:
 explainthisrepo facebook/react --quick
 ```
 ![Quick Mode Output](assets/quick-command-output.png)
+
 ---
 
 ### Detailed mode
@@ -101,6 +102,8 @@ Generate a more detailed explanation (includes architecture / folder structure):
 ```bash
 explainthisrepo owner/repo --detailed
 ```
+
+![Detailed Mode Output](assets/detailed-command-output.png)
 
 ---
 
