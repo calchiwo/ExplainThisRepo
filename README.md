@@ -92,7 +92,7 @@ Example:
 ```bash
 explainthisrepo facebook/react --quick
 ```
-
+![Quick Mode Output](assets/quick-command-output.png)
 ---
 
 ### Detailed mode
