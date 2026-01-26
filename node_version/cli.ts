@@ -12,6 +12,10 @@ import { generateExplanation } from "./generate.js";
 import { writeOutput } from "./writer.js";
 import { readRepoSignalFiles } from "./repo_reader.js";
 
+import { fetchLanguages } from "./github.js";
+import { detectStack } from "./stack-detector.js";
+import { printStack } from "./stack_printer.js";
+
 function usage(): void {
   console.log("usage:");
   console.log("  explainthisrepo owner/repo");
@@ -114,6 +118,7 @@ async function main(): Promise<void> {
   let detailed = false;
   let quick = false;
   let simple = false;
+  let stack = false;
 
   // Accept:
   // - explainthisrepo owner/repo
@@ -124,6 +129,7 @@ async function main(): Promise<void> {
     if (args[1] === "--detailed") detailed = true;
     else if (args[1] === "--quick") quick = true;
     else if (args[1] === "--simple") simple = true;
+    else if (args[1] === "--stack") stack = true;
     else {
       usage();
       process.exit(1);
@@ -134,10 +140,15 @@ async function main(): Promise<void> {
   }
 
   // mutually exclusive flags
-  if ((quick && simple) || (detailed && simple) || (detailed && quick)) {
-    usage();
-    process.exit(1);
-  }
+  if (
+  (quick && simple) ||
+  (detailed && simple) ||
+  (detailed && quick) ||
+  (stack && (quick || simple || detailed))
+) {
+  usage();
+  process.exit(1);
+}
 
   const target = args[0];
 
@@ -153,6 +164,19 @@ async function main(): Promise<void> {
   }
 
   console.log(`Fetching ${owner}/${repo}...`);
+  if (stack) {
+  const languages = await fetchLanguages(owner, repo);
+  const read = await readRepoSignalFiles(owner, repo);
+
+  const report = detectStack({
+    languages,
+    tree: read.tree,
+    keyFiles: read.keyFiles,
+  });
+
+  printStack(report, owner, repo);
+  return;
+}
 
   try {
     const repoData = await fetchRepo(owner, repo);

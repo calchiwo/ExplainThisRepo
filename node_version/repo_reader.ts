@@ -7,9 +7,11 @@ type TreeItem = {
 };
 
 export type RepoReadResult = {
+  tree: TreeItem[];
   treeText: string;
   filesText: string;
   selectedFiles: string[];
+  keyFiles: Record<string, string>;
 };
 
 const MAX_FILES = 20;
@@ -144,10 +146,38 @@ export async function readRepoSignalFiles(
       // ignore file fetch failures
     }
   }
+const keyFiles: Record<string, string> = {};
+
+const STACK_KEY_FILES = [
+  "package.json",
+  "pyproject.toml",
+  "requirements.txt",
+  "go.mod",
+  "Cargo.toml",
+  "composer.json",
+  "pom.xml",
+  "build.gradle",
+  "Dockerfile",
+  "docker-compose.yml",
+  "vercel.json",
+  "netlify.toml",
+];
+
+for (const path of STACK_KEY_FILES) {
+  const match = tree.find(t => t.path.toLowerCase() === path.toLowerCase());
+  if (!match) continue;
+
+  try {
+    const content = await fetchFile(owner, repo, path);
+    keyFiles[path] = content.slice(0, 20000);
+  } catch {}
+}  
 
   return {
+    tree,
     treeText,
     filesText: fileBlocks.join("\n"),
     selectedFiles: selected,
+    keyFiles,
   };
 }
