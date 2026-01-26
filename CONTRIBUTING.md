@@ -52,6 +52,11 @@ node dist/cli.js facebook/react --detailed
 
 ## Python version (PyPI)
 
+### Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
 ### Install (editable)
 ```bash
 pip install -e .
