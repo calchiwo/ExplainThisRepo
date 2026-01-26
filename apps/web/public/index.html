@@ -14,7 +14,6 @@
 
   <link rel="canonical" href="https://explainthisrepo.com/" />
 
-  <!-- LINK PREVIEW (Open Graph + Twitter) -->
   <meta property="og:title" content="ExplainThisRepo: Explain GitHub repos in plain English and generate EXPLAIN.md to quickly understand them" />
   <meta property="og:description" content="ExplainThisRepo is a CLI developer tool that can be used to explain and understand github repositories quickly in plain English. Install with 'pip install explainthisrepo' or 'npm install -g explainthisrepo' and use 'explainthisrepo owner/repo' to generate an EXPLAIN.md summary for any repo." />
   <meta property="og:type" content="website" />
@@ -39,14 +38,8 @@
       --btn-hover: #333;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
 
     body {
       min-height: 100vh;
@@ -57,29 +50,36 @@
       flex-direction: column;
     }
 
-    a {
-      color: var(--fg);
-      text-decoration: none;
-    }
+    a { color: var(--fg); text-decoration: none; }
 
-    /* top bar */
     .top {
       display: flex;
       justify-content: flex-end;
+      align-items: center;
       padding: 16px 20px;
-      gap: 2rem;
+      gap: 1rem;
     }
 
-    .github-link {
-      font-size: 0.9rem;
-      opacity: 0.85;
+    .github-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(4px);
+      transition: all 0.15s ease;
     }
 
-    .github-link:hover {
-      opacity: 1;
+    .github-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.25);
+      transform: translateY(-1px);
     }
 
-    /* main */
     main {
       flex: 1;
       display: flex;
@@ -94,16 +94,13 @@
       text-align: center;
     }
 
-    /* NEW: downloads badge row */
     .badges {
       display: flex;
       justify-content: center;
       margin-bottom: 1.25rem;
     }
 
-    .badges img {
-      height: 28px;
-    }
+    .badges img { height: 28px; }
 
     h1 {
       font-size: clamp(2.2rem, 6vw, 4rem);
@@ -118,6 +115,13 @@
       margin: 0 0 2rem;
     }
 
+    .install-label {
+      text-align: left;
+      color: var(--muted);
+      margin: 0 0 0.5rem 0.25rem;
+      font-size: 0.9rem;
+    }
+
     .command-box {
       position: relative;
       background: var(--box);
@@ -129,7 +133,7 @@
       text-align: left;
       max-width: 100%;
       overflow-x: auto;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .command-box code {
@@ -150,31 +154,35 @@
       font-size: 0.75rem;
     }
 
-    .copy-btn:hover {
-      background: var(--btn-hover);
-    }
+    .copy-btn:hover { background: var(--btn-hover); }
 
-    .copy-btn:disabled {
-      opacity: 0.7;
-      cursor: default;
-    }
-
-    /* inline footer */
+    /* SHADCN FOOTER */
     .inline-footer {
-      font-size: 0.85rem;
+      margin-top: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(4px);
       color: var(--muted);
-      margin-top: 0.5rem;
     }
 
-    .inline-footer a {
+    .footer-link {
+      color: var(--fg);
       font-weight: 500;
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+      transition: background 0.15s ease;
     }
 
-    .inline-footer a:hover {
-      text-decoration: underline;
+    .footer-link:hover {
+      background: rgba(255,255,255,0.08);
     }
 
-    /* hidden SEO text */
     .seo {
       position: absolute;
       left: -9999px;
@@ -188,51 +196,46 @@
 <body>
 
   <div class="top">
-      <a target="_blank" href="/docs/">Docs</a>
-    <a
-      class="github-link"
-      href="https://github.com/calchiwo/ExplainThisRepo"
-      target="_blank"
-      rel="noopener"
-    >
-      ⭐star this project on github
+    <a target="_blank" href="/docs/">Docs</a>
+
+    <a class="github-btn" href="https://github.com/calchiwo/ExplainThisRepo" target="_blank" rel="noopener">
+      <svg height="18" viewBox="0 0 16 16" width="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span>Star on GitHub</span>
     </a>
-    
   </div>
 
   <main>
     <div class="container">
 
-      <!-- PyPI downloads badge -->
       <div class="badges">
-        <a
-          href="https://pepy.tech/projects/explainthisrepo"
-          target="_blank"
-          rel="noopener"
-        >
-          <img
-            alt="PyPI Downloads"
-            src="https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads"
-          />
+        <a href="https://pepy.tech/projects/explainthisrepo" target="_blank" rel="noopener">
+          <img alt="PyPI Downloads" src="https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads" />
         </a>
       </div>
 
       <h1>ExplainThisRepo </h1>
       <h2>An Open source developer CLI tool that explains GitHub repos quickly in plain English</h2>
 
+      <div class="install-label">Install using PyPi:</div>
       <div class="command-box">
-        <button class="copy-btn" id="copyBtn" onclick="copyCommand()">copy</button>
+        <button class="copy-btn" onclick="copyPip(this)">copy</button>
         <code>pip install explainthisrepo</code>
         <code>explainthisrepo owner/repo</code>
       </div>
 
-      <div class="inline-footer">
-        built by
-        <a href="https://x.com/calchiwo" target="_blank" rel="noopener">
-          Caleb Wodi
-        </a>
-        with ❤️ for the open source community
+      <div class="install-label">Or install using Node:</div>
+      <div class="command-box">
+        <button class="copy-btn" onclick="copyNpm(this)">copy</button>
+        <code>npm install -g explainthisrepo</code>
+        <code>explainthisrepo owner/repo</code>
       </div>
+
+      <div class="inline-footer">
+        <span>Built by</span>
+        <a class="footer-link" href="https://x.com/calchiwo" target="_blank" rel="noopener">Caleb Wodi</a>
+        <span>for the open source community</span>
+      </div>
+
     </div>
   </main>
 
@@ -241,20 +244,22 @@
   </div>
 
   <script>
-    function copyCommand() {
-      const text = `pip install explainthisrepo
-explainthisrepo owner/repo`;
-
+    function handleCopy(btn, text) {
       navigator.clipboard.writeText(text);
-
-      const btn = document.getElementById("copyBtn");
       btn.textContent = "copied";
       btn.disabled = true;
-
       setTimeout(() => {
         btn.textContent = "copy";
         btn.disabled = false;
       }, 1500);
+    }
+    function copyPip(btn) {
+      handleCopy(btn, `pip install explainthisrepo
+explainthisrepo owner/repo`);
+    }
+    function copyNpm(btn) {
+      handleCopy(btn, `npm install -g explainthisrepo
+explainthisrepo owner/repo`);
     }
   </script>
 
