@@ -17,11 +17,17 @@ import { detectStack } from "./stack-detector.js";
 import { printStack } from "./stack_printer.js";
 
 function usage(): void {
+  const version = getPkgVersion();
+
+  console.log(`ExplainThisRepo v${version}`);
+  console.log("Explain GitHub repositories in plain English.\n");
+
   console.log("usage:");
   console.log("  explainthisrepo owner/repo");
   console.log("  explainthisrepo owner/repo --detailed");
   console.log("  explainthisrepo owner/repo --quick");
   console.log("  explainthisrepo owner/repo --simple");
+  console.log("  explainthisrepo owner/repo --stack");
   console.log("  explainthisrepo --doctor");
   console.log("  explainthisrepo --version");
 }
@@ -125,6 +131,7 @@ async function main(): Promise<void> {
   // - explainthisrepo owner/repo --detailed
   // - explainthisrepo owner/repo --quick
   // - explainthisrepo owner/repo --simple
+  // - explainthisrepo owner/repo --stack
   if (args.length === 2) {
     if (args[1] === "--detailed") detailed = true;
     else if (args[1] === "--quick") quick = true;
