@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from explain_this_repo.github import fetch_tree, fetch_file
@@ -8,9 +8,10 @@ from explain_this_repo.github import fetch_tree, fetch_file
 
 @dataclass
 class ReadResult:
+    tree: list[dict]
     tree_text: str
     files_text: str
-
+    key_files: dict[str, str] = field(default_factory=dict)
 
 # Hard limits (keep it fast + cheap)
 MAX_FILES = 20
@@ -132,6 +133,7 @@ def _format_files_snippets(snips: list[tuple[str, str]]) -> str:
 
 
 def read_repo_signal_files(owner: str, repo: str) -> ReadResult:
+    key_files: dict[str, str] = {}
     tree = fetch_tree(owner, repo)
 
     tree_text = _render_tree(tree)
@@ -158,4 +160,9 @@ def read_repo_signal_files(owner: str, repo: str) -> ReadResult:
 
     files_text = _format_files_snippets(snippets)
 
-    return ReadResult(tree_text=tree_text, files_text=files_text)
+    return ReadResult(
+    tree=tree,
+    tree_text=tree_text,
+    files_text=files_text,
+    key_files=key_files,
+)
