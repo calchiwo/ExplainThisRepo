@@ -30,6 +30,7 @@ function usage(): void {
   console.log("  explainthisrepo owner/repo --stack");
   console.log("  explainthisrepo --doctor");
   console.log("  explainthisrepo --version");
+  console.log("  explainthisrepo --help");
 }
 
 function getPkgVersion(): string {
