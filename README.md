@@ -16,25 +16,25 @@ ExplainThisRepo is a CLI (Command Line Interface) tool that generates plain-Engl
 
 ## 🎯 Purpose
 
-This tool solves the problem of understanding unfamiliar codebases. Speeds up understanding unfamiliar codebases, developers can use this CLI to generate a clear, readable explanation of any GitHub repository.
+This tool solves the problem of understanding unfamiliar codebases. It speeds up understanding unfamiliar codebases, developers can use this CLI to generate a clear, readable explanation of any GitHub repository.
 
 ---
 
 ## ⚡ Key Features
 
 - Fetches public GitHub repositories automatically
-- Analyzes repository structure, and high-signal source files, not just README
+- Analyzes repository structure and high-signal source files, not just README
+- Uses real repository data (file tree, configs, entrypoints) to ground explanations
 - Extracts repo signals from key files (package.json, pyproject.toml, config files, entrypoints)
 - Builds a file tree summary to understand project architecture
 - Detects programming languages via the GitHub API
 - Generates clear explanations in plain English
 - Outputs an EXPLAIN.md file in your current directory (default mode)
-- Uses real repository data (file tree, configs, entrypoints) to ground explanations
 - Multi-mode command-line interface
 
 ## 🧭 Modes
 
-- default → Full repository explanation written to EXPLAIN.md
+- (no flag) → Full repository explanation written to EXPLAIN.md
 
 - --quick → One-sentence summary
 
