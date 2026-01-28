@@ -31,6 +31,22 @@ This tool solves the problem of understanding unfamiliar codebases. Instead of m
 - Outputs an EXPLAIN.md file in your current directory (default mode)
 - Multi-mode command-line interface
 
+## 🧭 Modes
+
+- default → Full repository explanation written to EXPLAIN.md
+
+- --quick → One-sentence summary
+
+- --simple → Short, easy explanation
+
+- --detailed → Deeper explanation including structure and architecture
+
+- --stack → Tech stack breakdown from repo signals
+
+- --version → Show CLI version
+
+- --help → Show usage guide
+
 ---
 
 ## 📦 Installation
