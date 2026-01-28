@@ -36,8 +36,16 @@ This tool solves the problem of understanding unfamiliar codebases. Instead of m
 
 ## 📦 Installation
 
+## Option 1: install via pip (recommended):
 
-## Option 1: Run with npm (recommended for most devs)
+Requirements: Python 3.9+
+
+```bash
+pip install explainthisrepo
+explainthisrepo owner/repo
+```
+
+## Option 2: Install with npm (recommended for most devs)
 
 Install globally and use forever:
 ```bash
@@ -45,19 +53,10 @@ npm install -g explainthisrepo
 explainthisrepo owner/repo
 ```
 
-Or
+Alternatively,
 
 ```bash
 npx explainthisrepo owner/repo
-```
-
-## Option 2: You can install via pip (recommended):
-
-Requirements: Python 3.9+
-
-```bash
-pip install explainthisrepo
-explainthisrepo owner/repo
 ```
 
 ## Option 3: Install with pipx
