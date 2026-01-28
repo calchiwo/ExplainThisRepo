@@ -237,3 +237,9 @@ def fetch_file(owner: str, repo: str, file_path: str) -> str | None:
         timeout=10,
         retries=2,
     )
+
+def fetch_languages(owner: str, repo: str) -> dict:
+    url = f"https://api.github.com/repos/{owner}/{repo}/languages"
+    r = requests.get(url, headers={"User-Agent": "ExplainThisRepo"})
+    r.raise_for_status()
+    return r.json()

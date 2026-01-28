@@ -4,11 +4,13 @@ import platform
 import urllib.request
 from importlib.metadata import version, PackageNotFoundError
 
-from explain_this_repo.github import fetch_repo, fetch_readme
+from explain_this_repo.github import fetch_repo, fetch_readme, fetch_languages
 from explain_this_repo.prompt import build_prompt, build_quick_prompt, build_simple_prompt
 from explain_this_repo.generate import generate_explanation
 from explain_this_repo.writer import write_output
 from explain_this_repo.repo_reader import read_repo_signal_files
+from explain_this_repo.stack_detector import detect_stack
+from explain_this_repo.stack_printer import print_stack
 
 
 def _pkg_version(name: str) -> str:
@@ -79,6 +81,7 @@ def usage() -> None:
     print("  explainthisrepo owner/repo --detailed")
     print("  explainthisrepo owner/repo --quick")
     print("  explainthisrepo owner/repo --simple")
+    print("  explainthisrepo owner/repo --stack")
     print("  explainthisrepo --doctor")
     print("  explainthisrepo --version")
     print("  python -m explain_this_repo owner/repo")
@@ -101,6 +104,7 @@ def main():
     detailed = False
     quick = False
     simple = False
+    stack = False
 
     if len(args) == 2:
         if args[1] == "--detailed":
@@ -109,6 +113,8 @@ def main():
             quick = True
         elif args[1] == "--simple":
             simple = True
+        elif args[1] == "--stack":
+            stack = True
         else:
             usage()
             raise SystemExit(1)
@@ -117,9 +123,14 @@ def main():
         raise SystemExit(1)
 
     # mutually exclusive flags
-    if (quick and simple) or (detailed and simple) or (detailed and quick):
-        usage()
-        raise SystemExit(1)
+    if (
+       (quick and simple)
+       or (detailed and simple)
+       or (detailed and quick)
+       or (stack and (quick or simple or detailed))
+   ):
+       usage()
+       raise SystemExit(1)
 
     target = args[0]
 
@@ -133,6 +144,23 @@ def main():
         raise SystemExit(1)
 
     print(f"Fetching {owner}/{repo}...")
+
+    if stack:
+        try:
+            read_result = read_repo_signal_files(owner, repo)
+            languages = fetch_languages(owner, repo)
+        except Exception as e:
+            print(f"error: {e}")
+            raise SystemExit(1)
+
+        report = detect_stack(
+            languages=languages,
+            tree=read_result.tree,
+            key_files=read_result.key_files,
+        )
+
+        print_stack(report, owner, repo)
+        return
 
     try:
         repo_data = fetch_repo(owner, repo)
