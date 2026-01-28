@@ -45,6 +45,13 @@ pip install explainthisrepo
 explainthisrepo owner/repo
 ```
 
+Alternatively,
+
+```bash
+pipx install explainthisrepo
+explainthisrepo owner/repo
+```
+
 ## Option 2: Install with npm (recommended for most devs)
 
 Install globally and use forever:
@@ -57,12 +64,6 @@ Alternatively,
 
 ```bash
 npx explainthisrepo owner/repo
-```
-
-## Option 3: Install with pipx
-```bash
-pipx install explainthisrepo
-explainthisrepo owner/repo
 ```
 
 ---
