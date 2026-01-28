@@ -23,14 +23,13 @@ This tool solves the problem of understanding unfamiliar codebases. Instead of m
 ## ⚡ Key Features
 
 - Fetches public GitHub repositories automatically
-
-- Analyzes README and repository metadata to understand the project
-
+- Analyzes repository structure, and high-signal source files, not just README
+- Extracts repo signals from key files (package.json, pyproject.toml, config files, entrypoints)
+- Builds a file tree summary to understand project architecture
+- Detects programming languages via the GitHub API
 - Generates clear explanations in plain English
-
-- Outputs a EXPLAIN.md file in your current directory
-
-- Simple command-line interface for ease of use
+- Outputs an EXPLAIN.md file in your current directory (default mode)
+- Multi-mode command-line interface
 
 ---
 
