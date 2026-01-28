@@ -1,6 +1,6 @@
 # ExplainThisRepo
 
-ExplainThisRepo is a CLI (Command Line Interface) tool that automatically generates plain-English explanations of GitHub repositories. It's designed to help developers quickly understand what any public GitHub repository does by analyzing its contents and creating an `EXPLAIN.md` file.
+ExplainThisRepo is a CLI (Command Line Interface) tool that generates plain-English explanations of public GitHub repositories by analyzing repository structure, README content, and selected high-signal files. It's designed to help developers quickly understand what any public GitHub repository does by analyzing its contents and creating an `EXPLAIN.md` file.
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -16,7 +16,7 @@ ExplainThisRepo is a CLI (Command Line Interface) tool that automatically genera
 
 ## 🎯 Purpose
 
-This tool solves the problem of understanding unfamiliar codebases. Instead of manually reading through code and documentation, developers can use this CLI to generate a clear, readable explanation of any GitHub repository.
+This tool solves the problem of understanding unfamiliar codebases. Speeds up understanding unfamiliar codebases, developers can use this CLI to generate a clear, readable explanation of any GitHub repository.
 
 ---
 
@@ -29,6 +29,7 @@ This tool solves the problem of understanding unfamiliar codebases. Instead of m
 - Detects programming languages via the GitHub API
 - Generates clear explanations in plain English
 - Outputs an EXPLAIN.md file in your current directory (default mode)
+- Uses real repository data (file tree, configs, entrypoints) to ground explanations
 - Multi-mode command-line interface
 
 ## 🧭 Modes
@@ -67,7 +68,7 @@ pipx install explainthisrepo
 explainthisrepo owner/repo
 ```
 
-## Option 2: Install with npm (recommended for most devs)
+## Option 2: Install with npm
 
 Install globally and use forever:
 ```bash
@@ -159,7 +160,7 @@ explainthisrepo --doctor
 
 ## 🔑 Configuration
 
-ExplainThisRepo uses Gemini 2.5 Flash Lite model for code analysis.
+ExplainThisRepo uses Gemini models for code analysis.
 
 Set your API key as an environment variable.
 
