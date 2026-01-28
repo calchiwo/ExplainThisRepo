@@ -76,6 +76,11 @@ def run_doctor() -> int:
 
 
 def usage() -> None:
+    v = _pkg_version("explainthisrepo")
+    print(f"explainthisrepo version {v}")
+    print("Explain Github reositories in plain English\n")
+
+    print("explainthisrepo")
     print("usage:")
     print("  explainthisrepo owner/repo")
     print("  explainthisrepo owner/repo --detailed")
@@ -84,8 +89,7 @@ def usage() -> None:
     print("  explainthisrepo owner/repo --stack")
     print("  explainthisrepo --doctor")
     print("  explainthisrepo --version")
-    print("  python -m explain_this_repo owner/repo")
-
+    print("  explainthisrepo --help")
 
 def main():
     args = sys.argv[1:]
