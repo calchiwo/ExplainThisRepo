@@ -116,6 +116,16 @@ explainthisrepo owner/repo --simple
 
 ![Simple Mode Output](assets/simple-command-output.png)
 
+---
+
+### Stack detector
+
+Get a tech stack breakdown detected from repo signals. No AI explanation. Prints only.
+```bash
+explainthisrepo owner/repo --stack
+```
+![Stack detector Output](assets/stack-command-output.png)
+
 ### Version
 
 Print the installed version:
