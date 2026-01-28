@@ -16,7 +16,7 @@ ExplainThisRepo is a CLI (Command Line Interface) tool that generates plain-Engl
 
 ## 🎯 Purpose
 
-This tool solves the problem of understanding unfamiliar codebases. It speeds up understanding unfamiliar codebases, developers can use this CLI to generate a clear, readable explanation of any GitHub repository.
+This tool solves the problem of understanding unfamiliar codebases. It speeds up onboarding by turning repository structure and code signals into a clear, readable explanation of any public GitHub repository.
 
 ---
 
@@ -31,6 +31,8 @@ This tool solves the problem of understanding unfamiliar codebases. It speeds up
 - Generates clear explanations in plain English
 - Outputs an EXPLAIN.md file in your current directory (default mode)
 - Multi-mode command-line interface
+
+---
 
 ## 🧭 Modes
 
