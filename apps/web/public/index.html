@@ -157,12 +157,14 @@
 
     .copy-btn:hover { background: var(--btn-hover); }
 
-    /* SHADCN FOOTER */
+    /* SHADCN FOOTER - MOBILE FRIENDLY */
     .inline-footer {
+      display: flex;              /* keep items in a line */
+      flex-wrap: nowrap;          /* prevent wrapping */
+      justify-content: center;    /* center horizontally */
+      align-items: center;        /* vertical alignment */
+      gap: 0.25rem;               /* small gap between items */
       margin-top: 1rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
       padding: 0.4rem 0.9rem;
       font-size: 0.8rem;
       border-radius: 8px;
@@ -170,6 +172,9 @@
       background: rgba(255,255,255,0.04);
       backdrop-filter: blur(4px);
       color: var(--muted);
+      white-space: nowrap;        /* prevent line break */
+      overflow-x: auto;           /* allow horizontal scroll if too long */
+      text-align: center;         /* keep text centered in the container */
     }
 
     .footer-link {
@@ -227,9 +232,7 @@
 
       <div class="inline-footer">
         <span>Built by</span>
-        <a class="footer-link" href="https://x.com/calchiwo" target="_blank" rel="noopener noreferrer">
-          Caleb Wodi
-        </a>
+        <a class="footer-link" href="https://x.com/calchiwo" target="_blank" rel="noopener noreferrer">Caleb Wodi</a>
         <span>with ❤️ for the open source community</span>
       </div>
 
