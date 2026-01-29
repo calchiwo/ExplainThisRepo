@@ -13,6 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <link rel="canonical" href="https://explainthisrepo.com/" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
 
   <meta property="og:title" content="ExplainThisRepo: Explain GitHub repos in plain English and generate EXPLAIN.md to quickly understand them" />
   <meta property="og:description" content="ExplainThisRepo is a CLI developer tool that can be used to explain and understand github repositories quickly in plain English. Install with 'pip install explainthisrepo' or 'npm install -g explainthisrepo' and use 'explainthisrepo owner/repo' to generate an EXPLAIN.md summary for any repo." />
@@ -182,33 +183,24 @@
     .footer-link:hover {
       background: rgba(255,255,255,0.08);
     }
-
-    .seo {
-      position: absolute;
-      left: -9999px;
-      top: -9999px;
-      height: 1px;
-      width: 1px;
-      overflow: hidden;
-    }
   </style>
 </head>
 <body>
 
-  <div class="top">
+  <header class="top">
     <a href="/docs/" target="_blank" rel="noopener noreferrer">Docs</a>
-    <a class="github-btn" href="https://github.com/calchiwo/ExplainThisRepo" target="_blank" rel="noopener">
+    <a class="github-btn" href="https://github.com/calchiwo/ExplainThisRepo" target="_blank" rel="noopener noreferrer">
       <svg height="18" viewBox="0 0 16 16" width="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
       <span>Star on GitHub</span>
     </a>
-  </div>
+  </header>
 
   <main>
     <div class="container">
 
       <div class="badges">
-        <a href="https://pepy.tech/projects/explainthisrepo" target="_blank" rel="noopener">
-          <img alt="PyPI Downloads" src="https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads" />
+        <a href="https://pepy.tech/projects/explainthisrepo" target="_blank" rel="noopener noreferrer">
+          <img loading="lazy" alt="PyPI Downloads" src="https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads" />
         </a>
       </div>
 
@@ -226,29 +218,37 @@
 
       <div class="install-label">Or install using Node:</div>
       <div class="command-box">
-        <button class="copy-btn" onclick="copyNpm(this)">copy</button>
+        <button class="copy-btn" onclick="copyNpm(this)" aria-label="Copy npm install command">
+          copy
+        </button>
         <code>npm install -g explainthisrepo</code>
         <code>explainthisrepo owner/repo</code>
       </div>
 
       <div class="inline-footer">
-       <span>Built by</span>
-       <a class="footer-link" href="https://x.com/calchiwo" target="_blank" rel="noopener noreferrer">
-         Caleb Wodi
-       </a>
-       <span>with ❤️ for the open source community</span>
+        <span>Built by</span>
+        <a class="footer-link" href="https://x.com/calchiwo" target="_blank" rel="noopener noreferrer">
+          Caleb Wodi
+        </a>
+        <span>with ❤️ for the open source community</span>
       </div>
-      
+
     </div>
   </main>
 
-  <div class="seo">
-    ExplainThisRepo is a CLI developer tool that can be used to explain and understand GitHub repositories quickly in plain English. Install with 'pip install explainthisrepo' or 'npm install -g explainthisrepo' and use 'explainthisrepo owner/repo' to generate an EXPLAIN.md summary for any repo.
-  </div>
-
   <script>
     function handleCopy(btn, text) {
-      navigator.clipboard.writeText(text);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
       btn.textContent = "copied";
       btn.disabled = true;
       setTimeout(() => {
@@ -256,10 +256,12 @@
         btn.disabled = false;
       }, 1500);
     }
+
     function copyPip(btn) {
       handleCopy(btn, `pip install explainthisrepo
 explainthisrepo owner/repo`);
     }
+
     function copyNpm(btn) {
       handleCopy(btn, `npm install -g explainthisrepo
 explainthisrepo owner/repo`);
