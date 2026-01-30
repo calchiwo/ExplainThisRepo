@@ -11,7 +11,55 @@ from explain_this_repo.writer import write_output
 from explain_this_repo.repo_reader import read_repo_signal_files
 from explain_this_repo.stack_detector import detect_stack
 from explain_this_repo.stack_printer import print_stack
+from urllib.parse import urlparse
 
+
+def resolve_repo_target(target: str) -> tuple[str, str]:
+    target = target.strip()
+
+    # Fix common scheme typos
+    if target.startswith("https//"):
+        target = target.replace("https//", "https://", 1)
+    if target.startswith("http//"):
+        target = target.replace("http//", "http://", 1)
+
+    # Case 1: SSH clone URL
+    # git@github.com:owner/repo.git
+    if target.startswith("git@github.com:"):
+        path = target.replace("git@github.com:", "", 1)
+        if "/" not in path:
+            raise ValueError("Invalid GitHub SSH repository URL")
+        owner, repo = path.split("/", 1)
+        return owner, repo.removesuffix(".git")
+
+    # Case 2: github.com/owner/repo
+    if target.startswith("github.com/"):
+        target = "https://" + target
+
+    # Case 3: Full HTTP(S) GitHub URL
+    if target.startswith("http://") or target.startswith("https://"):
+        parsed = urlparse(target)
+
+        if parsed.netloc.lower() not in {"github.com", "www.github.com"}:
+            raise ValueError("Only GitHub repository URLs are supported")
+
+        clean_path = parsed.path.split("?")[0].split("#")[0]
+        parts = [p for p in clean_path.split("/") if p]
+
+        if len(parts) < 2:
+            raise ValueError("URL must point to a repository, not a GitHub page")
+
+        owner = parts[0]
+        repo = parts[1].removesuffix(".git")
+        return owner, repo
+
+    # Case 4: owner/repo
+    if target.count("/") == 1:
+        owner, repo = target.split("/")
+        if owner and repo:
+            return owner, repo
+
+    raise ValueError("Invalid format. Use owner/repo or a GitHub repo URL")
 
 def _pkg_version(name: str) -> str:
     try:
@@ -78,11 +126,15 @@ def run_doctor() -> int:
 def usage() -> None:
     v = _pkg_version("explainthisrepo")
     print(f"explainthisrepo version {v}")
-    print("Explain Github reositories in plain English\n")
+    print("Explain GitHub repositories in plain English\n")
 
     print("explainthisrepo")
     print("usage:")
     print("  explainthisrepo owner/repo")
+    print("  explainthisrepo https://github.com/owner/repo")
+    print("  explainthisrepo github.com/owner/repo")
+    print("  explainthisrepo git@github.com:owner/repo.git\n")
+    
     print("  explainthisrepo owner/repo --detailed")
     print("  explainthisrepo owner/repo --quick")
     print("  explainthisrepo owner/repo --simple")
@@ -138,14 +190,12 @@ def main():
 
     target = args[0]
 
-    if "/" not in target or target.count("/") != 1:
-        print("invalid format. use owner/repo")
+    try:
+        owner, repo = resolve_repo_target(target)
+    except ValueError as e:
+        print(f"error: {e}")
         raise SystemExit(1)
 
-    owner, repo = target.split("/")
-    if not owner or not repo:
-        print("invalid format. use owner/repo")
-        raise SystemExit(1)
 
     print(f"Fetching {owner}/{repo}...")
 
