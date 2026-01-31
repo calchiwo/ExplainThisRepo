@@ -93,12 +93,12 @@ You don’t need to reformat links anymore.
 
 ExplainThisRepo accepts GitHub repositories the way you actually copy them.
 ```bash
-explainthisrepo facebook/react
-explainthisrepo https://github.com/facebook/react
-explainthisrepo github.com/facebook/react
-explainthisrepo https://github.com/facebook/react/issues/123
-explainthisrepo https://github.com/facebook/react?tab=readme
-explainthisrepo git@github.com:facebook/react.git
+explainthisrepo owner/repo
+explainthisrepo https://github.com/owner/repo
+explainthisrepo github.com/owner/repo
+explainthisrepo https://github.com/owner/repo/issues/123
+explainthisrepo https://github.com/owner/repo?tab=readme
+explainthisrepo git@github.com:owner/repo.git
 ```
 
 All inputs are normalized internally to owner/repo.
