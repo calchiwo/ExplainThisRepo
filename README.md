@@ -28,6 +28,7 @@ This tool solves the problem of understanding unfamiliar codebases. It speeds up
 - Extracts repo signals from key files (package.json, pyproject.toml, config files, entrypoints)
 - Builds a file tree summary to understand project architecture
 - Detects programming languages via the GitHub API
+- Accepts repositories via owner/repo, GitHub URLs (with or without https), including issue/PR links and query strings), or SSH clone links
 - Generates clear explanations in plain English
 - Outputs an EXPLAIN.md file in your current directory (default mode)
 - Multi-mode command-line interface
