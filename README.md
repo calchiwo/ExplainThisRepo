@@ -28,7 +28,7 @@ This tool solves the problem of understanding unfamiliar codebases. It speeds up
 - Extracts repo signals from key files (package.json, pyproject.toml, config files, entrypoints)
 - Builds a file tree summary to understand project architecture
 - Detects programming languages via the GitHub API
-- Accepts repositories via owner/repo, GitHub URLs (with or without https), including issue/PR links and query strings), or SSH clone links
+- Accepts repositories via owner/repo, GitHub URLs (with or without https), including issue/PR links and query strings, or SSH clone links
 - Generates clear explanations in plain English
 - Outputs an EXPLAIN.md file in your current directory (default mode)
 - Multi-mode command-line interface
@@ -84,6 +84,25 @@ Alternatively,
 ```bash
 npx explainthisrepo owner/repo
 ```
+
+---
+
+## 🔗 Flexible Repository Input
+
+You don’t need to reformat links anymore.
+
+ExplainThisRepo accepts GitHub repositories the way you actually copy them.
+```bash
+explainthisrepo facebook/react
+explainthisrepo https://github.com/facebook/react
+explainthisrepo github.com/facebook/react
+explainthisrepo https://github.com/facebook/react/issues/123
+explainthisrepo https://github.com/facebook/react?tab=readme
+explainthisrepo git@github.com:facebook/react.git
+```
+
+All inputs are normalized internally to owner/repo.
+No change to engine behavior. Just less friction.
 
 ---
 
@@ -212,6 +231,7 @@ Installing Gemini support may require building Rust-based dependencies on Androi
 ```bash
 pip install --user -U "explainthisrepo[gemini]"
 ```
+
 ## Contributions
 
 Contributions are welcome!
