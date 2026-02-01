@@ -107,9 +107,7 @@ def _request_json(
             continue
 
         # Other errors
-        raise RuntimeError(
-            f"GitHub API request failed ({response.status_code})."
-        )
+        raise RuntimeError(f"GitHub API request failed ({response.status_code}).")
 
     # Should never reach here
     raise RuntimeError("GitHub request failed unexpectedly.")
@@ -194,7 +192,9 @@ def fetch_readme(owner: str, repo: str) -> str | None:
 
     for branch in branches:
         for name in filenames:
-            raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{name}"
+            raw_url = (
+                f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{name}"
+            )
             raw = _request_text(
                 session,
                 raw_url,
@@ -206,6 +206,8 @@ def fetch_readme(owner: str, repo: str) -> str | None:
                 return raw
 
     return None
+
+
 def fetch_tree(owner: str, repo: str) -> list[dict]:
     """
     Uses Git Trees API to fetch full file tree.
@@ -237,6 +239,7 @@ def fetch_file(owner: str, repo: str, file_path: str) -> str | None:
         timeout=10,
         retries=2,
     )
+
 
 def fetch_languages(owner: str, repo: str) -> dict:
     url = f"https://api.github.com/repos/{owner}/{repo}/languages"
