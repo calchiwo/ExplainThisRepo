@@ -1,11 +1,12 @@
 from __future__ import annotations
 from typing import Dict, List
 
-
 StackReport = Dict[str, List[str]]
 
 
-def detect_stack(languages: Dict[str, int], tree: list[dict], key_files: Dict[str, str]) -> StackReport:
+def detect_stack(
+    languages: Dict[str, int], tree: list[dict], key_files: Dict[str, str]
+) -> StackReport:
     report: StackReport = {
         "languages": [],
         "runtimes": [],

@@ -13,6 +13,7 @@ class ReadResult:
     files_text: str
     key_files: dict[str, str] = field(default_factory=dict)
 
+
 # Hard limits (keep it fast + cheap)
 MAX_FILES = 20
 MAX_TOTAL_CHARS = 150_000
@@ -52,7 +53,9 @@ def _score_path(path: str) -> int:
     # entrypoints
     if p.endswith(("main.py", "__main__.py", "cli.py", "cli.ts", "cli.js")):
         return 85
-    if p.endswith(("index.js", "index.ts", "app.js", "app.ts", "server.js", "server.ts")):
+    if p.endswith(
+        ("index.js", "index.ts", "app.js", "app.ts", "server.js", "server.ts")
+    ):
         return 80
 
     # backend / config
@@ -161,8 +164,8 @@ def read_repo_signal_files(owner: str, repo: str) -> ReadResult:
     files_text = _format_files_snippets(snippets)
 
     return ReadResult(
-    tree=tree,
-    tree_text=tree_text,
-    files_text=files_text,
-    key_files=key_files,
-)
+        tree=tree,
+        tree_text=tree_text,
+        files_text=files_text,
+        key_files=key_files,
+    )

@@ -5,7 +5,11 @@ import urllib.request
 from importlib.metadata import version, PackageNotFoundError
 
 from explain_this_repo.github import fetch_repo, fetch_readme, fetch_languages
-from explain_this_repo.prompt import build_prompt, build_quick_prompt, build_simple_prompt
+from explain_this_repo.prompt import (
+    build_prompt,
+    build_quick_prompt,
+    build_simple_prompt,
+)
 from explain_this_repo.generate import generate_explanation
 from explain_this_repo.writer import write_output
 from explain_this_repo.repo_reader import read_repo_signal_files
@@ -61,6 +65,7 @@ def resolve_repo_target(target: str) -> tuple[str, str]:
 
     raise ValueError("Invalid format. Use owner/repo or a GitHub repo URL")
 
+
 def _pkg_version(name: str) -> str:
     try:
         return version(name)
@@ -87,7 +92,9 @@ def _check_url(url: str, timeout: int = 6) -> tuple[bool, str]:
 
 
 def run_doctor() -> int:
-    is_termux = "TERMUX_VERSION" in os.environ or "com.termux" in os.getenv("PREFIX", "")
+    is_termux = "TERMUX_VERSION" in os.environ or "com.termux" in os.getenv(
+        "PREFIX", ""
+    )
 
     print("explainthisrepo doctor report\n")
 
@@ -134,7 +141,7 @@ def usage() -> None:
     print("  explainthisrepo https://github.com/owner/repo")
     print("  explainthisrepo github.com/owner/repo")
     print("  explainthisrepo git@github.com:owner/repo.git\n")
-    
+
     print("  explainthisrepo owner/repo --detailed")
     print("  explainthisrepo owner/repo --quick")
     print("  explainthisrepo owner/repo --simple")
@@ -142,6 +149,7 @@ def usage() -> None:
     print("  explainthisrepo --doctor")
     print("  explainthisrepo --version")
     print("  explainthisrepo --help")
+
 
 def main():
     args = sys.argv[1:]
@@ -180,13 +188,13 @@ def main():
 
     # mutually exclusive flags
     if (
-       (quick and simple)
-       or (detailed and simple)
-       or (detailed and quick)
-       or (stack and (quick or simple or detailed))
-   ):
-       usage()
-       raise SystemExit(1)
+        (quick and simple)
+        or (detailed and simple)
+        or (detailed and quick)
+        or (stack and (quick or simple or detailed))
+    ):
+        usage()
+        raise SystemExit(1)
 
     target = args[0]
 
@@ -195,7 +203,6 @@ def main():
     except ValueError as e:
         print(f"error: {e}")
         raise SystemExit(1)
-
 
     print(f"Fetching {owner}/{repo}...")
 

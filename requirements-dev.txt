@@ -1,0 +1,7 @@
+pyflakes
+black
+pytest
+pytest-cov
+isort
+build
+twine
