@@ -28,7 +28,7 @@ This tool solves the problem of understanding unfamiliar codebases. It speeds up
 - Extracts repo signals from key files (package.json, pyproject.toml, config files, entrypoints)
 - Builds a file tree summary to understand project architecture
 - Detects programming languages via the GitHub API
-- Accepts repositories via owner/repo, GitHub URLs (with or without https), including issue/PR links and query strings, or SSH clone links
+- Accepts repositories via owner/repo, GitHub URLs (with or without https), including issue/PR links and query strings, and SSH clone links
 - Generates clear explanations in plain English
 - Outputs an EXPLAIN.md file in your current directory (default mode)
 - Multi-mode command-line interface
@@ -77,12 +77,7 @@ Install globally and use forever:
 ```bash
 npm install -g explainthisrepo
 explainthisrepo owner/repo
-```
-
-Alternatively,
-
-```bash
-npx explainthisrepo owner/repo
+# or: npx explainthisrepo owner/repo
 ```
 
 ---
@@ -93,7 +88,6 @@ You don’t need to reformat links anymore.
 
 ExplainThisRepo accepts GitHub repositories the way you actually copy them.
 ```bash
-explainthisrepo owner/repo
 explainthisrepo https://github.com/owner/repo
 explainthisrepo github.com/owner/repo
 explainthisrepo https://github.com/owner/repo/issues/123
