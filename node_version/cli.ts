@@ -24,6 +24,9 @@ function usage(): void {
 
   console.log("usage:");
   console.log("  explainthisrepo owner/repo");
+  console.log("  explainthisrepo https://github.com/owner/repo");
+  console.log("  explainthisrepo github.com/owner/repo");
+  console.log("  explainthisrepo git@github.com:owner/repo.git");
   console.log("  explainthisrepo owner/repo --detailed");
   console.log("  explainthisrepo owner/repo --quick");
   console.log("  explainthisrepo owner/repo --simple");
@@ -31,6 +34,55 @@ function usage(): void {
   console.log("  explainthisrepo --doctor");
   console.log("  explainthisrepo --version");
   console.log("  explainthisrepo --help");
+}
+
+function resolveRepoTarget(target: string): { owner: string; repo: string } {
+  target = target.trim();
+
+  // Fix scheme typos
+  if (target.startsWith("https//")) {
+    target = target.replace("https//", "https://");
+  }
+  if (target.startsWith("http//")) {
+    target = target.replace("http//", "http://");
+  }
+
+  // Case 1: SSH clone URL
+  if (target.startsWith("git@github.com:")) {
+    const path = target.replace("git@github.com:", "");
+    const [owner, repoRaw] = path.split("/", 2);
+    if (!owner || !repoRaw) throw new Error("Invalid GitHub SSH URL");
+    return { owner, repo: repoRaw.replace(/\.git$/, "") };
+  }
+
+  // Case 2: github.com/owner/repo
+  if (target.startsWith("github.com/")) {
+    target = "https://" + target;
+  }
+
+  // Case 3: Full URL
+  if (target.startsWith("http://") || target.startsWith("https://")) {
+    const url = new URL(target);
+
+    if (!["github.com", "www.github.com"].includes(url.hostname)) {
+      throw new Error("Only GitHub repository URLs are supported");
+    }
+
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (parts.length < 2) {
+      throw new Error("URL must point to a repository");
+    }
+
+    return { owner: parts[0], repo: parts[1].replace(/\.git$/, "") };
+  }
+
+  // Case 4: owner/repo
+  const parts = target.split("/");
+  if (parts.length === 2 && parts[0] && parts[1]) {
+    return { owner: parts[0], repo: parts[1] };
+  }
+
+  throw new Error("Invalid format. Use owner/repo or a GitHub repo URL");
 }
 
 function getPkgVersion(): string {
@@ -158,14 +210,15 @@ async function main(): Promise<void> {
   process.exit(1);
 }
 
-  const target = args[0];
+  let owner: string, repo: string;
 
-  if (!target.includes("/") || target.split("/").length !== 2) {
-    console.log("Invalid format. Use owner/repo");
-    process.exit(1);
-  }
+try {
+  ({ owner, repo } = resolveRepoTarget(args[0]));
+} catch (e: any) {
+  console.log(`error: ${e.message}`);
+  process.exit(1);
+}
 
-  const [owner, repo] = target.split("/");
   if (!owner || !repo) {
     console.log("Invalid format. Use owner/repo");
     process.exit(1);
@@ -185,11 +238,35 @@ async function main(): Promise<void> {
   printStack(report, owner, repo);
   return;
 }
-
   try {
-    const repoData = await fetchRepo(owner, repo);
-    const readme = await fetchReadme(owner, repo);
-    const readResult = await readRepoSignalFiles(owner, repo);
+  let repoData: any;
+  try {
+    repoData = await fetchRepo(owner, repo);
+  } catch (e: any) {
+    console.log("Failed to fetch repository data.");
+    console.log(`error: ${e?.message || e}`);
+    console.log("\nfix:");
+    console.log("- Ensure the repository exists and is public");
+    console.log("- Or set GITHUB_TOKEN to avoid rate limits");
+    process.exit(1);
+  }
+
+    let readme: string | null = null;
+
+        try {
+          readme = await fetchReadme(owner, repo);
+        } catch {
+          readme = null;
+        }
+
+    let readResult: any = null;
+    if (!quick) {
+      try {
+        readResult = await readRepoSignalFiles(owner, repo);
+      } catch {
+        readResult = null;
+      }
+    }
 
     const prompt = buildPrompt(
       repoData.full_name,
@@ -197,8 +274,8 @@ async function main(): Promise<void> {
       readme,
       detailed,
       quick,
-      readResult.treeText,
-      readResult.filesText
+      readResult?.treeText ?? null,
+      readResult?.filesText ?? null
     );
 
     console.log("Generating explanation...");

@@ -35,8 +35,7 @@ Rules:
   }
 
   // NORMAL / DETAILED MODE
-  let prompt = `
-You are a senior software engineer.
+  let prompt = `You are a senior software engineer.
 
 Your task is to explain a GitHub repository clearly and concisely for a human reader.
 
@@ -73,7 +72,7 @@ Additional instructions:
 - Mention important files and their roles.
 `;
   }
-
+  
   prompt += `
 
 Output format:
