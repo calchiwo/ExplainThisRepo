@@ -3,7 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExplainThisRepo - Documentation</title>
+    <title>ExplainThisRepo: CLI to explain GitHub repositories in plain English</title>
+    
+    <meta name="description" content="ExplainThisRepo is a CLI developer tool that can be used to explain and understand github repositories quickly in plain English. Install with 'pip install explainthisrepo' or 'npm install -g explainthisrepo' and use 'explainthisrepo owner/repo' to generate an EXPLAIN.md summary for any repo." />
+    <meta name="google-site-verification" content="Q_GAe-bAWrpB5F_iWIUmdqdApp3Vya846luv3Lwu5uo" />
+    <meta name="keywords" content="understand github repo, explain github repo, github cli, repo explainer, developer tools, open source cli, node, pip, generate repo summary, repo map" />
+    <meta name="author" content="Caleb Wodi" />
+    <meta name="robots" content="index, follow" />
+    
+    <link rel="canonical" href="https://explainthisrepo.com/" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    
+    <meta property="og:title" content="ExplainThisRepo: Explain GitHub repos in plain English and generate EXPLAIN.md to quickly understand them" />
+    <meta property="og:description" content="ExplainThisRepo is a CLI developer tool that can be used to explain and understand github repositories quickly in plain English. Install with 'pip install explainthisrepo' or 'npm install -g explainthisrepo' and use 'explainthisrepo owner/repo' to generate an EXPLAIN.md summary for any repo." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://explainthisrepo.com/" />
+    <meta property="og:image" content="https://explainthisrepo.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ExplainThisRepo: Explain GitHub repos in plain English" />
+    <meta name="twitter:description" content="Run one command. Get a plain-English EXPLAIN.md for any repo." />
+    <meta name="twitter:image" content="https://explainthisrepo.com/og.png" />
+    <meta name="twitter:creator" content="@calchiwo" />
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
     /* --- RESET & VARIABLES --- */
@@ -75,6 +99,48 @@
         display: grid;
         grid-template-columns: 280px 1fr;
         width: 100%;
+    }
+
+    /* --- HEADER --- */
+    .top-header {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 280px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 16px 20px;
+        gap: 1rem;
+        background: var(--bg-primary);
+        border-bottom: 1px solid var(--border-color);
+        z-index: 100;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .github-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-dark);
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+    .github-btn:hover {
+        background: var(--border-hover);
+        transform: translateY(-1px);
+    }
+
+    .github-btn svg {
+        width: 18px;
+        height: 18px;
     }
 
     /* --- SIDEBAR --- */
@@ -195,7 +261,7 @@
     /* --- MAIN CONTENT --- */
     .main-content {
         grid-column: 2;
-        padding: 3rem 4rem;
+        padding: 5rem 4rem 3rem;
         max-width: 1100px;
     }
 
@@ -203,6 +269,18 @@
         border: 0;
         border-top: 1px solid var(--border-color);
         margin: 3.5rem 0;
+    }
+
+    /* --- BADGES --- */
+    .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .badge-img {
+        height: 20px;
     }
 
     /* --- TYPOGRAPHY --- */
@@ -240,18 +318,6 @@
     p {
         color: var(--text-medium);
         margin-bottom: 1rem;
-    }
-
-    /* --- BADGES --- */
-    .badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin: 1.5rem 0;
-    }
-
-    .badge-img {
-        height: 20px;
     }
 
     .tag {
@@ -536,41 +602,37 @@
         transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* --- SCREENSHOTS --- */
-    .screenshot-placeholder {
-        background: #f1f5f9;
-        border: 2px dashed var(--border-color);
-        border-radius: 8px;
-        padding: 3rem;
-        text-align: center;
-        color: var(--text-gray);
-        margin: 1.5rem 0;
-    }
-
-    /* --- FOOTER --- */
-    .footer {
-        margin-top: 4rem;
-        padding-top: 2rem;
-        border-top: 1px solid var(--border-color);
-        color: var(--text-gray);
-        font-size: 0.9rem;
-    }
-
-    .footer-links {
+    /* --- INLINE FOOTER --- */
+    .inline-footer {
         display: flex;
-        gap: 1.5rem;
-        margin-top: 1rem;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 3rem;
+        padding: 0.7rem 1.2rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-gray);
+        white-space: nowrap;
+        overflow-x: auto;
+        text-align: center;
+        transition: all 0.3s ease;
     }
 
-    .footer-links a {
-        color: var(--primary);
+    .footer-link {
+        color: var(--text-dark);
+        font-weight: 500;
+        padding: 0.15rem 0.4rem;
+        border-radius: 6px;
+        transition: background 0.15s ease;
         text-decoration: none;
-        transition: color 0.2s;
     }
 
-    .footer-links a:hover {
-        color: var(--primary-hover);
-        text-decoration: underline;
+    .footer-link:hover {
+        background: var(--border-hover);
     }
 
     /* --- RESPONSIVE --- */
@@ -586,8 +648,11 @@
             border-right: none;
             border-bottom: 1px solid var(--border-color);
         }
+        .top-header {
+            left: 0;
+        }
         .main-content {
-            padding: 2rem 1.5rem;
+            padding: 5rem 2rem 2rem;
         }
         .feature-grid {
             grid-template-columns: 1fr;
@@ -596,13 +661,16 @@
 
     @media (max-width: 640px) {
         .main-content {
-            padding: 1.5rem 1rem;
+            padding: 5rem 1rem 1.5rem;
         }
         h1 {
             font-size: 1.75rem;
         }
         h2 {
             font-size: 1.5rem;
+        }
+        .top-header {
+            padding: 12px 16px;
         }
     }
 
@@ -614,10 +682,18 @@
 </head>
 <body>
     <div class="docs-layout">
+        <!-- HEADER WITH GITHUB BUTTON -->
+        <header class="top-header">
+            <a class="github-btn" href="https://github.com/calchiwo/ExplainThisRepo" target="_blank" rel="noopener noreferrer">
+                <svg height="18" viewBox="0 0 16 16" width="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                <span>Star on GitHub</span>
+            </a>
+        </header>
+
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="brand">
-                <a href="https://explainthisrepo.com" class="brand-link">ExplainThisRepo</a>
+                <span class="brand-link">ExplainThisRepo</span>
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
                     <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -653,6 +729,13 @@
             <!-- INTRODUCTION -->
             <section id="introduction" class="intro-wrapper">
                 <h1>Introduction</h1>
+                
+                <div class="badges">
+                    <a href="https://pepy.tech/projects/explainthisrepo" target="_blank" rel="noopener noreferrer">
+                        <img loading="lazy" alt="PyPI Downloads" src="https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads" class="badge-img" />
+                    </a>
+                </div>
+
                 <p class="lead">
                     ExplainThisRepo is a developer tool designed to bridge the gap between complex codebases and human understanding.
                 </p>
@@ -1151,6 +1234,13 @@
                     </div>
                 </div>
             </section>
+
+            <!-- INLINE FOOTER -->
+            <div class="inline-footer">
+                <span>Built by</span>
+                <a class="footer-link" href="https://x.com/calchiwo" target="_blank" rel="noopener noreferrer">Caleb Wodi</a>
+                <span>with ❤️ for the open source community</span>
+            </div>
         </main>
     </div>
 
