@@ -98,12 +98,14 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        width: 100%;
     }
 
     .brand-link {
         color: var(--text-dark);
         text-decoration: none;
         transition: color 0.2s ease;
+        flex: 1;
     }
 
     .brand-link:hover {
@@ -122,6 +124,8 @@
         justify-content: center;
         transition: all 0.3s ease;
         color: var(--text-dark);
+        flex-shrink: 0;
+        margin-left: auto;
     }
 
     .theme-toggle:hover {
@@ -171,9 +175,20 @@
         color: var(--text-dark);
     }
 
+    [data-theme="dark"] .sidebar a:hover {
+        background: #334155;
+        color: var(--text-dark);
+    }
+
     .sidebar a.active {
         background: #eff6ff;
         color: var(--primary);
+        font-weight: 500;
+    }
+
+    [data-theme="dark"] .sidebar a.active {
+        background: #1e3a8a;
+        color: #60a5fa;
         font-weight: 500;
     }
 
@@ -519,6 +534,17 @@
         background: var(--bg-primary);
         border-radius: 4px;
         transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* --- SCREENSHOTS --- */
+    .screenshot-placeholder {
+        background: #f1f5f9;
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        padding: 3rem;
+        text-align: center;
+        color: var(--text-gray);
+        margin: 1.5rem 0;
     }
 
     /* --- FOOTER --- */
@@ -1205,6 +1231,8 @@
         const navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
 
         function highlightNav() {
+            if (!sections.length || !navLinks.length) return;
+            
             let current = '';
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
@@ -1216,7 +1244,8 @@
 
             navLinks.forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('href') === `#${current}`) {
+                const href = link.getAttribute('href');
+                if (href && href === '#' + current) {
                     link.classList.add('active');
                 }
             });
