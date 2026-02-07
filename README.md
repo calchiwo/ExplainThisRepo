@@ -14,13 +14,13 @@ ExplainThisRepo is a CLI (Command Line Interface) tool that generates plain-Engl
 
 ![demo](https://github.com/user-attachments/assets/837e0593-db64-4657-8855-bb1915011eb6)
 
-## 🎯 Purpose
+## Purpose
 
 This tool solves the problem of understanding unfamiliar codebases. It speeds up onboarding by turning repository structure and code signals into a clear, readable explanation of any public GitHub repository.
 
 ---
 
-## ⚡ Key Features
+## Key Features
 
 - Fetches public GitHub repositories automatically
 - Analyzes repository structure and high-signal source files, not just README
@@ -35,7 +35,7 @@ This tool solves the problem of understanding unfamiliar codebases. It speeds up
 
 ---
 
-## 🧭 Modes
+## Modes
 
 - (no flag) → Full repository explanation written to EXPLAIN.md
 
@@ -53,7 +53,7 @@ This tool solves the problem of understanding unfamiliar codebases. It speeds up
 
 ---
 
-## 📦 Installation
+## Installation
 
 ## Option 1: install via pip (recommended):
 
@@ -100,7 +100,7 @@ No change to engine behavior. Just less friction.
 
 ---
 
-## 🧪 Usage
+## Usage
 
 ### Basic
 Generate a full explanation and saves it to `EXPLAIN.md`:
@@ -174,7 +174,7 @@ Check environment + connectivity (useful for debugging):
 explainthisrepo --doctor
 ```
 
-## 🔑 Configuration
+## Configuration
 
 ExplainThisRepo uses Gemini models for code analysis.
 
