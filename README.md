@@ -82,7 +82,7 @@ explainthisrepo owner/repo
 
 ---
 
-## 🔗 Flexible Repository Input
+## Flexible Repository Input
 
 You don’t need to reformat links anymore.
 
