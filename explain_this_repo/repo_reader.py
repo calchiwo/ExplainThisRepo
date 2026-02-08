@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from explain_this_repo.github import fetch_tree, fetch_file
+from explain_this_repo.github import fetch_file, fetch_tree
 
 
 @dataclass

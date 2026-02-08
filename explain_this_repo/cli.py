@@ -1,22 +1,19 @@
-import os
-import sys
-import platform
-import urllib.request
 import argparse
-from importlib.metadata import version, PackageNotFoundError
+import os
+import platform
+import sys
+import urllib.request
+from importlib.metadata import PackageNotFoundError, version
+from urllib.parse import urlparse
 
-from explain_this_repo.github import fetch_repo, fetch_readme, fetch_languages
-from explain_this_repo.prompt import (
-    build_prompt,
-    build_quick_prompt,
-    build_simple_prompt,
-)
 from explain_this_repo.generate import generate_explanation
-from explain_this_repo.writer import write_output
+from explain_this_repo.github import fetch_languages, fetch_readme, fetch_repo
+from explain_this_repo.prompt import (build_prompt, build_quick_prompt,
+                                      build_simple_prompt)
 from explain_this_repo.repo_reader import read_repo_signal_files
 from explain_this_repo.stack_detector import detect_stack
 from explain_this_repo.stack_printer import print_stack
-from urllib.parse import urlparse
+from explain_this_repo.writer import write_output
 
 
 def resolve_repo_target(target: str) -> tuple[str, str]:

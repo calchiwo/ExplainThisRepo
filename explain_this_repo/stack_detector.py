@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Dict, List
 
 StackReport = Dict[str, List[str]]
