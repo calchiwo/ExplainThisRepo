@@ -2,6 +2,7 @@ import os
 import sys
 import platform
 import urllib.request
+import argparse
 from importlib.metadata import version, PackageNotFoundError
 
 from explain_this_repo.github import fetch_repo, fetch_readme, fetch_languages
@@ -127,76 +128,80 @@ def run_doctor() -> int:
         print("- If PATH is annoying, run:")
         print("  python -m explain_this_repo owner/repo")
 
-    return 0 if ok1 else 1
-
-
-def usage() -> None:
-    v = _pkg_version("explainthisrepo")
-    print(f"explainthisrepo version {v}")
-    print("Explain GitHub repositories in plain English\n")
-
-    print("explainthisrepo")
-    print("usage:")
-    print("  explainthisrepo owner/repo")
-    print("  explainthisrepo https://github.com/owner/repo")
-    print("  explainthisrepo github.com/owner/repo")
-    print("  explainthisrepo git@github.com:owner/repo.git\n")
-
-    print("  explainthisrepo owner/repo --detailed")
-    print("  explainthisrepo owner/repo --quick")
-    print("  explainthisrepo owner/repo --simple")
-    print("  explainthisrepo owner/repo --stack")
-    print("  explainthisrepo --doctor")
-    print("  explainthisrepo --version")
-    print("  explainthisrepo --help")
+    return 0 if (ok1 and ok2) else 1
 
 
 def main():
-    args = sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        prog="explainthisrepo",
+        description="Explain GitHub repositories in plain English",
+        epilog="Examples:\n"
+        "  explainthisrepo owner/repo\n"
+        "  explainthisrepo https://github.com/owner/repo\n"
+        "  explainthisrepo github.com/owner/repo\n"
+        "  explainthisrepo git@github.com:owner/repo.git\n"
+        "  explainthisrepo owner/repo --detailed\n"
+        "  explainthisrepo owner/repo --quick\n"
+        "  explainthisrepo owner/repo --simple\n"
+        "  explainthisrepo owner/repo --stack\n"
+        "  explainthisrepo --doctor\n"
+        "  explainthisrepo --version",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
 
-    if not args or args[0] in {"-h", "--help"}:
-        usage()
-        return
+    parser.add_argument(
+        "--doctor",
+        action="store_true",
+        help="Run diagnostics",
+    )
 
-    if args[0] == "--doctor":
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="Show version",
+    )
+
+    parser.add_argument(
+        "repository",
+        nargs="?",
+        help="GitHub repository (owner/repo or URL)",
+    )
+
+    mode_group = parser.add_mutually_exclusive_group()
+    mode_group.add_argument(
+        "--quick",
+        action="store_true",
+        help="Quick summary mode",
+    )
+    mode_group.add_argument(
+        "--simple",
+        action="store_true",
+        help="Simple summary mode",
+    )
+    mode_group.add_argument(
+        "--detailed",
+        action="store_true",
+        help="Detailed explanation mode",
+    )
+    mode_group.add_argument(
+        "--stack",
+        action="store_true",
+        help="Stack detection mode",
+    )
+
+    args = parser.parse_args()
+
+    if args.doctor:
         raise SystemExit(run_doctor())
 
-    if args[0] == "--version":
+    if args.version:
         print_version()
         return
 
-    detailed = False
-    quick = False
-    simple = False
-    stack = False
+    if not args.repository:
+        parser.error("repository argument required")
 
-    if len(args) == 2:
-        if args[1] == "--detailed":
-            detailed = True
-        elif args[1] == "--quick":
-            quick = True
-        elif args[1] == "--simple":
-            simple = True
-        elif args[1] == "--stack":
-            stack = True
-        else:
-            usage()
-            raise SystemExit(1)
-    elif len(args) != 1:
-        usage()
-        raise SystemExit(1)
-
-    # mutually exclusive flags
-    if (
-        (quick and simple)
-        or (detailed and simple)
-        or (detailed and quick)
-        or (stack and (quick or simple or detailed))
-    ):
-        usage()
-        raise SystemExit(1)
-
-    target = args[0]
+    target = args.repository
 
     try:
         owner, repo = resolve_repo_target(target)
@@ -206,7 +211,7 @@ def main():
 
     print(f"Fetching {owner}/{repo}...")
 
-    if stack:
+    if args.stack:
         try:
             read_result = read_repo_signal_files(owner, repo)
             languages = fetch_languages(owner, repo)
@@ -231,7 +236,7 @@ def main():
         raise SystemExit(1)
 
     # QUICK MODE
-    if quick:
+    if args.quick:
         prompt = build_quick_prompt(
             repo_name=repo_data.get("full_name"),
             description=repo_data.get("description"),
@@ -257,14 +262,15 @@ def main():
     # NORMAL/DETAILED path: repo reader (safe)
     try:
         read_result = read_repo_signal_files(owner, repo)
-    except Exception:
+    except Exception as e:
+        print(f"warning: could not read repository files: {e}")
         read_result = None
 
     prompt = build_prompt(
         repo_name=repo_data.get("full_name"),
         description=repo_data.get("description"),
         readme=readme,
-        detailed=detailed,
+        detailed=args.detailed,
         tree_text=read_result.tree_text if read_result else None,
         files_text=read_result.files_text if read_result else None,
     )
@@ -282,7 +288,7 @@ def main():
         raise SystemExit(1)
 
     # SIMPLE MODE: summarize the long output, no file write
-    if simple:
+    if args.simple:
         print("Summarizing...")
         simple_prompt = build_simple_prompt(output)
 
