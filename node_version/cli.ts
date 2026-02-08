@@ -5,6 +5,7 @@ import process from "node:process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { Command } from "commander";
 
 import { fetchRepo, fetchReadme } from "./github.js";
 import { buildPrompt, buildSimplePrompt } from "./prompt.js";
@@ -15,26 +16,6 @@ import { readRepoSignalFiles } from "./repo_reader.js";
 import { fetchLanguages } from "./github.js";
 import { detectStack } from "./stack-detector.js";
 import { printStack } from "./stack_printer.js";
-
-function usage(): void {
-  const version = getPkgVersion();
-
-  console.log(`ExplainThisRepo v${version}`);
-  console.log("Explain GitHub repositories in plain English.\n");
-
-  console.log("usage:");
-  console.log("  explainthisrepo owner/repo");
-  console.log("  explainthisrepo https://github.com/owner/repo");
-  console.log("  explainthisrepo github.com/owner/repo");
-  console.log("  explainthisrepo git@github.com:owner/repo.git");
-  console.log("  explainthisrepo owner/repo --detailed");
-  console.log("  explainthisrepo owner/repo --quick");
-  console.log("  explainthisrepo owner/repo --simple");
-  console.log("  explainthisrepo owner/repo --stack");
-  console.log("  explainthisrepo --doctor");
-  console.log("  explainthisrepo --version");
-  console.log("  explainthisrepo --help");
-}
 
 function resolveRepoTarget(target: string): { owner: string; repo: string } {
   target = target.trim();
@@ -153,171 +134,186 @@ async function runDoctor(): Promise<number> {
   const gem = await checkUrl("https://generativelanguage.googleapis.com");
   console.log(`- gemini endpoint: ${gem.msg}`);
 
-  return gh.ok ? 0 : 1;
+  return gh.ok && gem.ok ? 0 : 1;
 }
 
 async function main(): Promise<void> {
-  const args = process.argv.slice(2);
+  const program = new Command();
 
-  if (args.length === 0 || args[0] === "-h" || args[0] === "--help") {
-    usage();
-    process.exit(0);
-  }
+  program
+    .name("explainthisrepo")
+    .description("Explain GitHub repositories in plain English")
+    .version(getPkgVersion(), "-v, --version", "Show version")
+    .argument("[repository]", "GitHub repository (owner/repo or URL)")
+    .option("--doctor", "Run diagnostics")
+    .option("--quick", "Quick summary mode")
+    .option("--simple", "Simple summary mode")
+    .option("--detailed", "Detailed explanation mode")
+    .option("--stack", "Stack detection mode")
+    .addHelpText(
+      "after",
+      `
+Examples:
+  $ explainthisrepo owner/repo
+  $ explainthisrepo https://github.com/owner/repo
+  $ explainthisrepo github.com/owner/repo
+  $ explainthisrepo git@github.com:owner/repo.git
+  $ explainthisrepo owner/repo --detailed
+  $ explainthisrepo owner/repo --quick
+  $ explainthisrepo owner/repo --simple
+  $ explainthisrepo owner/repo --stack
+  $ explainthisrepo --doctor`
+    );
 
-  if (args[0] === "--version") {
-    printVersion();
-    process.exit(0);
-  }
+  program.parse(process.argv);
 
-  if (args[0] === "--doctor") {
+  const options = program.opts();
+  const repository = program.args[0];
+
+  if (options.doctor) {
     const code = await runDoctor();
     process.exit(code);
   }
 
-  let detailed = false;
-  let quick = false;
-  let simple = false;
-  let stack = false;
+  const modeFlags = [
+    options.quick,
+    options.simple,
+    options.detailed,
+    options.stack,
+  ].filter(Boolean);
 
-  // Accept:
-  // - explainthisrepo owner/repo
-  // - explainthisrepo owner/repo --detailed
-  // - explainthisrepo owner/repo --quick
-  // - explainthisrepo owner/repo --simple
-  // - explainthisrepo owner/repo --stack
-  if (args.length === 2) {
-    if (args[1] === "--detailed") detailed = true;
-    else if (args[1] === "--quick") quick = true;
-    else if (args[1] === "--simple") simple = true;
-    else if (args[1] === "--stack") stack = true;
-    else {
-      usage();
-      process.exit(1);
-    }
-  } else if (args.length !== 1) {
-    usage();
+  if (modeFlags.length > 1) {
+    console.error("error: only one mode flag can be used at a time");
     process.exit(1);
   }
 
-  // mutually exclusive flags
-  if (
-  (quick && simple) ||
-  (detailed && simple) ||
-  (detailed && quick) ||
-  (stack && (quick || simple || detailed))
-) {
-  usage();
-  process.exit(1);
-}
+  if (!repository) {
+    program.error("repository argument required");
+  }
 
   let owner: string, repo: string;
 
-try {
-  ({ owner, repo } = resolveRepoTarget(args[0]));
-} catch (e: any) {
-  console.log(`error: ${e.message}`);
-  process.exit(1);
-}
-
-  if (!owner || !repo) {
-    console.log("Invalid format. Use owner/repo");
+  try {
+    ({ owner, repo } = resolveRepoTarget(repository));
+  } catch (e: any) {
+    console.error(`error: ${e.message}`);
     process.exit(1);
   }
 
   console.log(`Fetching ${owner}/${repo}...`);
-  if (stack) {
-  const languages = await fetchLanguages(owner, repo);
-  const read = await readRepoSignalFiles(owner, repo);
 
-  const report = detectStack({
-    languages,
-    tree: read.tree,
-    keyFiles: read.keyFiles,
-  });
+  if (options.stack) {
+    try {
+      const languages = await fetchLanguages(owner, repo);
+      const read = await readRepoSignalFiles(owner, repo);
 
-  printStack(report, owner, repo);
-  return;
-}
-  try {
+      const report = detectStack({
+        languages,
+        tree: read.tree,
+        keyFiles: read.keyFiles,
+      });
+
+      printStack(report, owner, repo);
+      return;
+    } catch (e: any) {
+      console.error(`error: ${e?.message || e}`);
+      process.exit(1);
+    }
+  }
+
   let repoData: any;
+
   try {
     repoData = await fetchRepo(owner, repo);
   } catch (e: any) {
-    console.log("Failed to fetch repository data.");
-    console.log(`error: ${e?.message || e}`);
-    console.log("\nfix:");
-    console.log("- Ensure the repository exists and is public");
-    console.log("- Or set GITHUB_TOKEN to avoid rate limits");
+    console.error("Failed to fetch repository data.");
+    console.error(`error: ${e?.message || e}`);
+    console.error("\nfix:");
+    console.error("- Ensure the repository exists and is public");
+    console.error("- Or set GITHUB_TOKEN to avoid rate limits");
     process.exit(1);
   }
 
-    let readme: string | null = null;
+  let readme: string | null = null;
 
-        try {
-          readme = await fetchReadme(owner, repo);
-        } catch {
-          readme = null;
-        }
-
-    let readResult: any = null;
-    if (!quick) {
-      try {
-        readResult = await readRepoSignalFiles(owner, repo);
-      } catch {
-        readResult = null;
-      }
-    }
-
-    const prompt = buildPrompt(
-      repoData.full_name,
-      repoData.description,
-      readme,
-      detailed,
-      quick,
-      readResult?.treeText ?? null,
-      readResult?.filesText ?? null
-    );
-
-    console.log("Generating explanation...");
-    const output = await generateExplanation(prompt);
-
-    // QUICK MODE: print only, no file write
-    if (quick) {
-      console.log("Quick summary 🎉");
-      console.log(output.trim());
-      return;
-    }
-
-    // SIMPLE MODE: generate long internally then summarize, no file write
-    if (simple) {
-      console.log("Summarizing...");
-      const simplePrompt = buildSimplePrompt(output);
-      const simpleOutput = await generateExplanation(simplePrompt);
-
-      console.log("Simple summary 🎉");
-      console.log(simpleOutput.trim());
-      return;
-    }
-
-    // NORMAL / DETAILED: write EXPLAIN.md
-    console.log("Writing EXPLAIN.md...");
-    writeOutput(output);
-
-    const wordCount = output.split(/\s+/).filter(Boolean).length;
-
-    console.log("EXPLAIN.md generated successfully 🎉");
-    console.log(`Words: ${wordCount}`);
-    console.log("Open EXPLAIN.md to read it.");
+  try {
+    readme = await fetchReadme(owner, repo);
   } catch (e: any) {
-    console.log("Failed to generate explanation.");
-    console.log(`error: ${e?.message || e}`);
+    console.warn(`Warning: Could not fetch README: ${e?.message || e}`);
+    readme = null;
+  }
 
-    console.log("\nfix:");
-    console.log("- Ensure GEMINI_API_KEY is set");
-    console.log("- Or run: explainthisrepo --doctor");
+  let readResult: any = null;
+  if (!options.quick) {
+    try {
+      readResult = await readRepoSignalFiles(owner, repo);
+    } catch (e: any) {
+      console.warn(`Warning: Could not read repo files: ${e?.message || e}`);
+      readResult = null;
+    }
+  }
 
+  const prompt = buildPrompt(
+    repoData.full_name,
+    repoData.description,
+    readme,
+    options.detailed || false,
+    options.quick || false,
+    readResult?.treeText ?? null,
+    readResult?.filesText ?? null
+  );
+
+  console.log("Generating explanation...");
+
+  let output: string;
+
+  try {
+    output = await generateExplanation(prompt);
+  } catch (e: any) {
+    console.error("Failed to generate explanation.");
+    console.error(`error: ${e?.message || e}`);
+    console.error("\nfix:");
+    console.error("- Ensure GEMINI_API_KEY is set");
+    console.error("- Or run: explainthisrepo --doctor");
     process.exit(1);
   }
+
+  if (options.quick) {
+    console.log("Quick summary 🎉");
+    console.log(output.trim());
+    return;
+  }
+
+  if (options.simple) {
+    console.log("Summarizing...");
+    const simplePrompt = buildSimplePrompt(output);
+
+    let simpleOutput: string;
+
+    try {
+      simpleOutput = await generateExplanation(simplePrompt);
+    } catch (e: any) {
+      console.error("Failed to generate explanation.");
+      console.error(`error: ${e?.message || e}`);
+      console.error("\nfix:");
+      console.error("- Ensure GEMINI_API_KEY is set");
+      console.error("- Or run: explainthisrepo --doctor");
+      process.exit(1);
+    }
+
+    console.log("Simple summary 🎉");
+    console.log(simpleOutput.trim());
+    return;
+  }
+
+  console.log("Writing EXPLAIN.md...");
+  writeOutput(output);
+
+  const wordCount = output.split(/\s+/).filter(Boolean).length;
+
+  console.log("EXPLAIN.md generated successfully 🎉");
+  console.log(`Words: ${wordCount}`);
+  console.log("Open EXPLAIN.md to read it.");
 }
 
 main();
