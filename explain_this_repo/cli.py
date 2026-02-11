@@ -256,7 +256,38 @@ def main():
         print(output.strip())
         return
 
-    # NORMAL/DETAILED path: repo reader (safe)
+    # SIMPLE MODE
+    if args.simple:
+        try:
+            read_result = read_repo_signal_files(owner, repo)
+        except Exception as e:
+            print(f"warning: could not read repository files: {e}")
+            read_result = None
+
+        prompt = build_simple_prompt(
+            repo_name=repo_data.get("full_name"),
+            description=repo_data.get("description"),
+            readme=readme,
+            tree_text=read_result.tree_text if read_result else None,
+        )
+
+        print("Generating explanation...")
+
+        try:
+            output = generate_explanation(prompt)
+        except Exception as e:
+            print("Failed to generate explanation.")
+            print(f"error: {e}")
+            print("\nfix:")
+            print("- Ensure GEMINI_API_KEY is set")
+            print("- Or run: explainthisrepo --doctor")
+            raise SystemExit(1)
+
+        print("Simple summary 🎉")
+        print(output.strip())
+        return
+
+    # NORMAL / DETAILED MODE
     try:
         read_result = read_repo_signal_files(owner, repo)
     except Exception as e:
@@ -284,26 +315,6 @@ def main():
         print("- Or run: explainthisrepo --doctor")
         raise SystemExit(1)
 
-    # SIMPLE MODE: summarize the long output, no file write
-    if args.simple:
-        print("Summarizing...")
-        simple_prompt = build_simple_prompt(output)
-
-        try:
-            simple_output = generate_explanation(simple_prompt)
-        except Exception as e:
-            print("Failed to generate explanation.")
-            print(f"error: {e}")
-            print("\nfix:")
-            print("- Ensure GEMINI_API_KEY is set")
-            print("- Or run: explainthisrepo --doctor")
-            raise SystemExit(1)
-
-        print("Simple summary 🎉")
-        print(simple_output.strip())
-        return
-
-    # NORMAL / DETAILED: write EXPLAIN.md
     print("Writing EXPLAIN.md...")
     write_output(output)
 
