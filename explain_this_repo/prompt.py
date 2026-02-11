@@ -88,14 +88,29 @@ Rules:
     return prompt.strip()
 
 
-def build_simple_prompt(long_explanation: str) -> str:
-    return f"""
+def build_simple_prompt(
+    repo_name: str,
+    description: str | None,
+    readme: str | None,
+    tree_text: str | None = None,
+) -> str:
+    readme_content = (readme or "No README provided")[:4000]
+    tree_content = (tree_text or "No file tree provided")[:1500]
+
+    prompt = f"""
 You are a senior software engineer.
 
-Rewrite the long repository explanation below into a SIMPLE version in the exact style specified.
+Summarize this GitHub repository in a concise bullet-point format.
 
-Input explanation:
-{long_explanation}
+Repository:
+- Name: {repo_name}
+- Description: {description or "No description provided"}
+
+README content:
+{readme_content}
+
+Repo structure:
+{tree_content}
 
 Output style rules:
 - Plain English.
@@ -107,12 +122,13 @@ Key points from the repo:
 - Each bullet MUST start with: ⬤
 - Each bullet title should be 1–3 words only (example: "Purpose", "Stack", "Entrypoints", "How it works", "Usage", "Structure").
 - Each bullet body should be 1–2 lines max.
-- If the input contains architecture/pipeline steps, capture them naturally.
-- If the input does NOT contain architecture/pipeline steps, do NOT invent them.
+- Base bullets strictly on the provided README and structure.
+- Do NOT invent features, architecture, or details not present in the input.
 - Optional: end with one extra line starting with:
 Also interesting:
-- Do NOT add features not present in the input.
 - No quotes.
 
 Make it feel like a human developer explaining to another developer in simple terms.
 """.strip()
+
+    return prompt
