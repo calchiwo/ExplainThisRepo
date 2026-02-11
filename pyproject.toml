@@ -1,20 +1,23 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=67.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "explainthisrepo"
 version = "0.4.0"
-description = "ExplainThisRepo is a CLI developer tool to quickly explain GitHub repository in plain English"
-readme = "README.md"
-requires-python = ">=3.9"
+description = "CLI tool to explain GitHub repository in plain English"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.9,<4.0"
 license = { text = "MIT" }
+
 authors = [
   { name = "Caleb Wodi", email = "calebwodi33@gmail.com" }
 ]
 
+keywords = ["cli", "github", "repository", "ai", "developer-tools"]
+
 dependencies = [
-  "requests"
+  "requests>=2.31,<3.0"
 ]
 
 classifiers = [
@@ -23,21 +26,38 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Environment :: Console",
+  "Topic :: Software Development :: Tools",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
 
 [project.optional-dependencies]
-gemini = ["google-genai>=1.0.0"]
+gemini = ["google-genai>=1.0.0,<2.0"]
+dev = [
+  "pytest>=7.0",
+  "black>=23.0",
+  "ruff>=0.1.0",
+  "mypy>=1.0",
+]
 
-[tool.setuptools]
-packages = ["explain_this_repo"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["explain_this_repo*"]
 
 [project.urls]
 Homepage = "https://github.com/calchiwo/ExplainThisRepo"
 Repository = "https://github.com/calchiwo/ExplainThisRepo.git"
+"Bug Tracker" = "https://github.com/calchiwo/ExplainThisRepo/issues"
 "Stars" = "https://github.com/calchiwo/ExplainThisRepo/stargazers"
-"Bug tracker" = "https://github.com/calchiwo/ExplainThisRepo/issues"
 
 [project.scripts]
 explainthisrepo = "explain_this_repo.cli:main"
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]
