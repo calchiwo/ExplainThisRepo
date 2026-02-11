@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "explainthisrepo"
-version = "0.4.0"
+version = "0.4.1"
 description = "CLI tool to explain GitHub repository in plain English"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9,<4.0"
@@ -27,7 +27,6 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Environment :: Console",
-  "Topic :: Software Development :: Tools",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
