@@ -1,3 +1,7 @@
+function escapeForPromptBlock(input: string): string {
+  return input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 export function buildPrompt(
   repoName: string,
   description: string | null,
@@ -11,20 +15,20 @@ export function buildPrompt(
 Your task is to explain a GitHub repository clearly and concisely for a human reader.
 
 <repository_metadata>
-Name: ${repoName}
-Description: ${description || "No description provided"}
+Name: ${escapeForPromptBlock(repoName)}
+Description: ${escapeForPromptBlock(description || "No description provided")}
 </repository_metadata>
 
 <readme>
-${readme || "No README provided"}
+${escapeForPromptBlock(readme || "No README provided")}
 </readme>
 
 <repo_structure>
-${treeText || "No file tree provided"}
+${escapeForPromptBlock(treeText || "No file tree provided")}
 </repo_structure>
 
 <code_files>
-${filesText || "No code files provided"}
+${escapeForPromptBlock(filesText || "No code files provided")}
 </code_files>
 
 Instructions:
@@ -75,12 +79,12 @@ export function buildQuickPrompt(
 Write a ONE-SENTENCE plain-English definition of what this GitHub repository is.
 
 <repository_metadata>
-Name: ${repoName}
-Description: ${description || "No description provided"}
+Name: ${escapeForPromptBlock(repoName)}
+Description: ${escapeForPromptBlock(description || "No description provided")}
 </repository_metadata>
 
 <readme>
-${readmeSnippet}
+${escapeForPromptBlock(readmeSnippet)}
 </readme>
 
 Rules:
@@ -112,16 +116,16 @@ export function buildSimplePrompt(
 Summarize this GitHub repository in a concise bullet-point format.
 
 <repository_metadata>
-Name: ${repoName}
-Description: ${description || "No description provided"}
+Name: ${escapeForPromptBlock(repoName)}
+Description: ${escapeForPromptBlock(description || "No description provided")}
 </repository_metadata>
 
 <readme>
-${readmeContent}
+${escapeForPromptBlock(readmeContent)}
 </readme>
 
 <repo_structure>
-${treeContent}
+${escapeForPromptBlock(treeContent)}
 </repo_structure>
 
 Output style rules:
