@@ -128,6 +128,26 @@ def run_doctor() -> int:
     return 0 if (ok1 and ok2) else 1
 
 
+def safe_read_repo_files(owner: str, repo: str):
+    try:
+        return read_repo_signal_files(owner, repo)
+    except Exception as e:
+        print(f"warning: could not read repository files: {e}")
+        return None
+
+
+def generate_with_exit(prompt: str) -> str:
+    try:
+        return generate_explanation(prompt)
+    except Exception as e:
+        print("Failed to generate explanation.")
+        print(f"error: {e}")
+        print("\nfix:")
+        print("- Ensure GEMINI_API_KEY is set")
+        print("- Or run: explainthisrepo --doctor")
+        raise SystemExit(1)
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="explainthisrepo",
@@ -242,15 +262,7 @@ def main():
 
         print("Generating explanation...")
 
-        try:
-            output = generate_explanation(prompt)
-        except Exception as e:
-            print("Failed to generate explanation.")
-            print(f"error: {e}")
-            print("\nfix:")
-            print("- Ensure GEMINI_API_KEY is set")
-            print("- Or run: explainthisrepo --doctor")
-            raise SystemExit(1)
+        output = generate_with_exit(prompt)
 
         print("Quick summary 🎉")
         print(output.strip())
@@ -258,11 +270,7 @@ def main():
 
     # SIMPLE MODE
     if args.simple:
-        try:
-            read_result = read_repo_signal_files(owner, repo)
-        except Exception as e:
-            print(f"warning: could not read repository files: {e}")
-            read_result = None
+        read_result = safe_read_repo_files(owner, repo)
 
         prompt = build_simple_prompt(
             repo_name=repo_data.get("full_name"),
@@ -273,26 +281,14 @@ def main():
 
         print("Generating explanation...")
 
-        try:
-            output = generate_explanation(prompt)
-        except Exception as e:
-            print("Failed to generate explanation.")
-            print(f"error: {e}")
-            print("\nfix:")
-            print("- Ensure GEMINI_API_KEY is set")
-            print("- Or run: explainthisrepo --doctor")
-            raise SystemExit(1)
+        output = generate_with_exit(prompt)
 
         print("Simple summary 🎉")
         print(output.strip())
         return
 
     # NORMAL / DETAILED MODE
-    try:
-        read_result = read_repo_signal_files(owner, repo)
-    except Exception as e:
-        print(f"warning: could not read repository files: {e}")
-        read_result = None
+    read_result = safe_read_repo_files(owner, repo)
 
     prompt = build_prompt(
         repo_name=repo_data.get("full_name"),
@@ -305,15 +301,7 @@ def main():
 
     print("Generating explanation...")
 
-    try:
-        output = generate_explanation(prompt)
-    except Exception as e:
-        print("Failed to generate explanation.")
-        print(f"error: {e}")
-        print("\nfix:")
-        print("- Ensure GEMINI_API_KEY is set")
-        print("- Or run: explainthisrepo --doctor")
-        raise SystemExit(1)
+    output = generate_with_exit(prompt)
 
     print("Writing EXPLAIN.md...")
     write_output(output)
