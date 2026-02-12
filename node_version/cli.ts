@@ -106,11 +106,13 @@ async function checkUrl(
 
     clearTimeout(t);
     return { ok: res.ok, msg: `ok (${res.status})` };
-  } catch (e: any) {
+  } catch (e: unknown) {
     clearTimeout(t);
+    const message = e instanceof Error ? e.message : String(e);
+    const name = e instanceof Error ? e.name : "Error";
     return {
       ok: false,
-      msg: `failed (${e?.name || "Error"}: ${e?.message || e})`,
+      msg: `failed (${name}: ${message})`,
     };
   }
 }
@@ -143,8 +145,9 @@ async function safeReadRepoFiles(
 ): Promise<RepoReadResult | null> {
   try {
     return await readRepoSignalFiles(owner, repo);
-  } catch (e: any) {
-    console.warn(`Warning: Could not read repo files: ${e?.message || e}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.warn(`Warning: Could not read repo files: ${message}`);
     return null;
   }
 }
@@ -152,9 +155,10 @@ async function safeReadRepoFiles(
 async function generateWithExit(prompt: string): Promise<string> {
   try {
     return await generateExplanation(prompt);
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
     console.error("Failed to generate explanation.");
-    console.error(`error: ${e?.message || e}`);
+    console.error(`error: ${message}`);
     console.error("\nfix:");
     console.error("- Ensure GEMINI_API_KEY is set");
     console.error("- Or run: explainthisrepo --doctor");
@@ -220,8 +224,9 @@ Examples:
 
   try {
     ({ owner, repo } = resolveRepoTarget(repository));
-  } catch (e: any) {
-    console.error(`error: ${e.message}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error(`error: ${message}`);
     process.exit(1);
   }
 
@@ -240,8 +245,9 @@ Examples:
 
       printStack(report, owner, repo);
       return;
-    } catch (e: any) {
-      console.error(`error: ${e?.message || e}`);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error(`error: ${message}`);
       process.exit(1);
     }
   }
@@ -250,9 +256,10 @@ Examples:
 
   try {
     repoData = await fetchRepo(owner, repo);
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
     console.error("Failed to fetch repository data.");
-    console.error(`error: ${e?.message || e}`);
+    console.error(`error: ${message}`);
     console.error("\nfix:");
     console.error("- Ensure the repository exists and is public");
     console.error("- Or set GITHUB_TOKEN to avoid rate limits");
@@ -263,8 +270,9 @@ Examples:
 
   try {
     readme = await fetchReadme(owner, repo);
-  } catch (e: any) {
-    console.warn(`Warning: Could not fetch README: ${e?.message || e}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.warn(`Warning: Could not fetch README: ${message}`);
     readme = null;
   }
 
