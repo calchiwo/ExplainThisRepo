@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 
 import { fetchRepo, fetchReadme } from "./github.js";
-import { buildPrompt, buildSimplePrompt } from "./prompt.js";
+import { buildPrompt, buildQuickPrompt, buildSimplePrompt } from "./prompt.js";
 import { generateExplanation } from "./generate.js";
 import { writeOutput } from "./writer.js";
 import { readRepoSignalFiles } from "./repo_reader.js";
@@ -243,14 +243,80 @@ Examples:
     readme = null;
   }
 
-  let readResult: any = null;
-  if (!options.quick) {
+  // QUICK MODE
+  if (options.quick) {
+    const prompt = buildQuickPrompt(
+      repoData.full_name,
+      repoData.description,
+      readme
+    );
+
+    console.log("Generating explanation...");
+
+    let output: string;
+
+    try {
+      output = await generateExplanation(prompt);
+    } catch (e: any) {
+      console.error("Failed to generate explanation.");
+      console.error(`error: ${e?.message || e}`);
+      console.error("\nfix:");
+      console.error("- Ensure GEMINI_API_KEY is set");
+      console.error("- Or run: explainthisrepo --doctor");
+      process.exit(1);
+    }
+
+    console.log("Quick summary 🎉");
+    console.log(output.trim());
+    return;
+  }
+
+  // SIMPLE MODE
+  if (options.simple) {
+    let readResult: any = null;
+
     try {
       readResult = await readRepoSignalFiles(owner, repo);
     } catch (e: any) {
       console.warn(`Warning: Could not read repo files: ${e?.message || e}`);
       readResult = null;
     }
+
+    const prompt = buildSimplePrompt(
+      repoData.full_name,
+      repoData.description,
+      readme,
+      readResult?.treeText ?? null
+    );
+
+    console.log("Generating explanation...");
+
+    let output: string;
+
+    try {
+      output = await generateExplanation(prompt);
+    } catch (e: any) {
+      console.error("Failed to generate explanation.");
+      console.error(`error: ${e?.message || e}`);
+      console.error("\nfix:");
+      console.error("- Ensure GEMINI_API_KEY is set");
+      console.error("- Or run: explainthisrepo --doctor");
+      process.exit(1);
+    }
+
+    console.log("Simple summary 🎉");
+    console.log(output.trim());
+    return;
+  }
+
+  // NORMAL / DETAILED MODE
+  let readResult: any = null;
+
+  try {
+    readResult = await readRepoSignalFiles(owner, repo);
+  } catch (e: any) {
+    console.warn(`Warning: Could not read repo files: ${e?.message || e}`);
+    readResult = null;
   }
 
   const prompt = buildPrompt(
@@ -258,7 +324,6 @@ Examples:
     repoData.description,
     readme,
     options.detailed || false,
-    options.quick || false,
     readResult?.treeText ?? null,
     readResult?.filesText ?? null
   );
@@ -276,34 +341,6 @@ Examples:
     console.error("- Ensure GEMINI_API_KEY is set");
     console.error("- Or run: explainthisrepo --doctor");
     process.exit(1);
-  }
-
-  if (options.quick) {
-    console.log("Quick summary 🎉");
-    console.log(output.trim());
-    return;
-  }
-
-  if (options.simple) {
-    console.log("Summarizing...");
-    const simplePrompt = buildSimplePrompt(output);
-
-    let simpleOutput: string;
-
-    try {
-      simpleOutput = await generateExplanation(simplePrompt);
-    } catch (e: any) {
-      console.error("Failed to generate explanation.");
-      console.error(`error: ${e?.message || e}`);
-      console.error("\nfix:");
-      console.error("- Ensure GEMINI_API_KEY is set");
-      console.error("- Or run: explainthisrepo --doctor");
-      process.exit(1);
-    }
-
-    console.log("Simple summary 🎉");
-    console.log(simpleOutput.trim());
-    return;
   }
 
   console.log("Writing EXPLAIN.md...");

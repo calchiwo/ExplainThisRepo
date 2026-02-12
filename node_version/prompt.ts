@@ -3,38 +3,9 @@ export function buildPrompt(
   description: string | null,
   readme: string | null,
   detailed: boolean = false,
-  quick: boolean = false,
   treeText: string | null = null,
   filesText: string | null = null
 ): string {
-  // QUICK MODE: one sentence definition only
-  if (quick) {
-    const readmeSnippet = (readme || "").slice(0, 2000);
-
-    return `
-You are a senior software engineer.
-
-Write a ONE-SENTENCE plain-English definition of what this GitHub repository is.
-
-Repository:
-- Name: ${repoName}
-- Description: ${description || "No description provided"}
-
-README snippet:
-${readmeSnippet || "No README provided"}
-
-Rules:
-- Output MUST be exactly 1 sentence.
-- Plain English.
-- No markdown.
-- No quotes.
-- No bullet points.
-- No extra text.
-- Do not add features not stated in the description/README.
-`.trim();
-  }
-
-  // NORMAL / DETAILED MODE
   let prompt = `You are a senior software engineer.
 
 Your task is to explain a GitHub repository clearly and concisely for a human reader.
@@ -46,10 +17,10 @@ Repository:
 README content:
 ${readme || "No README provided"}
 
-Repository structure:
-${treeText || "No tree provided"}
+Repo structure:
+${treeText || "No file tree provided"}
 
-Key files (snippets):
+Key code files:
 ${filesText || "No code files provided"}
 
 Instructions:
@@ -72,7 +43,7 @@ Additional instructions:
 - Mention important files and their roles.
 `;
   }
-  
+
   prompt += `
 
 Output format:
@@ -86,14 +57,59 @@ Output format:
   return prompt.trim();
 }
 
-export function buildSimplePrompt(longExplanation: string): string {
-  return `
-You are a senior software engineer.
+export function buildQuickPrompt(
+  repoName: string,
+  description: string | null,
+  readme: string | null
+): string {
+  const readmeSnippet = (readme || "No README provided").slice(0, 2000);
 
-Rewrite the long repository explanation below into a SIMPLE version in the exact style specified.
+  const prompt = `You are a senior software engineer.
 
-Input explanation:
-${longExplanation}
+Write a ONE-SENTENCE plain-English definition of what this GitHub repository is.
+
+Repository:
+- Name: ${repoName}
+- Description: ${description || "No description provided"}
+
+README snippet:
+${readmeSnippet}
+
+Rules:
+- Output MUST be exactly 1 sentence.
+- Plain English.
+- No markdown.
+- No quotes.
+- No bullet points.
+- No extra text.
+- Do not add features not stated in the description/README.
+`;
+
+  return prompt.trim();
+}
+
+export function buildSimplePrompt(
+  repoName: string,
+  description: string | null,
+  readme: string | null,
+  treeText: string | null = null
+): string {
+  const readmeContent = (readme || "No README provided").slice(0, 4000);
+  const treeContent = (treeText || "No file tree provided").slice(0, 1500);
+
+  const prompt = `You are a senior software engineer.
+
+Summarize this GitHub repository in a concise bullet-point format.
+
+Repository:
+- Name: ${repoName}
+- Description: ${description || "No description provided"}
+
+README content:
+${readmeContent}
+
+Repo structure:
+${treeContent}
 
 Output style rules:
 - Plain English.
@@ -105,13 +121,14 @@ Key points from the repo:
 - Each bullet MUST start with: ⬤
 - Each bullet title should be 1–3 words only (example: "Purpose", "Stack", "Entrypoints", "How it works", "Usage", "Structure").
 - Each bullet body should be 1–2 lines max.
-- If the input contains architecture/pipeline steps, capture them naturally.
-- If the input does NOT contain architecture/pipeline steps, do NOT invent them.
+- Base bullets strictly on the provided README and structure.
+- Do NOT invent features, architecture, or details not present in the input.
 - Optional: end with one extra line starting with:
 Also interesting:
-- Do NOT add features not present in the input.
 - No quotes.
 
 Make it feel like a human developer explaining to another developer in simple terms.
-`.trim();
+`;
+
+  return prompt.trim();
 }
