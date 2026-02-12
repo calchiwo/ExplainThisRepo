@@ -1,6 +1,6 @@
 {
   "name": "explainthisrepo",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A CLI developer tool to explain any GitHub repository in plain English",
   "license": "MIT",
   "type": "module",
