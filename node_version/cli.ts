@@ -11,7 +11,7 @@ import { fetchRepo, fetchReadme } from "./github.js";
 import { buildPrompt, buildQuickPrompt, buildSimplePrompt } from "./prompt.js";
 import { generateExplanation } from "./generate.js";
 import { writeOutput } from "./writer.js";
-import { readRepoSignalFiles } from "./repo_reader.js";
+import { readRepoSignalFiles, type RepoReadResult } from "./repo_reader.js";
 
 import { fetchLanguages } from "./github.js";
 import { detectStack } from "./stack-detector.js";
@@ -137,6 +137,31 @@ async function runDoctor(): Promise<number> {
   return gh.ok && gem.ok ? 0 : 1;
 }
 
+async function safeReadRepoFiles(
+  owner: string,
+  repo: string
+): Promise<RepoReadResult | null> {
+  try {
+    return await readRepoSignalFiles(owner, repo);
+  } catch (e: any) {
+    console.warn(`Warning: Could not read repo files: ${e?.message || e}`);
+    return null;
+  }
+}
+
+async function generateWithExit(prompt: string): Promise<string> {
+  try {
+    return await generateExplanation(prompt);
+  } catch (e: any) {
+    console.error("Failed to generate explanation.");
+    console.error(`error: ${e?.message || e}`);
+    console.error("\nfix:");
+    console.error("- Ensure GEMINI_API_KEY is set");
+    console.error("- Or run: explainthisrepo --doctor");
+    process.exit(1);
+  }
+}
+
 async function main(): Promise<void> {
   const program = new Command();
 
@@ -253,18 +278,7 @@ Examples:
 
     console.log("Generating explanation...");
 
-    let output: string;
-
-    try {
-      output = await generateExplanation(prompt);
-    } catch (e: any) {
-      console.error("Failed to generate explanation.");
-      console.error(`error: ${e?.message || e}`);
-      console.error("\nfix:");
-      console.error("- Ensure GEMINI_API_KEY is set");
-      console.error("- Or run: explainthisrepo --doctor");
-      process.exit(1);
-    }
+    const output = await generateWithExit(prompt);
 
     console.log("Quick summary 🎉");
     console.log(output.trim());
@@ -273,14 +287,7 @@ Examples:
 
   // SIMPLE MODE
   if (options.simple) {
-    let readResult: any = null;
-
-    try {
-      readResult = await readRepoSignalFiles(owner, repo);
-    } catch (e: any) {
-      console.warn(`Warning: Could not read repo files: ${e?.message || e}`);
-      readResult = null;
-    }
+    const readResult = await safeReadRepoFiles(owner, repo);
 
     const prompt = buildSimplePrompt(
       repoData.full_name,
@@ -291,18 +298,7 @@ Examples:
 
     console.log("Generating explanation...");
 
-    let output: string;
-
-    try {
-      output = await generateExplanation(prompt);
-    } catch (e: any) {
-      console.error("Failed to generate explanation.");
-      console.error(`error: ${e?.message || e}`);
-      console.error("\nfix:");
-      console.error("- Ensure GEMINI_API_KEY is set");
-      console.error("- Or run: explainthisrepo --doctor");
-      process.exit(1);
-    }
+    const output = await generateWithExit(prompt);
 
     console.log("Simple summary 🎉");
     console.log(output.trim());
@@ -310,14 +306,7 @@ Examples:
   }
 
   // NORMAL / DETAILED MODE
-  let readResult: any = null;
-
-  try {
-    readResult = await readRepoSignalFiles(owner, repo);
-  } catch (e: any) {
-    console.warn(`Warning: Could not read repo files: ${e?.message || e}`);
-    readResult = null;
-  }
+  const readResult = await safeReadRepoFiles(owner, repo);
 
   const prompt = buildPrompt(
     repoData.full_name,
@@ -330,18 +319,7 @@ Examples:
 
   console.log("Generating explanation...");
 
-  let output: string;
-
-  try {
-    output = await generateExplanation(prompt);
-  } catch (e: any) {
-    console.error("Failed to generate explanation.");
-    console.error(`error: ${e?.message || e}`);
-    console.error("\nfix:");
-    console.error("- Ensure GEMINI_API_KEY is set");
-    console.error("- Or run: explainthisrepo --doctor");
-    process.exit(1);
-  }
+  const output = await generateWithExit(prompt);
 
   console.log("Writing EXPLAIN.md...");
   writeOutput(output);
