@@ -5,6 +5,7 @@ export default function Page() {
     <main>
       <Navbar />
       <Hero />
+      <Features />
     </main>
   )
 }
