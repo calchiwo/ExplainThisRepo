@@ -6,6 +6,7 @@ export default function Page() {
       <Navbar />
       <Hero />
       <Features />
+      <Modes />
     </main>
   )
 }
