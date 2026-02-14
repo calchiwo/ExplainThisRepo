@@ -7,6 +7,8 @@ export default function Page() {
       <Hero />
       <Features />
       <Modes />
+      <InputFormats />
+      <Install />
     </main>
   )
 }
