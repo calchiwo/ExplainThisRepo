@@ -39,23 +39,45 @@ This tool solves the problem of understanding unfamiliar codebases. It speeds up
 
 - (no flag) → Full repository explanation written to EXPLAIN.md
 
-- --quick → One-sentence summary
+- `--quick` → One-sentence summary
 
-- --simple → Short, easy explanation
+- `--simple` → Short, easy explanation
 
-- --detailed → Deeper explanation including structure and architecture
+- `--detailed` → Deeper explanation including structure and architecture
 
-- --stack → Tech stack breakdown from repo signals
+- `--stack` → Tech stack breakdown from repo signals
 
-- --version → Show CLI version
+- `--version` → Show CLI version
 
-- --help → Show usage guide
+- `--help` → Show usage guide
+
+- `--doctor` → Check environmental health and API connectivity
 
 ---
 
+## Configuration
+
+ExplainThisRepo uses Gemini models for code analysis.
+
+Set your API key as an environment variable.
+
+macOS / Linux
+
+```linux
+export GEMINI_API_KEY="your_api_key_here"
+```
+
+Windows (PowerShell)
+
+```powershell
+setx GEMINI_API_KEY "your_api_key_here"
+```
+
+Restart your terminal after setting the key.
+
 ## Installation
 
-## Option 1: install via pip (recommended):
+### Option 1: install via pip (recommended):
 
 Requirements: Python 3.9+
 
@@ -71,7 +93,7 @@ pipx install explainthisrepo
 explainthisrepo owner/repo
 ```
 
-## Option 2: Install with npm
+### Option 2: Install with npm
 
 Install globally and use forever:
 ```bash
@@ -173,26 +195,6 @@ Check environment + connectivity (useful for debugging):
 ```bash
 explainthisrepo --doctor
 ```
-
-## Configuration
-
-ExplainThisRepo uses Gemini models for code analysis.
-
-Set your API key as an environment variable.
-
-macOS / Linux
-
-```linux
-export GEMINI_API_KEY="your_api_key_here"
-```
-
-Windows (PowerShell)
-
-```powershell
-setx GEMINI_API_KEY "your_api_key_here"
-```
-
-Restart your terminal after setting the key.
 
 ## Termux (Android) install notes
 
