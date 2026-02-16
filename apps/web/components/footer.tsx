@@ -48,6 +48,12 @@ export function Footer() {
             >
               Twitter
             </Link>
+            <Link
+              href="mailto:caleb@explainthisrepo.com"
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Contact
+            </Link>
           </div>
 
           <p className="text-xs text-muted-foreground">
