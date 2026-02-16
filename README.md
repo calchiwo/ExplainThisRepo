@@ -1,6 +1,8 @@
 # ExplainThisRepo
 
-ExplainThisRepo is a CLI (Command Line Interface) tool that generates plain-English explanations of public GitHub repositories by analyzing repository structure, README content, and selected high-signal files. It's designed to help developers quickly understand what any public GitHub repository does by analyzing its contents and creating an `EXPLAIN.md` file.
+ExplainThisRepo is a CLI that generates plain-English explanations of public GitHub repositories by analyzing repository structure, README content, and selected high signal files.
+
+It's helps developers understand unfamiliar repositories does by generating a structured `EXPLAIN.md` from real
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -13,25 +15,20 @@ ExplainThisRepo is a CLI (Command Line Interface) tool that generates plain-Engl
 ---
 
 ![demo](https://github.com/user-attachments/assets/837e0593-db64-4657-8855-bb1915011eb6)
-
-## Purpose
-
-This tool solves the problem of understanding unfamiliar codebases. It speeds up onboarding by turning repository structure and code signals into a clear, readable explanation of any public GitHub repository.
-
 ---
 
 ## Key Features
 
+- Understand unfamiliar repositories instantly through structural and architechural summaries by turning structure and code signals into a readable architectural summary
 - Fetches public GitHub repositories automatically
-- Analyzes repository structure and high-signal source files, not just README
-- Uses real repository data (file tree, configs, entrypoints) to ground explanations
+- Analyzes real repository data including file tree, configs, entrypoints, and high signal source files
 - Extracts repo signals from key files (package.json, pyproject.toml, config files, entrypoints)
 - Builds a file tree summary to understand project architecture
 - Detects programming languages via the GitHub API
-- Accepts repositories via owner/repo, GitHub URLs (with or without https), including issue/PR links and query strings, and SSH clone links
-- Generates clear explanations in plain English
+- Accepts repositories via owner/repo, GitHub URLs (with or without https), issue links, query strings, and SSH clone links
+- Generates a structured plain English explanation grounded in actual project files
 - Outputs an EXPLAIN.md file in your current directory (default mode)
-- Multi-mode command-line interface
+- Multi mode command-line interface
 
 ---
 
@@ -63,13 +60,13 @@ Set your API key as an environment variable.
 
 macOS / Linux
 
-```linux
+```bash
 export GEMINI_API_KEY="your_api_key_here"
 ```
 
 Windows (PowerShell)
 
-```powershell
+```bash
 setx GEMINI_API_KEY "your_api_key_here"
 ```
 
@@ -118,7 +115,6 @@ explainthisrepo git@github.com:owner/repo.git
 ```
 
 All inputs are normalized internally to owner/repo.
-No change to engine behavior. Just less friction.
 
 ---
 
@@ -249,6 +245,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 Caleb Wodi
 
-- [Twitter](https://x.com/calchiwo)
-- [LinkedIn](https://linkedin.com/in/calchiwo)
-- [Portfolio](https://calebwodi.vercel.app)
+- Email: caleb@explainthisrepo.com
+- Twitter: [@calchiwo](https://x.com/calchiwo)
+- LinkedIn: [@calchiwo](https://linkedin.com/in/calchiwo)
