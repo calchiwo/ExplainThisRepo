@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "explainthisrepo"
-version = "0.4.2"
+version = "0.5.0"
 description = "A CLI developer tool to explain GitHub repository in plain English"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9,<4.0"
@@ -48,7 +48,6 @@ include = ["explain_this_repo*"]
 Homepage = "https://github.com/calchiwo/ExplainThisRepo"
 Repository = "https://github.com/calchiwo/ExplainThisRepo.git"
 "Bug Tracker" = "https://github.com/calchiwo/ExplainThisRepo/issues"
-"Stars" = "https://github.com/calchiwo/ExplainThisRepo/stargazers"
 
 [project.scripts]
 explainthisrepo = "explain_this_repo.cli:main"
