@@ -162,6 +162,11 @@ def main():
         "  explainthisrepo owner/repo --quick\n"
         "  explainthisrepo owner/repo --simple\n"
         "  explainthisrepo owner/repo --stack\n"
+        "  explainthisrepo .\n"
+        "  explainthisrepo ./path/to/directory\n"
+        "  explainthisrepo . --detailed\n"
+        "  explainthisrepo . --quick\n"
+        "  explainthisrepo . --simple\n"
         "  explainthisrepo . --stack\n"
         "  explainthisrepo --doctor\n"
         "  explainthisrepo --version",
