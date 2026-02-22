@@ -2,6 +2,7 @@
 
 import os from "node:os";
 import process from "node:process";
+import fs from "node:fs";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,6 +13,7 @@ import { buildPrompt, buildQuickPrompt, buildSimplePrompt } from "./prompt.js";
 import { generateExplanation } from "./generate.js";
 import { writeOutput } from "./writer.js";
 import { readRepoSignalFiles, type RepoReadResult } from "./repo_reader.js";
+import { readLocalRepoSignalFiles } from "./local_reader.js";
 
 import { fetchLanguages } from "./github.js";
 import { detectStack } from "./stack-detector.js";
@@ -30,8 +32,8 @@ function resolveRepoTarget(target: string): { owner: string; repo: string } {
 
   // Case 1: SSH clone URL
   if (target.startsWith("git@github.com:")) {
-    const path = target.replace("git@github.com:", "");
-    const [owner, repoRaw] = path.split("/", 2);
+    const p = target.replace("git@github.com:", "");
+    const [owner, repoRaw] = p.split("/", 2);
     if (!owner || !repoRaw) throw new Error("Invalid GitHub SSH URL");
     return { owner, repo: repoRaw.replace(/\.git$/, "") };
   }
@@ -71,7 +73,6 @@ function getPkgVersion(): string {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
 
-    // dist/cli.js -> dist -> package root
     const pkgPath = path.join(__dirname, "..", "package.json");
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 
@@ -110,10 +111,7 @@ async function checkUrl(
     clearTimeout(t);
     const message = e instanceof Error ? e.message : String(e);
     const name = e instanceof Error ? e.name : "Error";
-    return {
-      ok: false,
-      msg: `failed (${name}: ${message})`,
-    };
+    return { ok: false, msg: `failed (${name}: ${message})` };
   }
 }
 
@@ -173,7 +171,7 @@ async function main(): Promise<void> {
     .name("explainthisrepo")
     .description("Explain GitHub repositories in plain English")
     .version(getPkgVersion(), "-v, --version", "Show version")
-    .argument("[repository]", "GitHub repository (owner/repo or URL)")
+    .argument("[repository]", "GitHub repository (owner/repo or URL) or local path")
     .option("--doctor", "Run diagnostics")
     .option("--quick", "Quick summary mode")
     .option("--simple", "Simple summary mode")
@@ -191,6 +189,9 @@ Examples:
   $ explainthisrepo owner/repo --quick
   $ explainthisrepo owner/repo --simple
   $ explainthisrepo owner/repo --stack
+  $ explainthisrepo .
+  $ explainthisrepo ./path/to/directory
+  $ explainthisrepo . --stack
   $ explainthisrepo --doctor`
     );
 
@@ -220,69 +221,94 @@ Examples:
     program.error("repository argument required");
   }
 
-  let owner: string, repo: string;
+  const local = fs.existsSync(repository);
+  let owner = "";
+  let repo = "";
+  let localPath = "";
 
-  try {
-    ({ owner, repo } = resolveRepoTarget(repository));
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    console.error(`error: ${message}`);
-    process.exit(1);
-  }
-
-  console.log(`Fetching ${owner}/${repo}...`);
-
-  if (options.stack) {
+  if (local) {
+    localPath = path.resolve(repository);
+    console.log(`Analyzing local directory: ${repository}`);
+  } else {
     try {
-      const languages = await fetchLanguages(owner, repo);
-      const read = await readRepoSignalFiles(owner, repo);
-
-      const report = detectStack({
-        languages,
-        tree: read.tree,
-        keyFiles: read.keyFiles,
-      });
-
-      printStack(report, owner, repo);
-      return;
+      ({ owner, repo } = resolveRepoTarget(repository));
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
       console.error(`error: ${message}`);
       process.exit(1);
     }
+
+    console.log(`Fetching ${owner}/${repo}...`);
   }
 
-  let repoData: any;
+  if (options.stack) {
+    let read: RepoReadResult;
+    let languages: Record<string, number> = {};
 
-  try {
-    repoData = await fetchRepo(owner, repo);
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    console.error("Failed to fetch repository data.");
-    console.error(`error: ${message}`);
-    console.error("\nfix:");
-    console.error("- Ensure the repository exists and is public");
-    console.error("- Or set GITHUB_TOKEN to avoid rate limits");
-    process.exit(1);
+    if (local) {
+      read = readLocalRepoSignalFiles(localPath);
+    } else {
+      try {
+        languages = await fetchLanguages(owner, repo);
+        read = await readRepoSignalFiles(owner, repo);
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        console.error(`error: ${message}`);
+        process.exit(1);
+      }
+    }
+    const report = detectStack({
+      languages,
+      tree: read.tree,
+      keyFiles: read.keyFiles,
+    });
+
+    const label = local ? repository : owner;
+    const sublabel = local ? "" : repo;
+    printStack(report, label, sublabel);
+    return;
   }
 
+  let repoData: { full_name: string; description: string | null } | null = null;
   let readme: string | null = null;
 
-  try {
-    readme = await fetchReadme(owner, repo);
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    console.warn(`Warning: Could not fetch README: ${message}`);
-    readme = null;
+  if (!local) {
+    try {
+      repoData = await fetchRepo(owner, repo);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error("Failed to fetch repository data.");
+      console.error(`error: ${message}`);
+      console.error("\nfix:");
+      console.error("- Ensure the repository exists and is public");
+      console.error("- Or set GITHUB_TOKEN to avoid rate limits");
+      process.exit(1);
+    }
+
+    try {
+      readme = await fetchReadme(owner, repo);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.warn(`Warning: Could not fetch README: ${message}`);
+      readme = null;
+    }
   }
 
   // QUICK MODE
   if (options.quick) {
-    const prompt = buildQuickPrompt(
-      repoData.full_name,
-      repoData.description,
-      readme
-    );
+    let quickReadme: string | null = readme;
+    const repoName: string = local ? localPath : (repoData?.full_name ?? "");
+    const description: string | null = local ? null : (repoData?.description ?? null);
+
+    if (local) {
+      const read = readLocalRepoSignalFiles(localPath);
+      const readmeKey = Object.keys(read.keyFiles).find((k) =>
+        k.toLowerCase().startsWith("readme")
+      );
+      quickReadme = readmeKey !== undefined ? read.keyFiles[readmeKey] : null;
+    }
+
+    const prompt = buildQuickPrompt(repoName, description, quickReadme);
 
     console.log("Generating explanation...");
 
@@ -295,12 +321,14 @@ Examples:
 
   // SIMPLE MODE
   if (options.simple) {
-    const readResult = await safeReadRepoFiles(owner, repo);
+    const readResult: RepoReadResult | null = local
+      ? readLocalRepoSignalFiles(localPath)
+      : await safeReadRepoFiles(owner, repo);
 
     const prompt = buildSimplePrompt(
-      repoData.full_name,
-      repoData.description,
-      readme,
+      local ? localPath : (repoData?.full_name ?? ""),
+      local ? null : (repoData?.description ?? null),
+      local ? null : readme,
       readResult?.treeText ?? null
     );
 
@@ -314,12 +342,14 @@ Examples:
   }
 
   // NORMAL / DETAILED MODE
-  const readResult = await safeReadRepoFiles(owner, repo);
-
+  const readResult: RepoReadResult | null = local
+    ? readLocalRepoSignalFiles(localPath)
+    : await safeReadRepoFiles(owner, repo);
+    
   const prompt = buildPrompt(
-    repoData.full_name,
-    repoData.description,
-    readme,
+    local ? localPath : (repoData?.full_name ?? ""),
+    local ? null : (repoData?.description ?? null),
+    local ? null : readme,
     options.detailed || false,
     readResult?.treeText ?? null,
     readResult?.filesText ?? null
@@ -339,4 +369,4 @@ Examples:
   console.log("Open EXPLAIN.md to read it.");
 }
 
-main();
+main();                                                                                        
