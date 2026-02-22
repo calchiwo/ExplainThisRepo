@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
+import ora from "ora";
 
 import { fetchRepo, fetchReadme } from "./github.js";
 import { buildPrompt, buildQuickPrompt, buildSimplePrompt } from "./prompt.js";
@@ -22,7 +23,6 @@ import { printStack } from "./stack_printer.js";
 function resolveRepoTarget(target: string): { owner: string; repo: string } {
   target = target.trim();
 
-  // Fix scheme typos
   if (target.startsWith("https//")) {
     target = target.replace("https//", "https://");
   }
@@ -237,8 +237,6 @@ Examples:
       console.error(`error: ${message}`);
       process.exit(1);
     }
-
-    console.log(`Fetching ${owner}/${repo}...`);
   }
 
   if (options.stack) {
@@ -246,21 +244,34 @@ Examples:
     let languages: Record<string, number> = {};
 
     if (local) {
-      read = readLocalRepoSignalFiles(localPath);
+      const spinner = ora("Reading repository files…").start();
+      try {
+        read = readLocalRepoSignalFiles(localPath);
+        spinner.stop();
+      } catch (e: unknown) {
+        spinner.stop();
+        const message = e instanceof Error ? e.message : String(e);
+        console.error(`error: ${message}`);
+        process.exit(1);
+      }
     } else {
+      const spinner = ora(`Fetching ${owner}/${repo}…`).start();
       try {
         languages = await fetchLanguages(owner, repo);
         read = await readRepoSignalFiles(owner, repo);
+        spinner.stop();
       } catch (e: unknown) {
+        spinner.stop();
         const message = e instanceof Error ? e.message : String(e);
         console.error(`error: ${message}`);
         process.exit(1);
       }
     }
+
     const report = detectStack({
       languages,
-      tree: read.tree,
-      keyFiles: read.keyFiles,
+      tree: read!.tree,
+      keyFiles: read!.keyFiles,
     });
 
     const label = local ? repository : owner;
@@ -273,9 +284,13 @@ Examples:
   let readme: string | null = null;
 
   if (!local) {
+    const spinner = ora(`Fetching ${owner}/${repo}…`).start();
     try {
       repoData = await fetchRepo(owner, repo);
+      readme = await fetchReadme(owner, repo);
+      spinner.stop();
     } catch (e: unknown) {
+      spinner.stop();
       const message = e instanceof Error ? e.message : String(e);
       console.error("Failed to fetch repository data.");
       console.error(`error: ${message}`);
@@ -283,14 +298,6 @@ Examples:
       console.error("- Ensure the repository exists and is public");
       console.error("- Or set GITHUB_TOKEN to avoid rate limits");
       process.exit(1);
-    }
-
-    try {
-      readme = await fetchReadme(owner, repo);
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e);
-      console.warn(`Warning: Could not fetch README: ${message}`);
-      readme = null;
     }
   }
 
@@ -301,18 +308,24 @@ Examples:
     const description: string | null = local ? null : (repoData?.description ?? null);
 
     if (local) {
-      const read = readLocalRepoSignalFiles(localPath);
-      const readmeKey = Object.keys(read.keyFiles).find((k) =>
-        k.toLowerCase().startsWith("readme")
-      );
-      quickReadme = readmeKey !== undefined ? read.keyFiles[readmeKey] : null;
+      const spinner = ora("Reading repository files…").start();
+      try {
+        const read = readLocalRepoSignalFiles(localPath);
+        spinner.stop();
+        const readmeKey = Object.keys(read.keyFiles).find((k) =>
+          k.toLowerCase().startsWith("readme")
+        );
+        quickReadme = readmeKey !== undefined ? read.keyFiles[readmeKey] : null;
+      } catch (e: unknown) {
+        spinner.stop();
+        throw e;
+      }
     }
 
     const prompt = buildQuickPrompt(repoName, description, quickReadme);
 
-    console.log("Generating explanation...");
-
-    const output = await generateWithExit(prompt);
+    const spinner = ora("Generating explanation…").start();
+    const output = await generateWithExit(prompt).finally(() => spinner.stop());
 
     console.log("Quick summary 🎉");
     console.log(output.trim());
@@ -321,9 +334,18 @@ Examples:
 
   // SIMPLE MODE
   if (options.simple) {
-    const readResult: RepoReadResult | null = local
-      ? readLocalRepoSignalFiles(localPath)
-      : await safeReadRepoFiles(owner, repo);
+    let readResult: RepoReadResult | null;
+
+    const spinner = ora("Reading repository files…").start();
+    try {
+      readResult = local
+        ? readLocalRepoSignalFiles(localPath)
+        : await safeReadRepoFiles(owner, repo);
+      spinner.stop();
+    } catch (e: unknown) {
+      spinner.stop();
+      throw e;
+    }
 
     const prompt = buildSimplePrompt(
       local ? localPath : (repoData?.full_name ?? ""),
@@ -332,9 +354,10 @@ Examples:
       readResult?.treeText ?? null
     );
 
-    console.log("Generating explanation...");
-
-    const output = await generateWithExit(prompt);
+    const genSpinner = ora("Generating explanation…").start();
+    const output = await generateWithExit(prompt).finally(() =>
+      genSpinner.stop()
+    );
 
     console.log("Simple summary 🎉");
     console.log(output.trim());
@@ -342,10 +365,19 @@ Examples:
   }
 
   // NORMAL / DETAILED MODE
-  const readResult: RepoReadResult | null = local
-    ? readLocalRepoSignalFiles(localPath)
-    : await safeReadRepoFiles(owner, repo);
-    
+  let readResult: RepoReadResult | null;
+
+  const readSpinner = ora("Reading repository files…").start();
+  try {
+    readResult = local
+      ? readLocalRepoSignalFiles(localPath)
+      : await safeReadRepoFiles(owner, repo);
+    readSpinner.stop();
+  } catch (e: unknown) {
+    readSpinner.stop();
+    throw e;
+  }
+
   const prompt = buildPrompt(
     local ? localPath : (repoData?.full_name ?? ""),
     local ? null : (repoData?.description ?? null),
@@ -355,9 +387,10 @@ Examples:
     readResult?.filesText ?? null
   );
 
-  console.log("Generating explanation...");
-
-  const output = await generateWithExit(prompt);
+  const genSpinner = ora("Generating explanation…").start();
+  const output = await generateWithExit(prompt).finally(() =>
+    genSpinner.stop()
+  );
 
   console.log("Writing EXPLAIN.md...");
   writeOutput(output);
@@ -369,4 +402,4 @@ Examples:
   console.log("Open EXPLAIN.md to read it.");
 }
 
-main();                                                                                        
+main();
