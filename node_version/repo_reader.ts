@@ -1,6 +1,6 @@
 import { fetchTree, fetchFile } from "./github.js";
 
-type TreeItem = {
+export type TreeItem = {
   path: string;
   type: "blob" | "tree";
   size?: number;
@@ -16,7 +16,7 @@ export type RepoReadResult = {
 
 const MAX_FILES = 20;
 const MAX_TOTAL_BYTES = 150_000;
-const MAX_FILE_CHARS = 6000; // hard snippet limit per file
+const MAX_FILE_CHARS = 6000;
 
 function isSkippablePath(p: string): boolean {
   const s = p.toLowerCase();
@@ -41,12 +41,10 @@ function isSkippablePath(p: string): boolean {
 function scoreSignalFile(p: string): number {
   const s = p.toLowerCase();
 
-  // project identity
   if (s === "package.json") return 100;
   if (s === "pyproject.toml" || s === "requirements.txt") return 90;
   if (s === "go.mod" || s === "cargo.toml" || s === "pom.xml" || s === "build.gradle") return 85;
 
-  // configs that reveal structure
   if (s === "tsconfig.json") return 75;
   if (s === "next.config.js" || s === "next.config.mjs" || s === "vite.config.ts" || s === "vite.config.js") return 70;
   if (s === "svelte.config.js" || s === "nuxt.config.ts" || s === "nuxt.config.js") return 70;
@@ -54,23 +52,19 @@ function scoreSignalFile(p: string): number {
   if (s === "docker-compose.yml" || s === "compose.yml") return 60;
   if (s === "vercel.json" || s === "netlify.toml") return 55;
 
-  // entrypoints (high signal)
   if (s.endsWith("/main.ts") || s.endsWith("/main.js") || s.endsWith("/index.ts") || s.endsWith("/index.js")) return 60;
   if (s.endsWith("/app.ts") || s.endsWith("/app.js") || s.endsWith("/server.ts") || s.endsWith("/server.js")) return 58;
   if (s.endsWith("/cli.ts") || s.endsWith("/cli.js")) return 57;
   if (s.endsWith("main.py") || s.endsWith("__main__.py")) return 55;
 
-  // monorepo hints
   if (s.startsWith("apps/") || s.startsWith("packages/")) return 50;
 
-  // general source files (lower score)
   if (s.endsWith(".ts") || s.endsWith(".js") || s.endsWith(".py") || s.endsWith(".go") || s.endsWith(".rs")) return 15;
 
   return 0;
 }
 
 function buildTreeSummary(tree: TreeItem[]): string {
-  // show only top-level + second-level for readability
   const lines: string[] = [];
 
   const top = new Set<string>();
@@ -101,7 +95,6 @@ export async function readRepoSignalFiles(
     .filter((x) => x.type === "blob")
     .map((x) => ({ path: x.path, type: "blob", size: x.size }));
 
-  // score + select
   const scored = blobs
     .filter((x) => !isSkippablePath(x.path))
     .map((x) => ({
@@ -117,7 +110,7 @@ export async function readRepoSignalFiles(
 
   for (const f of scored) {
     if (selected.length >= MAX_FILES) break;
-    if (f.size > 0 && f.size > 200_000) continue; // skip huge files
+    if (f.size > 0 && f.size > 200_000) continue;
     if (totalBytes + (f.size || 2000) > MAX_TOTAL_BYTES) continue;
 
     selected.push(f.path);
@@ -143,7 +136,7 @@ export async function readRepoSignalFiles(
         ].join("\n")
       );
     } catch {
-      // ignore file fetch failures
+
     }
   }
 const keyFiles: Record<string, string> = {};
