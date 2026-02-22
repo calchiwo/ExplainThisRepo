@@ -1,8 +1,8 @@
 # ExplainThisRepo
 
-ExplainThisRepo is a CLI that generates plain-English explanations of public GitHub repositories by analyzing repository structure, README content, and selected high signal files.
+ExplainThisRepo is a CLI that generates plain-English explanations of public GitHub repositories and local directories by analyzing project structure, README content, and high signal files.
 
-It's helps developers understand unfamiliar repositories does by generating a structured `EXPLAIN.md` from real
+It helps developers quickly understand unfamiliar codebases by deriving architectural explanations from real project structure and code signals, producing a clear, structured `EXPLAIN.md`.
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -19,15 +19,15 @@ It's helps developers understand unfamiliar repositories does by generating a st
 
 ## Key Features
 
-- Understand unfamiliar repositories instantly through structural and architechural summaries by turning structure and code signals into a readable architectural summary
-- Fetches public GitHub repositories automatically
-- Analyzes real repository data including file tree, configs, entrypoints, and high signal source files
+- Generates architectural summaries from repository structure and code signals
+- Fetches public repositories by GitHub URLs (with or without https), `owner/repo` format, issue links, query strings, and SSH clone links
+- Analyzes repository data including file tree, configs, entrypoints, and high signal source files
 - Extracts repo signals from key files (package.json, pyproject.toml, config files, entrypoints)
 - Builds a file tree summary to understand project architecture
-- Detects programming languages via the GitHub API
-- Accepts repositories via owner/repo, GitHub URLs (with or without https), issue links, query strings, and SSH clone links
+- Detects programming languages with the GitHub API
+- Analyzes local project directories using the same pipeline as GitHub repositories
 - Generates a structured plain English explanation grounded in actual project files
-- Outputs an EXPLAIN.md file in your current directory (default mode)
+- Outputs the explanation to an `EXPLAIN.md` file in your current directory or print it directly in the terminal
 - Multi mode command-line interface
 
 ---
@@ -38,13 +38,13 @@ It's helps developers understand unfamiliar repositories does by generating a st
 
 - `--quick` → One-sentence summary
 
-- `--simple` → Short, easy explanation
+- `--simple` → Short, simplified explanation
 
 - `--detailed` → Deeper explanation including structure and architecture
 
 - `--stack` → Tech stack breakdown from repo signals
 
-- `--version` → Show CLI version
+- `--version` → Check installed CLI version
 
 - `--help` → Show usage guide
 
@@ -56,9 +56,9 @@ It's helps developers understand unfamiliar repositories does by generating a st
 
 ExplainThisRepo uses Gemini models for code analysis.
 
-Set your API key as an environment variable.
+Set your Google Gemini API key as an environment variable.
 
-macOS / Linux
+Linux / macOS
 
 ```bash
 export GEMINI_API_KEY="your_api_key_here"
@@ -74,7 +74,7 @@ Restart your terminal after setting the key.
 
 ## Installation
 
-### Option 1: install via pip (recommended):
+### Option 1: install with pip (recommended):
 
 Requirements: Python 3.9+
 
@@ -99,29 +99,32 @@ explainthisrepo owner/repo
 # or: npx explainthisrepo owner/repo
 ```
 
+Replace `owner/repo` with the GitHub repository identifier (e.g., `facebook/react`).
+
 ---
 
-## Flexible Repository Input
+## Flexible Repository and Local Directory Input
 
-You don’t need to reformat links anymore.
+Accepts various formats for repository input, full GitHub URLs, issue links, and SSH clone links.
 
-ExplainThisRepo accepts GitHub repositories the way you actually copy them.
 ```bash
 explainthisrepo https://github.com/owner/repo
 explainthisrepo github.com/owner/repo
 explainthisrepo https://github.com/owner/repo/issues/123
 explainthisrepo https://github.com/owner/repo?tab=readme
 explainthisrepo git@github.com:owner/repo.git
+explainthisrepo .
+explainthisrepo ./path/to/directory
 ```
 
-All inputs are normalized internally to owner/repo.
+All inputs are normalized internally to `owner/repo`.
 
 ---
 
 ## Usage
 
 ### Basic
-Generate a full explanation and saves it to `EXPLAIN.md`:
+Writes a full explanation to `EXPLAIN.md`:
 
 ```bash
 explainthisrepo owner/repo
@@ -134,7 +137,8 @@ explainthisrepo facebook/react
 
 ### Quick mode
 
-Get a one-sentence definition (prints only, no file created):
+Prints a one-sentence summary to stdout:
+
 ```bash
 explainthisrepo owner/repo --quick
 ```
@@ -148,7 +152,8 @@ explainthisrepo facebook/react --quick
 
 ### Detailed mode
 
-Generate a more detailed explanation (includes architecture / folder structure):
+Writes a more detailed explanation of repository structure and architecture:
+
 ```bash
 explainthisrepo owner/repo --detailed
 ```
@@ -159,7 +164,8 @@ explainthisrepo owner/repo --detailed
 
 ### Simple mode
 
-Prints only the simple output (no EXPLAIN.md)
+Prints a short, simplified explanation to stdout. No files are written.
+
 ```bash
 explainthisrepo owner/repo --simple
 ```
@@ -170,15 +176,43 @@ explainthisrepo owner/repo --simple
 
 ### Stack detector
 
-Get a tech stack breakdown detected from repo signals. No AI explanation. Prints only.
+Tech stack breakdown detected from repo signals. No LLM calls are made.
+
 ```bash
 explainthisrepo owner/repo --stack
 ```
 ![Stack detector Output](assets/stack-command-output.png)
 
+### Local Directory Analysis
+
+ExplainThisRepo can analyze local directories directly in the terminal, using the same modes and output formats as GitHub repositories
+
+```bash
+explainthisrepo .
+explainthisrepo ./path/to/directory
+```
+
+This works with all existing modes:
+
+```bash
+explainthisrepo . --quick
+explainthisrepo . --simple
+explainthisrepo . --detailed
+explainthisrepo . --stack
+```
+
+When analyzing a local directory:
+- Repository structure is derived from the filesystem
+- Key files (README, configs, entrypoints) are extracted locally
+- No GitHub APIs calls are made
+- All prompts and outputs remain identical
+
+This allows analysis of projects directly from the local filesystem, without requiring a GitHub repository.
+
 ### Version
 
-Print the installed version:
+Print the installed CLI version:
+
 ```bash
 explainthisrepo --version
 ```
@@ -187,12 +221,13 @@ explainthisrepo --version
 
 ### Doctor
 
-Check environment + connectivity (useful for debugging):
+Check environment and connectivity (useful for debugging):
+
 ```bash
 explainthisrepo --doctor
 ```
 
-## Termux (Android) install notes
+### Termux (Android) install notes
 
 Termux has some environment limitations that can make `pip install explainthisrepo` fail to create the `explainthisrepo` command in `$PREFIX/bin`.
 
@@ -216,7 +251,7 @@ If you do not want to modify PATH, you can run ExplainThisRepo as a module:
 python -m explain_this_repo owner/repo
 ```
 
-Gemini support on Termux (Optional)
+### Gemini support on Termux (Optional)
 
 Installing Gemini support may require building Rust-based dependencies on Android, which can take time on first install:
 
