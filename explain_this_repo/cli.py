@@ -367,5 +367,13 @@ def main():
     print("Open EXPLAIN.md to read it.")
 
 
+def _run():
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nInterrupted.", file=sys.stderr)
+        raise SystemExit(130)
+
+
 if __name__ == "__main__":
-    main()
+    _run()
