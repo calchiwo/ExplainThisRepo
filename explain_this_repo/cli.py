@@ -189,6 +189,12 @@ def main():
     )
 
     parser.add_argument(
+        "command",
+        nargs="?",
+        help="Optional command (e.g. init)",
+    )
+
+    parser.add_argument(
         "repository",
         nargs="?",
         help="GitHub repository (owner/repo or URL) or local path",
@@ -218,6 +224,12 @@ def main():
 
     args = parser.parse_args()
 
+    if args.command == "init":
+        from explain_this_repo.init import run_init
+
+        run_init()
+        return
+
     if args.doctor:
         raise SystemExit(run_doctor())
 
@@ -226,7 +238,7 @@ def main():
         return
 
     if not args.repository:
-        parser.error("repository argument required")
+        parser.error("repository argument required (or use 'init')")
 
     target = args.repository
 
@@ -367,5 +379,13 @@ def main():
     print("Open EXPLAIN.md to read it.")
 
 
+def _run():
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nInterrupted.", file=sys.stderr)
+        raise SystemExit(130)
+
+
 if __name__ == "__main__":
-    main()
+    _run()
