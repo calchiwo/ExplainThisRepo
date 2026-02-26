@@ -1,6 +1,5 @@
 import readline, { Interface as ReadlineInterface } from "node:readline";
 import process from "node:process";
-import { stdin as input, stderr as output } from "node:process";
 import chalk from "chalk";
 
 import { writeConfig } from "./config.js";
@@ -15,9 +14,11 @@ api_key = "{api_key}"
 `;
 
 export async function runInit(): Promise<void> {
-  output.write(
+  const err = process.stderr;
+
+  err.write(
     chalk.yellow(
-      "WARNING: input is hidden. Paste your GEMINI_API_KEY and press Enter.\n"
+      "WARNING: input is hidden. Paste your GEMINI_API_KEY and press Enter.\n\n"
     )
   );
 
@@ -25,33 +26,42 @@ export async function runInit(): Promise<void> {
     const apiKey = (await promptHidden("Gemini API key: ")).trim();
 
     if (!apiKey) {
-      output.write(chalk.red("error: API key cannot be empty\n"));
+      err.write(chalk.red("error: API key cannot be empty\n"));
       process.exit(1);
     }
 
     writeConfig(CONFIG_TEMPLATE.replace("{api_key}", apiKey));
 
-    output.write(chalk.green("Configuration written.\n"));
+    err.write("\r");
+    err.write("\x1b[2K");
+    err.write(chalk.green("Configuration written.\n"));
     process.exit(0);
   } catch {
-    output.write(chalk.red("\nInterrupted.\n"));
+    err.write(chalk.red("\nInterrupted.\n"));
     process.exit(130);
   }
 }
 
-function promptHidden(prompt: string): Promise<string> {
+function promptHidden(label: string): Promise<string> {
+  const err = process.stderr;
+
   return new Promise((resolve) => {
+    // 1. Print prompt ourselves
+    err.write(label);
+
+    // 2. Read input WITHOUT owning output
     const rl = readline.createInterface({
-      input,
-      output,
+      input: process.stdin,
+      output: undefined,
       terminal: true,
     }) as HiddenReadlineInterface;
 
+    // 3. Disable echo
     rl._writeToOutput = () => {};
 
-    rl.question(prompt, (answer) => {
+    rl.question("", (answer) => {
       rl.close();
-      output.write("\n");
+      err.write("\n");
       resolve(answer);
     });
   });
