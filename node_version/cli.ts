@@ -8,6 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import ora from "ora";
+import { runInit } from "./init.js";
 
 import { fetchRepo, fetchReadme } from "./github.js";
 import { buildPrompt, buildQuickPrompt, buildSimplePrompt } from "./prompt.js";
@@ -169,7 +170,7 @@ async function main(): Promise<void> {
 
   program
     .name("explainthisrepo")
-    .description("Explain any codebase in plain English")
+    .description("CLI that generates plain English explanations of any codebase")
     .version(getPkgVersion(), "-v, --version", "Show version")
     .argument("[repository]", "GitHub repository (owner/repo or URL) or local directories")
     .option("--doctor", "Run diagnostics")
@@ -195,7 +196,18 @@ Examples:
   $ explainthisrepo --doctor`
     );
 
+  program
+    .command("init")
+    .description("Initialize configuration with Gemini API key")
+    .action(async () => {
+      await runInit();
+    });
+
   program.parse(process.argv);
+
+  if (process.argv[2] === "init") {
+    return;
+  }
 
   const options = program.opts();
   const repository = program.args[0];
@@ -218,7 +230,7 @@ Examples:
   }
 
   if (!repository) {
-    program.error("repository argument required");
+    program.error("repository argument required (or use `init` to set up API key)");
   }
 
   const local = fs.existsSync(repository);
