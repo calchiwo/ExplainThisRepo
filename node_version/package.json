@@ -1,7 +1,7 @@
 {
   "name": "explainthisrepo",
-  "version": "0.5.1",
-  "description": "A CLI developer tool that generate plain English explanations of any codebase",
+  "version": "0.6.1",
+  "description": "CLI that generates plain English explanations of any codebase",
   "license": "MIT",
   "type": "module",
   "author": "Caleb Wodi <calebwodi33@gmail.com>",

@@ -26,9 +26,9 @@ It helps developers quickly understand unfamiliar codebases by deriving architec
 - Builds a file tree summary to understand project architecture
 - Detects programming languages with the GitHub API
 - Analyzes local project directories using the same pipeline as GitHub repositories
-- Generates a structured plain English explanation grounded in actual project files
-- Outputs the explanation to an `EXPLAIN.md` file in your current directory or print it directly in the terminal
-- Multi mode command-line interface
+- Generates a structured plain-English explanation grounded in actual project files
+- Outputs the explanation to an `EXPLAIN.md` file in your current directory or prints it directly in the terminal
+- Multi-mode command-line interface
 
 ---
 
@@ -54,9 +54,21 @@ It helps developers quickly understand unfamiliar codebases by deriving architec
 
 ## Configuration
 
-ExplainThisRepo uses Gemini models for code analysis.
+ExplainThisRepo requires a Google Gemini API key for code analysis.
 
-Set your Google Gemini API key as an environment variable.
+### Quick setup (recommended)
+
+Use the built-in `init` command to securely store your API key:
+
+```bash
+explainthisrepo init
+# or npx explainthisrepo init
+```
+> For details about how initialization works, see [INIT.md](INIT.md).
+
+### Environment variable (manual setup)
+
+If you prefer not to use the `init` command, you can also configure the API key using an environment variable
 
 Linux / macOS
 
