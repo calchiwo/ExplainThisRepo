@@ -31,7 +31,6 @@ function resolveRepoTarget(target: string): { owner: string; repo: string } {
     target = target.replace("http//", "http://");
   }
 
-  // Case 1: SSH clone URL
   if (target.startsWith("git@github.com:")) {
     const p = target.replace("git@github.com:", "");
     const [owner, repoRaw] = p.split("/", 2);
@@ -39,12 +38,10 @@ function resolveRepoTarget(target: string): { owner: string; repo: string } {
     return { owner, repo: repoRaw.replace(/\.git$/, "") };
   }
 
-  // Case 2: github.com/owner/repo
   if (target.startsWith("github.com/")) {
     target = "https://" + target;
   }
 
-  // Case 3: Full URL
   if (target.startsWith("http://") || target.startsWith("https://")) {
     const url = new URL(target);
 
@@ -60,7 +57,6 @@ function resolveRepoTarget(target: string): { owner: string; repo: string } {
     return { owner: parts[0], repo: parts[1].replace(/\.git$/, "") };
   }
 
-  // Case 4: owner/repo
   const parts = target.split("/");
   if (parts.length === 2 && parts[0] && parts[1]) {
     return { owner: parts[0], repo: parts[1] };
@@ -81,10 +77,6 @@ function getPkgVersion(): string {
   } catch {
     return "unknown";
   }
-}
-
-function printVersion(): void {
-  console.log(getPkgVersion());
 }
 
 function hasEnv(key: string): boolean {
@@ -165,53 +157,16 @@ async function generateWithExit(prompt: string): Promise<string> {
   }
 }
 
-async function main(): Promise<void> {
-  const program = new Command();
-
-  program
-    .name("explainthisrepo")
-    .description("CLI that generates plain English explanations of any codebase")
-    .version(getPkgVersion(), "-v, --version", "Show version")
-    .argument("[repository]", "GitHub repository (owner/repo or URL) or local directories")
-    .option("--doctor", "Run diagnostics")
-    .option("--quick", "Quick summary mode")
-    .option("--simple", "Simple summary mode")
-    .option("--detailed", "Detailed explanation mode")
-    .option("--stack", "Stack detection mode")
-    .addHelpText(
-      "after",
-      `
-Examples:
-  $ explainthisrepo owner/repo
-  $ explainthisrepo https://github.com/owner/repo
-  $ explainthisrepo github.com/owner/repo
-  $ explainthisrepo git@github.com:owner/repo.git
-  $ explainthisrepo owner/repo --detailed
-  $ explainthisrepo owner/repo --quick
-  $ explainthisrepo owner/repo --simple
-  $ explainthisrepo owner/repo --stack
-  $ explainthisrepo .
-  $ explainthisrepo ./path/to/directory
-  $ explainthisrepo . --stack
-  $ explainthisrepo --doctor`
-    );
-
-  program
-    .command("init")
-    .description("Initialize configuration with Gemini API key")
-    .action(async () => {
-      await runInit();
-    });
-
-  program.parse(process.argv);
-
-  if (process.argv[2] === "init") {
-    return;
+async function runAnalysis(
+  repository: string,
+  options: {
+    doctor?: boolean;
+    quick?: boolean;
+    simple?: boolean;
+    detailed?: boolean;
+    stack?: boolean;
   }
-
-  const options = program.opts();
-  const repository = program.args[0];
-
+): Promise<void> {
   if (options.doctor) {
     const code = await runDoctor();
     process.exit(code);
@@ -227,10 +182,6 @@ Examples:
   if (modeFlags.length > 1) {
     console.error("error: only one mode flag can be used at a time");
     process.exit(1);
-  }
-
-  if (!repository) {
-    program.error("repository argument required (or use `init` to set up API key)");
   }
 
   const local = fs.existsSync(repository);
@@ -414,4 +365,60 @@ Examples:
   console.log("Open EXPLAIN.md to read it.");
 }
 
-main();
+const program = new Command();
+
+program
+  .name("explainthisrepo")
+  .description("CLI that generates plain English explanations of any codebase")
+  .version(getPkgVersion(), "-v, --version", "Show version")
+  .argument("[repository]", "GitHub repository (owner/repo or URL) or local directories")
+  .option("--doctor", "Run diagnostics")
+  .option("--quick", "Quick summary mode")
+  .option("--simple", "Simple summary mode")
+  .option("--detailed", "Detailed explanation mode")
+  .option("--stack", "Stack detection mode")
+  .addHelpText(
+    "after",
+    `
+Examples:
+  $ explainthisrepo owner/repo
+  $ explainthisrepo https://github.com/owner/repo
+  $ explainthisrepo github.com/owner/repo
+  $ explainthisrepo git@github.com:owner/repo.git
+  $ explainthisrepo owner/repo --detailed
+  $ explainthisrepo owner/repo --quick
+  $ explainthisrepo owner/repo --simple
+  $ explainthisrepo owner/repo --stack
+  $ explainthisrepo .
+  $ explainthisrepo ./path/to/directory
+  $ explainthisrepo . --stack
+  $ explainthisrepo --doctor`
+  )
+  .action(async (repository: string | undefined, options: {
+    doctor?: boolean;
+    quick?: boolean;
+    simple?: boolean;
+    detailed?: boolean;
+    stack?: boolean;
+  }) => {
+    if (options.doctor) {
+      const code = await runDoctor();
+      process.exit(code);
+    }
+
+    if (!repository) {
+      program.error("repository argument required (or use `init` to set up API key)");
+      return;
+    }
+
+    await runAnalysis(repository, options);
+  });
+
+program
+  .command("init")
+  .description("Initialize configuration with Gemini API key")
+  .action(async () => {
+    await runInit();
+  });
+
+program.parseAsync(process.argv);
