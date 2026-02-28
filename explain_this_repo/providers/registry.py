@@ -58,12 +58,14 @@ def get_provider(name: str) -> LLMProvider:
     return provider_cls(provider_config)
 
 
-def get_active_provider() -> LLMProvider:
+def get_active_provider(
+    override: str | None = None,
+) -> LLMProvider:
+
+    if override:
+        return get_provider(override)
 
     config = load_config()
-
-    if _runtime_override:
-        return get_provider(_runtime_override)
 
     default_provider = config.get("llm", {}).get("provider")
 
