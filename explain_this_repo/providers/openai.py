@@ -14,13 +14,16 @@ class OpenAIProvider(LLMProvider):
         self.api_key = config.get("api_key")
         self.model = config.get("model", DEFAULT_MODEL)
 
+        self.validate_config()
+
+        self._client = None
+
+    def validate_config(self) -> None:
         if not self.api_key:
             raise LLMProviderError(
                 "OpenAI provider requires an API key.\n"
                 "Run 'explainthisrepo init' or set providers.openai.api_key."
             )
-
-        self._client = None
 
     def _get_client(self):
         if self._client is not None:
@@ -54,7 +57,13 @@ class OpenAIProvider(LLMProvider):
         except Exception:
             text = None
 
-        if not text:
+        if not text or not text.strip():
             raise LLMProviderError("OpenAI returned no text")
 
         return text.strip()
+
+    def doctor(self) -> list[str]:
+        return [
+            f"OPENAI_API_KEY set: {bool(self.api_key)}",
+            f"model: {self.model}",
+        ]
