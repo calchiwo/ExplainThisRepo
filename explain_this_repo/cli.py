@@ -233,7 +233,10 @@ def main():
         "  explainthisrepo owner/repo --quick\n"
         "  explainthisrepo owner/repo --simple\n"
         "  explainthisrepo owner/repo --stack\n"
+        "  explainthisrepo init\n"
+        "  explainthisrepo owner/repo --llm gemini\n"
         "  explainthisrepo owner/repo --llm openai\n"
+        "  explainthisrepo owner/repo --llm ollama\n"
         "  explainthisrepo .\n"
         "  explainthisrepo ./path/to/directory\n"
         "  explainthisrepo . --detailed\n"
@@ -241,7 +244,9 @@ def main():
         "  explainthisrepo . --simple\n"
         "  explainthisrepo . --stack\n"
         "  explainthisrepo --doctor\n"
+        "  explainthisrepo --doctor --llm gemini\n"
         "  explainthisrepo --doctor --llm openai\n"
+        "  explainthisrepo --doctor --llm ollama\n"
         "  explainthisrepo --version",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -268,7 +273,7 @@ def main():
     parser.add_argument(
         "command",
         nargs="?",
-        help="Optional command (e.g. init)",
+        help="Optional command (e.g. explainthisrepo init)",
     )
 
     parser.add_argument(
@@ -330,7 +335,9 @@ def main():
         args.command = None
 
     if not args.repository:
-        parser.error("repository argument required (or use 'init') to set up API key")
+        parser.error(
+            "repository argument required (or use 'explainthisrepo init') to set up API key"
+        )
 
     target = args.repository
 
