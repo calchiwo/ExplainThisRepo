@@ -126,6 +126,24 @@ All inputs are normalized internally to `owner/repo`.
 
 ---
 
+## Model selection
+
+The `--llm` flag to selects which configured model backend to use for the current command
+
+```bash
+explainthisrepo owner/repo --llm gemini
+explainthisrepo owner/repo --llm openai
+explainthisrepo owner/repo --llm ollama
+```
+
+Works with all modes:
+
+```bash
+explainthisrepo owner/repo --quick --llm gemini
+explainthisrepo . --detailed --llm openai
+explainthisrepo owner/repo --simple --llm ollama
+```
+
 ## Usage
 
 ### Basic
