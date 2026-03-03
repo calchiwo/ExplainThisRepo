@@ -1,62 +1,140 @@
-# Initialization (`init`)
+# Initialization (init)
 
 The `init` command bootstraps ExplainThisRepo by creating a local, persistent configuration file.
 
-It is designed to be safe, offline, and one-time.
+It configures your selected LLM provider once and exits.
 
----
+And no repository analysis is performed during initialization.
+
 
 ## What `init` does
 
-- Prompts once for your `GEMINI_API_KEY`
+- Prompts you to select an LLM provider:
+
+  - Gemini
+  - OpenAI
+  - Ollama
+
+- Collects only the configuration required for that provider
+
 - Writes a minimal `config.toml` file to the OS-appropriate config directory
+
+- Sets the selected provider as default
+
 - Exits immediately
 
-No analysis is performed.
 
----
+## Per model input
+
+Depending on the provider selected:
+
+### Gemini
+
+- Prompts for `api_key`
+
+
+### OpenAI
+
+- Prompts for `api_key`
+
+
+### Ollama
+
+- Prompts for `model` (e.g. `llama3`, `gemma3:4b`, `glm-5:cloud`)
+
+- Prompts for `host` (default: `http://localhost:11434`)
+
+Only the selected provider’s configuration is written.
+
 
 ## What `init` does NOT do
 
-- No network requests are made
-- No API key validation occurs
-- No data is sent to any server
-- No environment variables are modified
-- No input is logged or echoed to the terminal
+- No repository analysis
 
-The API key is written locally only.
+- No model execution
 
----
+- No API key validation
+
+- No dependency installation
+
+- No environment variable modification
+
+- No network requests
+
+The configuration is written locally only.
+
 
 ## Input handling
 
-- Input is read with terminal-level hidden input
-- Characters are not echoed or masked
+- API keys are read using hidden terminal input
+
+- Characters are not echoed
+
 - Paste works normally
+
 - Ctrl+C exits cleanly without writing partial state
 
----
 
 ## Config location
 
 A single authoritative config path is used per OS.
 
-- **Windows**  
-  `%APPDATA%\ExplainThisRepo\config.toml`
+### Windows
 
-- **macOS / Linux**  
-  `$XDG_CONFIG_HOME/explainthisrepo/config.toml`  
-  Fallback: `~/.config/explainthisrepo/config.toml`
+`%APPDATA%\ExplainThisRepo\config.toml`
 
----
+### macOS / Linux
+
+`$XDG_CONFIG_HOME/explainthisrepo/config.toml`
+
+Fallback: `~/.config/explainthisrepo/config.toml`
+
+
+## Example resulting config
+
+Example for Gemini:
+
+```bash
+[llm]
+provider = "gemini"
+
+[providers.gemini]
+api_key = "..."
+```
+Example for OpenAI:
+
+```bash
+[llm]
+provider = "openai"
+
+[providers.gemini]
+api_key = "..."
+```
+
+Example for Ollama:
+
+```bash
+[llm]
+provider = "ollama"
+
+[providers.ollama]
+model = "llama3"
+host = "http://localhost:11434"
+```
 
 ## Design intent
 
-`init` exists to separate **bootstrap** from **analysis**.
+`init` exists to separate configuration from execution.
 
 After initialization:
-- All analysis commands can run without setup
-- Future binaries (pip, npm) can share the same config
-- No repeated prompting is required
 
-This establishes a stable foundation for long-term usage.
+- All analysis commands run without repeated prompts
+
+- Provider selection can be overridden via `--llm`
+
+- Multiple providers can be supported without reinitialization
+
+- Configuration remains explicit and local
+
+
+This establishes a stable foundation for multi-LLM operation.
