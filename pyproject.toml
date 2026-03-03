@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "explainthisrepo"
-version = "0.6.1"
-description = "A CLI that generates plain-English explanations of any codebase"
+version = "0.9.0"
+description = "CLI that generates plain English explanations of any codebase"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9,<4.0"
 license = { text = "MIT" }
@@ -14,7 +14,7 @@ authors = [
   { name = "Caleb Wodi", email = "calebwodi33@gmail.com" }
 ]
 
-keywords = ["cli", "github", "repository", "ai", "developer-tools"]
+keywords = ["cli", "github", "repo-analysis", "code-explanation", "developer-tools"]
 
 dependencies = [
   "requests>=2.31,<3.0",
@@ -34,6 +34,7 @@ classifiers = [
 
 [project.optional-dependencies]
 gemini = ["google-genai>=1.0.0,<2.0"]
+openai = ["openai>=1.0.0,<2.0"]
 dev = [
   "pytest>=7.0",
   "black>=23.0",
@@ -46,8 +47,8 @@ where = ["."]
 include = ["explain_this_repo*"]
 
 [project.urls]
-Homepage = "https://github.com/calchiwo/ExplainThisRepo"
-Repository = "https://github.com/calchiwo/ExplainThisRepo.git"
+Homepage = "https://explainthisrepo.com"
+Repository = "https://github.com/calchiwo/ExplainThisRepo"
 "Bug Tracker" = "https://github.com/calchiwo/ExplainThisRepo/issues"
 
 [project.scripts]

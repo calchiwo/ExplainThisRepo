@@ -48,41 +48,27 @@ It helps developers quickly understand unfamiliar codebases by deriving architec
 
 - `--help` → Show usage guide
 
-- `--doctor` → Check environmental health and API connectivity
+- `--doctor` → Check system health and active model diagnostics
 
 ---
 
 ## Configuration
 
-ExplainThisRepo requires a Google Gemini API key for code analysis.
+ExplainThisRepo supports multiple LLM models:
+
+- Gemini
+- OpenAI
+- Ollama (local or cloud-routed)
 
 ### Quick setup (recommended)
 
-Use the built-in `init` command to securely store your API key:
+Use the built-in `init` command to configure your preferred model:
 
 ```bash
 explainthisrepo init
 # or npx explainthisrepo init
 ```
 > For details about how initialization works, see [INIT.md](INIT.md).
-
-### Environment variable (manual setup)
-
-If you prefer not to use the `init` command, you can also configure the API key using an environment variable
-
-Linux / macOS
-
-```bash
-export GEMINI_API_KEY="your_api_key_here"
-```
-
-Windows (PowerShell)
-
-```bash
-setx GEMINI_API_KEY "your_api_key_here"
-```
-
-Restart your terminal after setting the key.
 
 ## Installation
 
@@ -100,6 +86,13 @@ Alternatively,
 ```bash
 pipx install explainthisrepo
 explainthisrepo owner/repo
+```
+
+To install support for specific models:
+
+```bash
+pip install explainthisrepo[gemini]
+pip install explainthisrepo[openai]
 ```
 
 ### Option 2: Install with npm
@@ -132,6 +125,24 @@ explainthisrepo ./path/to/directory
 All inputs are normalized internally to `owner/repo`.
 
 ---
+
+## Model selection
+
+The `--llm` flag to selects which configured model backend to use for the current command
+
+```bash
+explainthisrepo owner/repo --llm gemini
+explainthisrepo owner/repo --llm openai
+explainthisrepo owner/repo --llm ollama
+```
+
+Works with all modes:
+
+```bash
+explainthisrepo owner/repo --quick --llm gemini
+explainthisrepo . --detailed --llm openai
+explainthisrepo owner/repo --simple --llm ollama
+```
 
 ## Usage
 
@@ -237,6 +248,12 @@ Check environment and connectivity (useful for debugging):
 
 ```bash
 explainthisrepo --doctor
+```
+
+### Set GitHub Token
+
+```bash
+export GITHUB_TOKEN=yourActualTokenHere
 ```
 
 ### Termux (Android) install notes

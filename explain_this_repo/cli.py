@@ -29,8 +29,6 @@ def resolve_repo_target(target: str) -> tuple[str, str]:
     if target.startswith("http//"):
         target = target.replace("http//", "http://", 1)
 
-    # Case 1: SSH clone URL
-    # git@github.com:owner/repo.git
     if target.startswith("git@github.com:"):
         path = target.replace("git@github.com:", "", 1)
         if "/" not in path:
@@ -38,11 +36,9 @@ def resolve_repo_target(target: str) -> tuple[str, str]:
         owner, repo = path.split("/", 1)
         return owner, repo.removesuffix(".git")
 
-    # Case 2: github.com/owner/repo
     if target.startswith("github.com/"):
         target = "https://" + target
 
-    # Case 3: Full HTTP(S) GitHub URL
     if target.startswith("http://") or target.startswith("https://"):
         parsed = urlparse(target)
 
@@ -59,7 +55,6 @@ def resolve_repo_target(target: str) -> tuple[str, str]:
         repo = parts[1].removesuffix(".git")
         return owner, repo
 
-    # Case 4: owner/repo
     if target.count("/") == 1:
         owner, repo = target.split("/")
         if owner and repo:
@@ -93,7 +88,39 @@ def _check_url(url: str, timeout: int = 6) -> tuple[bool, str]:
         return False, f"failed ({type(e).__name__}: {e})"
 
 
-def run_doctor() -> int:
+def _run_provider_diagnostics(provider: object, provider_name: str) -> bool:
+
+    try:
+        result = provider.doctor()
+    except AttributeError:
+        print(f"- {provider_name}: no diagnostics implemented")
+        return True
+    except Exception as e:
+        print(f"- {provider_name}: diagnostics raised an unexpected error ({e})")
+        return False
+
+    if isinstance(result, bool):
+        if result:
+            print(f"- {provider_name}: ok")
+        else:
+            print(f"- {provider_name}: checks did not pass")
+        return result
+
+    if isinstance(result, list):
+        if not result:
+            print(f"- {provider_name}: ok")
+            return True
+        for line in result:
+            print(f"- {provider_name}: {line}")
+        return False
+
+    print(
+        f"- {provider_name}: doctor() returned unexpected type {type(result).__name__!r}"
+    )
+    return False
+
+
+def run_doctor(llm_override: str | None = None) -> int:
     is_termux = "TERMUX_VERSION" in os.environ or "com.termux" in os.getenv(
         "PREFIX", ""
     )
@@ -108,16 +135,45 @@ def run_doctor() -> int:
     print("\npackage versions:")
     print(f"- explainthisrepo: {_pkg_version('explainthisrepo')}")
     print(f"- requests: {_pkg_version('requests')}")
-    print(f"- google-genai: {_pkg_version('google-genai')}")
-
-    print("\nenvironment:")
-    print(f"- GEMINI_API_KEY set: {_has_env('GEMINI_API_KEY')}")
 
     print("\nnetwork checks:")
-    ok1, msg1 = _check_url("https://api.github.com")
-    print(f"- github api: {msg1}")
-    ok2, msg2 = _check_url("https://generativelanguage.googleapis.com")
-    print(f"- gemini endpoint: {msg2}")
+    ok_gh, msg_gh = _check_url("https://api.github.com")
+    print(f"- github api: {msg_gh}")
+
+    print("\nprovider diagnostics:")
+
+    provider = None
+    provider_name = None
+    provider_ok = True
+
+    try:
+        from explain_this_repo.providers.registry import get_active_provider
+
+        provider = get_active_provider(override=llm_override)
+        provider_name = getattr(provider, "name", llm_override or "unknown")
+
+    except ValueError:
+        if llm_override is not None:
+            print(f"- provider '{llm_override}' could not be resolved")
+            print("- check that the provider name is correct and properly installed")
+            provider_ok = False
+        else:
+            print("- no provider configured and no --llm override given")
+            print("- skipping provider checks")
+            print("- run `explainthisrepo init` to configure a provider")
+
+    except ImportError as e:
+        print(f"- provider registry could not be loaded (import error): {e}")
+        print("- this is likely a broken installation")
+        provider_ok = False
+
+    except Exception as e:
+        print(f"- provider registry raised an unexpected error: {e}")
+        provider_ok = False
+
+    if provider is not None:
+        print(f"- active provider: {provider_name}")
+        provider_ok = _run_provider_diagnostics(provider, provider_name)
 
     print("\nnotes:")
     if is_termux:
@@ -129,7 +185,7 @@ def run_doctor() -> int:
         print("- If PATH is annoying, run:")
         print("  python -m explain_this_repo owner/repo")
 
-    return 0 if (ok1 and ok2) else 1
+    return 0 if (ok_gh and provider_ok) else 1
 
 
 def safe_read_repo_files(owner: str, repo: str):
@@ -140,14 +196,26 @@ def safe_read_repo_files(owner: str, repo: str):
         return None
 
 
-def generate_with_exit(prompt: str) -> str:
+def generate_with_exit(prompt: str, llm: str | None = None) -> str:
     try:
-        return generate_explanation(prompt)
+        return generate_explanation(prompt, provider_override=llm)
+    except ValueError as e:
+        print(f"error: {e}")
+        print("\nfix:")
+        print("- Check that the provider name is correct (e.g. gemini, openai, ollama)")
+        print("- Or run: explainthisrepo --doctor")
+        raise SystemExit(1)
+    except ImportError as e:
+        print(f"error: missing dependencies for the selected provider: {e}")
+        print("\nfix:")
+        print("- Install the required provider package")
+        print("- Or run: explainthisrepo --doctor")
+        raise SystemExit(1)
     except Exception as e:
         print("Failed to generate explanation.")
         print(f"error: {e}")
         print("\nfix:")
-        print("- Ensure GEMINI_API_KEY is set")
+        print("- Ensure your API key is set for the selected provider")
         print("- Or run: explainthisrepo --doctor")
         raise SystemExit(1)
 
@@ -155,7 +223,7 @@ def generate_with_exit(prompt: str) -> str:
 def main():
     parser = argparse.ArgumentParser(
         prog="explainthisrepo",
-        description="Explain any codebase in plain English",
+        description="CLI that generates plain English explanations of any codebase",
         epilog="Examples:\n"
         "  explainthisrepo owner/repo\n"
         "  explainthisrepo https://github.com/owner/repo\n"
@@ -165,6 +233,10 @@ def main():
         "  explainthisrepo owner/repo --quick\n"
         "  explainthisrepo owner/repo --simple\n"
         "  explainthisrepo owner/repo --stack\n"
+        "  explainthisrepo init\n"
+        "  explainthisrepo owner/repo --llm gemini\n"
+        "  explainthisrepo owner/repo --llm openai\n"
+        "  explainthisrepo owner/repo --llm ollama\n"
         "  explainthisrepo .\n"
         "  explainthisrepo ./path/to/directory\n"
         "  explainthisrepo . --detailed\n"
@@ -172,6 +244,9 @@ def main():
         "  explainthisrepo . --simple\n"
         "  explainthisrepo . --stack\n"
         "  explainthisrepo --doctor\n"
+        "  explainthisrepo --doctor --llm gemini\n"
+        "  explainthisrepo --doctor --llm openai\n"
+        "  explainthisrepo --doctor --llm ollama\n"
         "  explainthisrepo --version",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -189,9 +264,16 @@ def main():
     )
 
     parser.add_argument(
+        "--llm",
+        metavar="PROVIDER",
+        default=None,
+        help="LLM provider to use (e.g. gemini, openai, ollama). Overrides config default.",
+    )
+
+    parser.add_argument(
         "command",
         nargs="?",
-        help="Optional command (e.g. init)",
+        help="Optional command (e.g. explainthisrepo init)",
     )
 
     parser.add_argument(
@@ -224,21 +306,38 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "init":
+    if args.command == "init" and args.repository is None:
         from explain_this_repo.init import run_init
 
         run_init()
         return
 
     if args.doctor:
-        raise SystemExit(run_doctor())
+        raise SystemExit(run_doctor(llm_override=args.llm))
 
     if args.version:
         print_version()
         return
 
+    if args.llm is not None:
+        from explain_this_repo.providers.registry import list_providers
+
+        known = list_providers()
+        if args.llm not in known:
+            print(f"error: unknown provider '{args.llm}'")
+            print(f"available providers: {', '.join(sorted(known))}")
+            raise SystemExit(1)
+
+    llm = args.llm
+
+    if args.repository is None and args.command is not None and args.command != "init":
+        args.repository = args.command
+        args.command = None
+
     if not args.repository:
-        parser.error("repository argument required (or use 'init')")
+        parser.error(
+            "repository argument required (or use 'explainthisrepo init') to set up API key"
+        )
 
     target = args.repository
 
@@ -255,7 +354,6 @@ def main():
             raise SystemExit(1)
 
     if args.stack:
-
         if local:
             with console.status("Reading repository files…", spinner="dots"):
                 read_result = read_local_repo_signal_files(local_path)
@@ -320,7 +418,7 @@ def main():
             )
 
         with console.status("Generating explanation…", spinner="dots"):
-            output = generate_with_exit(prompt)
+            output = generate_with_exit(prompt, llm=llm)
 
         print("Quick summary 🎉")
         print(output.strip())
@@ -328,7 +426,6 @@ def main():
 
     # SIMPLE MODE
     if args.simple:
-
         if local:
             with console.status("Reading repository files…", spinner="dots"):
                 read_result = read_local_repo_signal_files(local_path)
@@ -344,7 +441,7 @@ def main():
         )
 
         with console.status("Generating explanation…", spinner="dots"):
-            output = generate_with_exit(prompt)
+            output = generate_with_exit(prompt, llm=llm)
 
         print("Simple summary 🎉")
         print(output.strip())
@@ -368,7 +465,7 @@ def main():
     )
 
     with console.status("Generating explanation…", spinner="dots"):
-        output = generate_with_exit(prompt)
+        output = generate_with_exit(prompt, llm=llm)
 
     print("Writing EXPLAIN.md...")
     write_output(output)
