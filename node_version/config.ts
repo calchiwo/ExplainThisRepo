@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import toml from "toml";
 
 const CONFIG_DIR_NAME = "ExplainThisRepo";
 const CONFIG_FILE_NAME = "config.toml";
@@ -35,4 +36,18 @@ export function readConfig(): string | null {
   const path = getConfigPath();
   if (!fs.existsSync(path)) return null;
   return fs.readFileSync(path, "utf-8");
+}
+
+export function loadConfig(): any {
+  const raw = readConfig();
+
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    return toml.parse(raw);
+  } catch (err) {
+    throw new Error("Invalid config.toml format");
+  }
 }
