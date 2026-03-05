@@ -1,6 +1,6 @@
 {
   "name": "explainthisrepo",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "CLI that generates plain-English explanations of any codebase",
   "license": "MIT",
   "type": "module",
@@ -50,7 +50,8 @@
     "commander": "^14.0.3",
     "dotenv": "^17.2.3",
     "openai": "^4.0.0",
-    "ora": "^9.3.0"
+    "ora": "^9.3.0",
+    "toml": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

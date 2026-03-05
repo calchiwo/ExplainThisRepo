@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import toml from "toml";
+import { parse } from "@iarna/toml";
 
 const CONFIG_DIR_NAME = "ExplainThisRepo";
 const CONFIG_FILE_NAME = "config.toml";
@@ -46,7 +46,7 @@ export function loadConfig(): any {
   }
 
   try {
-    return toml.parse(raw);
+    return parse(raw);
   } catch (err) {
     throw new Error("Invalid config.toml format");
   }
