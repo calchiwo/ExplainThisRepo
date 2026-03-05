@@ -1,6 +1,6 @@
 {
   "name": "explainthisrepo",
-  "version": "0.6.2",
+  "version": "0.9.0",
   "description": "CLI that generates plain-English explanations of any codebase",
   "license": "MIT",
   "type": "module",
@@ -45,9 +45,11 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@iarna/toml": "^2.2.5",
     "axios": "^1.13.2",
     "commander": "^14.0.3",
     "dotenv": "^17.2.3",
+    "openai": "^4.0.0",
     "ora": "^9.3.0"
   },
   "devDependencies": {
