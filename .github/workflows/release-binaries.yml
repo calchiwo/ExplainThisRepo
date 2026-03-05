@@ -48,18 +48,12 @@ jobs:
             target: node18-linux-arm64
             output: explainthisrepo-linux-arm64
 
-          # Windows
+          # Windows (ARM64 removed — pkg is unstable there)
           - os: windows
             arch: x64
             runner: windows-latest
             target: node18-win-x64
             output: explainthisrepo-win-x64.exe
-
-          - os: windows
-            arch: arm64
-            runner: windows-latest
-            target: node18-win-arm64
-            output: explainthisrepo-win-arm64.exe
 
     steps:
       - name: Checkout
@@ -81,7 +75,7 @@ jobs:
         run: npm run build
 
       - name: Install pkg
-        run: npm install -g pkg
+        run: npm install -g pkg@5.8.1
 
       - name: Build binary
         working-directory: node_version
@@ -97,7 +91,11 @@ jobs:
         shell: bash
         run: |
           cd artifacts
-          shasum -a 256 ${{ matrix.output }} > ${{ matrix.output }}.sha256
+          if command -v shasum >/dev/null 2>&1; then
+            shasum -a 256 ${{ matrix.output }} > ${{ matrix.output }}.sha256
+          else
+            openssl dgst -sha256 ${{ matrix.output }} | awk '{print $2}' > ${{ matrix.output }}.sha256
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
