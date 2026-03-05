@@ -108,7 +108,7 @@ async function checkUrl(
   }
 }
 
-async function runDoctor(): Promise<number> {
+async function runDoctor(llmOverride?: string): Promise<number> {
   console.log("explainthisrepo doctor report\n");
 
   console.log(`node: ${process.version}`);
@@ -117,17 +117,60 @@ async function runDoctor(): Promise<number> {
   console.log(`version: ${getPkgVersion()}`);
 
   console.log("\nenvironment:");
-  console.log(`- GEMINI_API_KEY set: ${hasEnv("GEMINI_API_KEY")}`);
   console.log(`- GITHUB_TOKEN set: ${hasEnv("GITHUB_TOKEN")}`);
 
   console.log("\nnetwork checks:");
   const gh = await checkUrl("https://api.github.com");
   console.log(`- github api: ${gh.msg}`);
 
-  const gem = await checkUrl("https://generativelanguage.googleapis.com");
-  console.log(`- gemini endpoint: ${gem.msg}`);
+  console.log("\nprovider diagnostics:");
 
-  return gh.ok && gem.ok ? 0 : 1;
+  let providerOk = true;
+
+  try {
+    const { getActiveProvider } = await import("./providers/registry.js");
+    const provider = await getActiveProvider(llmOverride);
+    const providerName: string =
+      (provider as { name?: string }).name ?? llmOverride ?? "unknown";
+
+    console.log(`- active provider: ${providerName}`);
+
+    const doctorFn = (provider as { doctor?: () => unknown }).doctor;
+
+    if (typeof doctorFn === "function") {
+      const result = await doctorFn.call(provider);
+
+      if (typeof result === "boolean") {
+        console.log(`- ${providerName}: ${result ? "ok" : "checks did not pass"}`);
+        providerOk = result;
+      } else if (Array.isArray(result)) {
+        if (result.length === 0) {
+          console.log(`- ${providerName}: ok`);
+        } else {
+          for (const line of result) {
+            console.log(`- ${providerName}: ${line}`);
+          }
+          providerOk = false;
+        }
+      } else {
+        console.log(`- ${providerName}: ok`);
+      }
+    } else {
+      console.log(`- ${providerName}: no diagnostics implemented`);
+    }
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    if (llmOverride) {
+      console.log(`- provider '${llmOverride}' could not be resolved`);
+      console.log("- check that the provider name is correct and properly configured");
+    } else {
+      console.log(`- provider registry error: ${message}`);
+      console.log("- run `explainthisrepo init` to configure a provider");
+    }
+    providerOk = false;
+  }
+
+  return gh.ok && providerOk ? 0 : 1;
 }
 
 async function safeReadRepoFiles(
@@ -143,15 +186,18 @@ async function safeReadRepoFiles(
   }
 }
 
-async function generateWithExit(prompt: string): Promise<string> {
+async function generateWithExit(prompt: string, llm?: string): Promise<string> {
   try {
-    return await generateExplanation(prompt);
+    return await generateExplanation(prompt, llm);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     console.error("Failed to generate explanation.");
     console.error(`error: ${message}`);
     console.error("\nfix:");
-    console.error("- Ensure GEMINI_API_KEY is set");
+    console.error(
+      "- Check that the provider name is correct (e.g. gemini, openai, ollama)"
+    );
+    console.error("- Ensure your API key is set for the selected provider");
     console.error("- Or run: explainthisrepo --doctor");
     process.exit(1);
   }
@@ -165,10 +211,11 @@ async function runAnalysis(
     simple?: boolean;
     detailed?: boolean;
     stack?: boolean;
+    llm?: string;
   }
 ): Promise<void> {
   if (options.doctor) {
-    const code = await runDoctor();
+    const code = await runDoctor(options.llm);
     process.exit(code);
   }
 
@@ -268,7 +315,9 @@ async function runAnalysis(
   if (options.quick) {
     let quickReadme: string | null = readme;
     const repoName: string = local ? localPath : (repoData?.full_name ?? "");
-    const description: string | null = local ? null : (repoData?.description ?? null);
+    const description: string | null = local
+      ? null
+      : (repoData?.description ?? null);
 
     if (local) {
       const spinner = ora("Reading repository files…").start();
@@ -288,7 +337,9 @@ async function runAnalysis(
     const prompt = buildQuickPrompt(repoName, description, quickReadme);
 
     const spinner = ora("Generating explanation…").start();
-    const output = await generateWithExit(prompt).finally(() => spinner.stop());
+    const output = await generateWithExit(prompt, options.llm).finally(() =>
+      spinner.stop()
+    );
 
     console.log("Quick summary 🎉");
     console.log(output.trim());
@@ -318,7 +369,7 @@ async function runAnalysis(
     );
 
     const genSpinner = ora("Generating explanation…").start();
-    const output = await generateWithExit(prompt).finally(() =>
+    const output = await generateWithExit(prompt, options.llm).finally(() =>
       genSpinner.stop()
     );
 
@@ -351,7 +402,7 @@ async function runAnalysis(
   );
 
   const genSpinner = ora("Generating explanation…").start();
-  const output = await generateWithExit(prompt).finally(() =>
+  const output = await generateWithExit(prompt, options.llm).finally(() =>
     genSpinner.stop()
   );
 
@@ -371,12 +422,19 @@ program
   .name("explainthisrepo")
   .description("CLI that generates plain English explanations of any codebase")
   .version(getPkgVersion(), "-v, --version", "Show version")
-  .argument("[repository]", "GitHub repository (owner/repo or URL) or local directories")
+  .argument(
+    "[repository]",
+    "GitHub repository (owner/repo or URL) or local directories"
+  )
   .option("--doctor", "Run diagnostics")
   .option("--quick", "Quick summary mode")
   .option("--simple", "Simple summary mode")
   .option("--detailed", "Detailed explanation mode")
   .option("--stack", "Stack detection mode")
+  .option(
+    "--llm <provider>",
+    "LLM provider to use (e.g. gemini, openai, ollama). Overrides config default."
+  )
   .addHelpText(
     "after",
     `
@@ -389,34 +447,49 @@ Examples:
   $ explainthisrepo owner/repo --quick
   $ explainthisrepo owner/repo --simple
   $ explainthisrepo owner/repo --stack
+  $ explainthisrepo owner/repo --llm gemini
+  $ explainthisrepo owner/repo --llm openai
+  $ explainthisrepo owner/repo --llm ollama
   $ explainthisrepo .
   $ explainthisrepo ./path/to/directory
   $ explainthisrepo . --stack
-  $ explainthisrepo --doctor`
+  $ explainthisrepo --doctor
+  $ explainthisrepo --doctor --llm gemini
+  $ explainthisrepo --doctor --llm openai
+  $ explainthisrepo --doctor --llm ollama`
   )
-  .action(async (repository: string | undefined, options: {
-    doctor?: boolean;
-    quick?: boolean;
-    simple?: boolean;
-    detailed?: boolean;
-    stack?: boolean;
-  }) => {
-    if (options.doctor) {
-      const code = await runDoctor();
-      process.exit(code);
-    }
+  .action(
+    async (
+      repository: string | undefined,
+      options: {
+        doctor?: boolean;
+        quick?: boolean;
+        simple?: boolean;
+        detailed?: boolean;
+        stack?: boolean;
+        llm?: string;
+      }
+    ) => {
 
-    if (!repository) {
-      program.error("repository argument required (or use `init` to set up API key)");
-      return;
-    }
+      if (options.doctor) {
+        const code = await runDoctor(options.llm);
+        process.exit(code);
+      }
 
-    await runAnalysis(repository, options);
-  });
+      if (!repository) {
+        program.error(
+          "repository argument required (or use `explainthisrepo init` to configure a provider)"
+        );
+        return;
+      }
+
+      await runAnalysis(repository, options);
+    }
+  );
 
 program
   .command("init")
-  .description("Initialize configuration with Gemini API key")
+  .description("Configure your LLM provider (Gemini, OpenAI, or Ollama)")
   .action(async () => {
     await runInit();
   });
