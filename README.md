@@ -1,6 +1,8 @@
 # ExplainThisRepo
 
-ExplainThisRepo is a CLI that generates plain-English explanations of any codebase (GitHub repositories and local directories) by analyzing project structure, README content, and high signal files.
+ExplainThisRepo is a CLI that generates plain-English explanations of any codebase (GitHub repositories and local directories) by analyzing project structure, READMEs, and high signal files.
+
+ExplainThisRepo is a command-line tool that analyzes GitHub repositories and local directories to generate plain-English explanations of the codebase architecture.
 
 It helps developers quickly understand unfamiliar codebases by deriving architectural explanations from real project structure and code signals, producing a clear, structured `EXPLAIN.md`.
 
@@ -136,13 +138,7 @@ explainthisrepo owner/repo --llm openai
 explainthisrepo owner/repo --llm ollama
 ```
 
-Works with all modes:
-
-```bash
-explainthisrepo owner/repo --quick --llm gemini
-explainthisrepo . --detailed --llm openai
-explainthisrepo owner/repo --simple --llm ollama
-```
+`--llm` works with all modes (``--quick``, ``--simple``, ``--detailed``).
 
 ## Usage
 
@@ -206,7 +202,7 @@ explainthisrepo owner/repo --stack
 ```
 ![Stack detector Output](assets/stack-command-output.png)
 
-### Local Directory Analysis
+## Local Directory Analysis
 
 ExplainThisRepo can analyze local directories directly in the terminal, using the same modes and output formats as GitHub repositories
 
@@ -226,7 +222,7 @@ explainthisrepo . --stack
 
 When analyzing a local directory:
 - Repository structure is derived from the filesystem
-- Key files (README, configs, entrypoints) are extracted locally
+- High signal files (Configs, README, entrypoints) are extracted locally
 - No GitHub APIs calls are made
 - All prompts and outputs remain identical
 
@@ -242,9 +238,8 @@ explainthisrepo --version
 
 ---
 
-### Doctor
-
-Check environment and connectivity (useful for debugging):
+### Diagnostics
+Use the `--doctor` flag to verify the environment, network connectivity, and API key configuration:
 
 ```bash
 explainthisrepo --doctor
@@ -252,11 +247,13 @@ explainthisrepo --doctor
 
 ### Set GitHub Token
 
+Setting a `GITHUB_TOKEN` environment variable is recommended to avoid rate limits when analyzing public repositories.
+
 ```bash
 export GITHUB_TOKEN=yourActualTokenHere
 ```
 
-### Termux (Android) install notes
+## Termux (Android) install notes
 
 Termux has some environment limitations that can make `pip install explainthisrepo` fail to create the `explainthisrepo` command in `$PREFIX/bin`.
 
@@ -267,12 +264,14 @@ pip install --user -U explainthisrepo
 ```
 
 Make sure your user bin directory is on your PATH:
+
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 ```
+
 > Tip: Add the PATH export to your ~/.bashrc or ~/.zshrc so it persists.
 
-Alternative (No PATH changes)
+### Alternative (No PATH changes)
 
 If you do not want to modify PATH, you can run ExplainThisRepo as a module:
 
@@ -280,7 +279,7 @@ If you do not want to modify PATH, you can run ExplainThisRepo as a module:
 python -m explain_this_repo owner/repo
 ```
 
-### Gemini support on Termux (Optional)
+### Gemini support on Termux
 
 Installing Gemini support may require building Rust-based dependencies on Android, which can take time on first install:
 
@@ -310,5 +309,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 Caleb Wodi
 
 - Email: caleb@explainthisrepo.com
-- Twitter: [@calchiwo](https://x.com/calchiwo)
 - LinkedIn: [@calchiwo](https://linkedin.com/in/calchiwo)
+- Twitter: [@calchiwo](https://x.com/calchiwo)
