@@ -34,7 +34,7 @@ classifiers = [
 
 [project.optional-dependencies]
 gemini = ["google-genai>=1.0.0,<2.0"]
-openai = ["openai>=1.0.0,<2.0"]
+openai = ["openai>=1.0.0,<3.0"]
 dev = [
   "pytest>=7.0",
   "black>=23.0",
