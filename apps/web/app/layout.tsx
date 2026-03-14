@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   description: 'A CLI tool that generates plain-English explanations of public GitHub repositories by analyzing repository structure, README content, and high-signal files.',
   keywords: ['GitHub', 'CLI', 'developer tools', 'code analysis', 'repository', 'documentation'],
   metadataBase: new URL('https://explainthisrepo.com'),
+  other: {
+"websitelaunches-verification": "155f2b1b53e5917e5ed8c827903883db"
+},
   openGraph: {
     title: 'ExplainThisRepo: Understand Any GitHub Repo Instantly',
     description: 'A CLI tool that generates plain-English explanations of public GitHub repositories.',
