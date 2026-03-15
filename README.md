@@ -1,8 +1,8 @@
 # ExplainThisRepo
 
-ExplainThisRepo is a CLI that generates plain-English explanations of any codebase (GitHub repositories and local directories) by analyzing project structure, READMEs, and high-signal files.
+_The fastest way to understand any codebase._
 
-It helps developers quickly understand unfamiliar codebases by deriving architectural explanations from real project structure and code signals, producing a clear, structured `EXPLAIN.md`.
+ExplainThisRepo analyzes real project signals configs, entrypoints, manifests, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase does and how it is organized in plain English.
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -12,29 +12,21 @@ It helps developers quickly understand unfamiliar codebases by deriving architec
 [![Node](https://img.shields.io/node/v/explainthisrepo)](https://www.npmjs.com/package/explainthisrepo)
 [![Docs](https://img.shields.io/badge/docs-explainthisrepo.com-black)](https://explainthisrepo.com)
 
----
-
 ![demo](https://github.com/user-attachments/assets/837e0593-db64-4657-8855-bb1915011eb6)
----
 
 ## Key Features
 
-- Generates architectural summaries from repository structure and code signals
-- Fetches public repositories by GitHub URLs (with or without https), `owner/repo` format, issue links, query strings, and SSH clone links
-- Analyzes repository data including file tree, configs, entrypoints, and high signal source files
-- Extracts repo signals from key files (package.json, pyproject.toml, config files, entrypoints)
-- Builds a file tree summary to understand project architecture
-- Detects programming languages with the GitHub API
-- Analyzes local project directories using the same pipeline as GitHub repositories
-- Generates a structured plain-English explanation grounded in actual project files
+- Understand any GitHub repository in seconds
+- Derives architectural summaries from repository structure and code signals.
+Not blind AI summarization.
+- Extract architecture signals from configs, entrypoints, and manifests
+- Works with GitHub repositories, local directories, private repositories, and monorepos
 - Outputs the explanation to an `EXPLAIN.md` file in your current directory or prints it directly in the terminal
-- Multi-mode command-line interface
+- Multiple explanation modes (quick, simple, detailed)
 
----
+## Flag options
 
-## Modes
-
-- (no flag) → Full repository explanation written to EXPLAIN.md
+- (no flag) → Full repository explanation written to `EXPLAIN.md`
 
 - `--quick` → One-sentence summary
 
@@ -50,7 +42,9 @@ It helps developers quickly understand unfamiliar codebases by deriving architec
 
 - `--doctor` → Check system health and active model diagnostics
 
----
+- `--llm` → Override provider selection
+
+- `--token/-t` → Set GitHub token for private repositories
 
 ## Configuration
 
@@ -60,15 +54,15 @@ ExplainThisRepo supports multiple LLM models:
 - OpenAI
 - Ollama (local or cloud-routed)
 
-### Quick setup (recommended)
-
 Use the built-in `init` command to configure your preferred model:
 
 ```bash
 explainthisrepo init
 # or npx explainthisrepo init
 ```
+
 > For details about how initialization works, see [INIT.md](INIT.md).
+
 
 ## Installation
 
@@ -98,14 +92,19 @@ pip install explainthisrepo[openai]
 ### Option 2: Install with npm
 
 Install globally and use forever:
+
 ```bash
 npm install -g explainthisrepo
 explainthisrepo owner/repo
-# or: npx explainthisrepo owner/repo
+```
+
+Or without install:
+
+```bash
+npx explainthisrepo owner/repo
 ```
 
 Replace `owner/repo` with the GitHub repository identifier (e.g., `facebook/react`).
-
 
 ### Option 3: Download standalone binary
 
@@ -138,11 +137,9 @@ Windows (PowerShell)
 curl -L https://github.com/calchiwo/ExplainThisRepo/releases/latest/download/explainthisrepo-win-x64.exe -o explainthisrepo.exe
 ```
 
----
-
 ## Flexible Repository and Local Directory Input
 
-Accepts various formats for repository input, full GitHub URLs, issue links, and SSH clone links.
+Accepts various formats for repository input, full GitHub URLs (with or without https), `owner/repo` format, issue links, query strings, and SSH clone links
 
 ```bash
 explainthisrepo https://github.com/owner/repo
@@ -156,8 +153,6 @@ explainthisrepo ./path/to/directory
 
 All inputs are normalized internally to `owner/repo`.
 
----
-
 ## Model selection
 
 The `--llm` flag selects which configured model backend to use for the current command.
@@ -170,31 +165,33 @@ explainthisrepo owner/repo --llm ollama
 
 `--llm` works with all modes (``--quick``, ``--simple``, ``--detailed``).
 
-## Usage
+## Command line usage
 
-### Basic
+### Default
 Writes a full explanation to `EXPLAIN.md`:
 
 ```bash
 explainthisrepo owner/repo
+#e.g. explainthisrepo vercel/next.js
 ```
-Example:
-```bash
-explainthisrepo facebook/react
-```
----
+
 
 ### Quick mode
 
 Prints a one-sentence summary to stdout:
-
 ```bash
 explainthisrepo owner/repo --quick
+# explainthisrepo facebook/react --quick
 ```
-Example:
+
 ```bash
-explainthisrepo facebook/react --quick
+$ explainthisrepo vercel/next.js --quick
+
+Next.js is a React framework that provides server-side rendering,
+file-based routing, API routes, and build tooling for fullstack
+web applications.
 ```
+
 ![Quick Mode Output](assets/quick-command-output.png)
 
 ---
@@ -252,30 +249,13 @@ explainthisrepo . --stack
 
 When analyzing a local directory:
 - Repository structure is derived from the filesystem
-- High signal files (Configs, README, entrypoints) are extracted locally
+- High signal files (configs, entrypoints, manifests) are extracted locally
 - No GitHub APIs calls are made
 - All prompts and outputs remain identical
 
 This allows analysis of projects directly from the local filesystem, without requiring a GitHub repository.
 
-### Version
-
-Print the installed CLI version:
-
-```bash
-explainthisrepo --version
-```
-
----
-
-### Diagnostics
-Use the `--doctor` flag to verify the environment, network connectivity, and API key configuration:
-
-```bash
-explainthisrepo --doctor
-```
-
-### Set GitHub Token
+### For private repositories, use the --token/-t option.
 
 Setting a `GITHUB_TOKEN` environment variable is recommended to avoid rate limits when analyzing public repositories.
 
@@ -283,11 +263,27 @@ Setting a `GITHUB_TOKEN` environment variable is recommended to avoid rate limit
 export GITHUB_TOKEN=yourActualTokenHere
 ```
 
+### Version
+
+Check the installed CLI version:
+
+```bash
+explainthisrepo --version
+```
+
+### Diagnostics
+
+Use the `--doctor` flag to verify the environment, network connectivity, and API key configuration:
+
+```bash
+explainthisrepo --doctor
+```
+
 ## Termux (Android) install notes
 
 Termux has some environment limitations that can make `pip install explainthisrepo` fail to create the `explainthisrepo` command in `$PREFIX/bin`.
 
-### Recommended install (Termux)
+However, it's recommended you install using:
 
 ```bash
 pip install --user -U explainthisrepo
@@ -299,7 +295,7 @@ Make sure your user bin directory is on your PATH:
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-> Tip: Add the PATH export to your ~/.bashrc or ~/.zshrc so it persists.
+> Tip: Add the PATH export to your `~/.bashrc` or `~/.zshrc` so it persists.
 
 ### Alternative (No PATH changes)
 
@@ -317,6 +313,18 @@ Installing Gemini support may require building Rust-based dependencies on Androi
 pip install --user -U "explainthisrepo[gemini]"
 ```
 
+For mobile environments like Termux where compiling Python dependencies can be slow,
+you can also run ExplainThisRepo using the Node.js version:
+
+```bash
+npx explainthisrepo owner/repo
+```
+
+## Special Thanks
+
+- @Spectra010s for implementing the Node.js version of ExplainThisRepo and improving installation support for mobile environments like Termux
+- @HalxDocs for implementing the `--detailed` mode for deeper architectural explanations
+
 ## Contributions
 
 Contributions are welcome!
@@ -326,13 +334,9 @@ If you find a bug, have an idea, or want to improve the tool:
 - Open an issue for bugs/feature requests
 - Or submit a pull request for fixes/improvements
 
----
-
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
 
 ## Author
 
