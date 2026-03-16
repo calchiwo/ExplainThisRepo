@@ -2,7 +2,7 @@
 
 _The fastest way to understand any codebase._
 
-ExplainThisRepo analyzes real project signals configs, entrypoints, manifests, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase does and how it is organized in plain English.
+ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, dependencies, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase does and how it is organized in plain English.
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -23,28 +23,6 @@ Not blind AI summarization.
 - Works with GitHub repositories, local directories, private repositories, and monorepos
 - Outputs the explanation to an `EXPLAIN.md` file in your current directory or prints it directly in the terminal
 - Multiple explanation modes (quick, simple, detailed)
-
-## Flag options
-
-- (no flag) → Full repository explanation written to `EXPLAIN.md`
-
-- `--quick` → One-sentence summary
-
-- `--simple` → Short, simplified explanation
-
-- `--detailed` → Deeper explanation including structure and architecture
-
-- `--stack` → Tech stack breakdown from repo signals
-
-- `--version` → Check installed CLI version
-
-- `--help` → Show usage guide
-
-- `--doctor` → Check system health and active model diagnostics
-
-- `--llm` → Override provider selection
-
-- `--token/-t` → Set GitHub token for private repositories
 
 ## Configuration
 
@@ -136,6 +114,28 @@ Windows (PowerShell)
 ```powershell
 curl -L https://github.com/calchiwo/ExplainThisRepo/releases/latest/download/explainthisrepo-win-x64.exe -o explainthisrepo.exe
 ```
+
+## Flag options
+
+- (no flag) → Full repository explanation written to `EXPLAIN.md`
+
+- `--quick` → One-sentence summary
+
+- `--simple` → Short, simplified explanation
+
+- `--detailed` → Deeper explanation including structure and architecture
+
+- `--stack` → Tech stack breakdown from repo signals
+
+- `--version` → Check installed CLI version
+
+- `--help` → Show usage guide
+
+- `--doctor` → Check system health and active model diagnostics
+
+- `--llm` → Override provider selection
+
+- `--token/-t` → Set GitHub token for private repositories
 
 ## Flexible Repository and Local Directory Input
 
