@@ -9,6 +9,8 @@ _PROVIDER_REGISTRY: Dict[str, str] = {
     "gemini": "explain_this_repo.providers.gemini.GeminiProvider",
     "openai": "explain_this_repo.providers.openai.OpenAIProvider",
     "ollama": "explain_this_repo.providers.ollama.OllamaProvider",
+    "anthropic": "explain_this_repo.providers.anthropic.AnthropicProvider",
+    "groq": "explain_this_repo.providers.groq.GroqProvider",
 }
 
 

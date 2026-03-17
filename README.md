@@ -32,6 +32,7 @@ ExplainThisRepo supports multiple LLM models:
 - OpenAI
 - Ollama (local or cloud-routed)
 - Anthropic
+- Groq
 
 Use the built-in `init` command to configure your preferred model:
 

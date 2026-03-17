@@ -12,6 +12,8 @@ PROVIDERS = {
     "1": "gemini",
     "2": "openai",
     "3": "ollama",
+    "4": "anthropic",
+    "5": "groq",
 }
 
 
@@ -20,6 +22,8 @@ def _prompt_provider() -> str:
     err.print("  1) Gemini")
     err.print("  2) OpenAI")
     err.print("  3) Ollama (local)")
+    err.print("  4) Anthropic (Claude)")
+    err.print("  5) Groq")
 
     choice = input("> ").strip()
 
@@ -58,6 +62,18 @@ def _prompt_provider_config(provider: str) -> Dict[str, str]:
             "model": model,
             "host": host,
         }
+
+    if provider == "anthropic":
+        key = getpass.getpass("Anthropic (Claude) API key: ").strip()
+        if not key:
+            raise RuntimeError("API key cannot be empty")
+        return {"api_key": key}
+
+    if provider == "groq":
+        key = getpass.getpass("Groq API key: ").strip()
+        if not key:
+            raise RuntimeError("API key cannot be empty")
+        return {"api_key": key}
 
     raise RuntimeError(f"Unsupported provider: {provider}")
 
