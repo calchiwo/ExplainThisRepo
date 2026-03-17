@@ -31,6 +31,7 @@ ExplainThisRepo supports multiple LLM models:
 - Gemini
 - OpenAI
 - Ollama (local or cloud-routed)
+- Anthropic
 
 Use the built-in `init` command to configure your preferred model:
 
@@ -65,6 +66,7 @@ To install support for specific models:
 ```bash
 pip install explainthisrepo[gemini]
 pip install explainthisrepo[openai]
+pip install explainthisrepo[anthropic]
 ```
 
 ### Option 2: Install with npm
@@ -161,6 +163,7 @@ The `--llm` flag selects which configured model backend to use for the current c
 explainthisrepo owner/repo --llm gemini
 explainthisrepo owner/repo --llm openai
 explainthisrepo owner/repo --llm ollama
+explainthisrepo owner/repo --llm anthropic
 ```
 
 `--llm` works with all modes (``--quick``, ``--simple``, ``--detailed``).
