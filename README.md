@@ -33,6 +33,7 @@ ExplainThisRepo supports multiple LLM models:
 - Ollama (local or cloud-routed)
 - Anthropic
 - Groq
+- OpenRouter
 
 Use the built-in `init` command to configure your preferred model:
 
@@ -68,6 +69,7 @@ To install support for specific models:
 pip install explainthisrepo[gemini]
 pip install explainthisrepo[openai]
 pip install explainthisrepo[anthropic]
+pip install explainthisrepo[groq]
 ```
 
 ### Option 2: Install with npm
@@ -165,6 +167,7 @@ explainthisrepo owner/repo --llm gemini
 explainthisrepo owner/repo --llm openai
 explainthisrepo owner/repo --llm ollama
 explainthisrepo owner/repo --llm anthropic
+explainthisrepo owner/repo --llm openrouter
 ```
 
 `--llm` works with all modes (``--quick``, ``--simple``, ``--detailed``).

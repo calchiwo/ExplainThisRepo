@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Optional, Type
+from typing import Dict, Type
 
 from explain_this_repo.config import load_config
 from explain_this_repo.providers.base import LLMProvider, LLMProviderError
@@ -11,28 +11,11 @@ _PROVIDER_REGISTRY: Dict[str, str] = {
     "ollama": "explain_this_repo.providers.ollama.OllamaProvider",
     "anthropic": "explain_this_repo.providers.anthropic.AnthropicProvider",
     "groq": "explain_this_repo.providers.groq.GroqProvider",
+    "openrouter": "explain_this_repo.providers.openrouter.OpenRouterProvider",
 }
 
 
-_runtime_override: Optional[str] = None
-
-
-def list_providers() -> set[str]:
-    return set(_PROVIDER_REGISTRY.keys())
-
-
-def set_runtime_provider(name: str) -> None:
-
-    global _runtime_override
-    _runtime_override = name.lower()
-
-
-def clear_runtime_provider() -> None:
-    global _runtime_override
-    _runtime_override = None
-
-
-def get_available_providers() -> list[str]:
+def list_providers() -> list[str]:
     return list(_PROVIDER_REGISTRY.keys())
 
 
@@ -44,13 +27,15 @@ def _import_provider_class(path: str) -> Type[LLMProvider]:
 
 
 def get_provider(name: str) -> LLMProvider:
-
     name = name.lower()
 
     if name not in _PROVIDER_REGISTRY:
-        raise LLMProviderError(f"Unknown LLM provider '{name}'")
+        raise LLMProviderError(
+            f"Unknown LLM provider '{name}'. "
+            f"Available providers: {', '.join(sorted(_PROVIDER_REGISTRY.keys()))}"
+        )
 
-    config = load_config()
+    config = load_config() or {}
 
     provider_config = config.get("providers", {}).get(name, {})
 
@@ -67,11 +52,14 @@ def get_active_provider(
     if override:
         return get_provider(override)
 
-    config = load_config()
+    config = load_config() or {}
 
     default_provider = config.get("llm", {}).get("provider")
 
     if not default_provider:
-        raise LLMProviderError()
+        raise LLMProviderError(
+            "No LLM provider configured.\n"
+            "Run `explainthisrepo init` to configure a provider."
+        )
 
     return get_provider(default_provider)
