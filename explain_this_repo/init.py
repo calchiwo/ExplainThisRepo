@@ -73,7 +73,28 @@ def _prompt_provider_config(provider: str) -> Dict[str, str]:
         key = getpass.getpass("Groq API key: ").strip()
         if not key:
             raise RuntimeError("API key cannot be empty")
-        return {"api_key": key}
+
+        err.print("Select Groq model:", style="bold")
+        err.print("  1) llama3-70b-8192")
+        err.print("  2) mixtral-8x7b")
+        err.print("  3) deepseek-r1-distill-llama-70b")
+
+        choice = input("> ").strip()
+
+        model_map = {
+            "1": "llama3-70b-8192",
+            "2": "mixtral-8x7b",
+            "3": "deepseek-r1-distill-llama-70b",
+        }
+
+        model = model_map.get(choice)
+        if not model:
+            raise RuntimeError("Invalid model selection")
+
+        return {
+            "api_key": key,
+            "model": model,
+        }
 
     raise RuntimeError(f"Unsupported provider: {provider}")
 

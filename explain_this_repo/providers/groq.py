@@ -4,8 +4,6 @@ from typing import Any, Dict
 
 from explain_this_repo.providers.base import LLMProvider, LLMProviderError
 
-DEFAULT_MODEL = "llama3-70b-8192"
-
 
 class GroqProvider(LLMProvider):
     name = "groq"
@@ -13,7 +11,7 @@ class GroqProvider(LLMProvider):
     def __init__(self, config: Dict[str, Any]) -> None:
         self.config = config
         self.api_key = config.get("api_key")
-        self.model = config.get("model", DEFAULT_MODEL)
+        self.model = config.get("model")
         self._client = None
 
         self.validate_config()
@@ -23,6 +21,12 @@ class GroqProvider(LLMProvider):
             raise LLMProviderError(
                 "Groq provider requires an API key.\n"
                 "Run `explainthisrepo init` or set providers.groq.api_key."
+            )
+
+        if not self.model or not str(self.model).strip():
+            raise LLMProviderError(
+                "Groq provider requires a model.\n"
+                "Set providers.groq.model (e.g. llama3-70b-8192, mixtral-8x7b, deepseek-r1-distill-llama-70b)."
             )
 
     def _get_client(self):
