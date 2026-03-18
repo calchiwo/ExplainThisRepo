@@ -7,7 +7,6 @@ from typing import Any, Dict
 
 from explain_this_repo.providers.base import LLMProvider, LLMProviderError
 
-DEFAULT_MODEL = "llama3"
 DEFAULT_HOST = "http://localhost:11434"
 
 
@@ -15,12 +14,18 @@ class OllamaProvider(LLMProvider):
     name = "ollama"
 
     def __init__(self, config: Dict[str, Any]) -> None:
-        self.model = config.get("model", DEFAULT_MODEL)
-        self.host = config.get("host", DEFAULT_HOST).rstrip("/")
+        self.model = config.get("model")
+        self.host = (config.get("host") or DEFAULT_HOST).rstrip("/")
 
         self.validate_config()
 
     def validate_config(self) -> None:
+        if not self.model or not str(self.model).strip():
+            raise LLMProviderError(
+                "Ollama provider requires a model.\n"
+                "Set providers.ollama.model (e.g. llama3, gemma3:4b, glm-5:cloud)."
+            )
+
         if not self.host.startswith("http"):
             raise LLMProviderError(
                 "Ollama host must be a valid URL (e.g. http://localhost:11434)"
@@ -38,8 +43,10 @@ class OllamaProvider(LLMProvider):
                     results.append("Ollama server reachable")
                 else:
                     results.append(f"Ollama server responded with {response.status}")
-        except Exception:
-            results.append("Ollama server not reachable")
+        except urllib.error.URLError as e:
+            results.append(f"Ollama server not reachable: {e}")
+        except Exception as e:
+            results.append(f"Ollama check failed: {e}")
 
         results.append(f"model: {self.model}")
         results.append(f"host: {self.host}")
@@ -65,6 +72,8 @@ class OllamaProvider(LLMProvider):
         try:
             with urllib.request.urlopen(req, timeout=120) as response:
                 raw = response.read().decode("utf-8")
+        except urllib.error.HTTPError as e:
+            raise LLMProviderError(f"Ollama HTTP error: {e.code} {e.reason}") from e
         except urllib.error.URLError as e:
             raise LLMProviderError(
                 "Failed to connect to Ollama.\n"
