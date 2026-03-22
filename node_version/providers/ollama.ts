@@ -1,6 +1,5 @@
 import { LLMProvider, LLMProviderError } from "./base.js"
 
-const DEFAULT_MODEL = "llama3"
 const DEFAULT_HOST = "http://localhost:11434"
 
 type OllamaConfig = {
@@ -17,21 +16,26 @@ export class OllamaProvider implements LLMProvider {
 
   constructor(config: OllamaConfig = {}) {
 
-    this.model = config.model ?? DEFAULT_MODEL
+    this.model = config.model as string
     this.host = (config.host ?? DEFAULT_HOST).replace(/\/$/, "")
 
     this.validateConfig()
-
   }
 
   validateConfig(): void {
+
+    if (!this.model || !String(this.model).trim()) {
+      throw new LLMProviderError(
+        "Ollama provider requires a model.\n" +
+        "Set providers.ollama.model (e.g. llama3, gemma3:4b, glm-5:cloud)."
+      )
+    }
 
     if (!this.host.startsWith("http")) {
       throw new LLMProviderError(
         "Ollama host must be a valid URL (e.g. http://localhost:11434)"
       )
     }
-
   }
 
   async doctor(): Promise<string[]> {
@@ -50,8 +54,8 @@ export class OllamaProvider implements LLMProvider {
         results.push(`Ollama server responded with ${res.status}`)
       }
 
-    } catch {
-      results.push("Ollama server not reachable")
+    } catch (err: any) {
+      results.push(`Ollama server not reachable: ${String(err?.message ?? err)}`)
     }
 
     results.push(`model: ${this.model}`)
@@ -70,47 +74,47 @@ export class OllamaProvider implements LLMProvider {
       stream: false
     }
 
-    try {
+    let res: Response
 
-      const res = await fetch(url, {
+    try {
+      res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(payload)
       })
-
-      if (!res.ok) {
-        throw new LLMProviderError(
-          `Ollama server responded with ${res.status}`
-        )
-      }
-
-      const data = await res.json()
-
-      const text = data?.response ?? ""
-
-      if (!text.trim()) {
-        throw new LLMProviderError("Ollama returned no text")
-      }
-
-      return text.trim()
-
     } catch (err: any) {
-
-      const message =
-        err?.message ? String(err.message) : String(err)
-
       throw new LLMProviderError(
         [
           "Failed to connect to Ollama.",
           "Ensure Ollama is running locally.",
           "Start it with: ollama serve",
-          `Error: ${message}`
+          `Error: ${String(err?.message ?? err)}`
         ].join("\n")
       )
     }
 
-  }
+    if (!res.ok) {
+      throw new LLMProviderError(
+        `Ollama HTTP error: ${res.status}`
+      )
+    }
 
+    let data: any
+
+    try {
+      data = await res.json()
+    } catch {
+      throw new LLMProviderError("Invalid response from Ollama")
+    }
+
+    const text = data?.response
+
+    if (!text || !String(text).trim()) {
+      throw new LLMProviderError("Ollama returned no text")
+    }
+
+    return String(text).trim()
+  }
 }
