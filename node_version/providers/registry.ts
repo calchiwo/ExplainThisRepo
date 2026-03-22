@@ -1,60 +1,56 @@
-import { loadConfig } from "../config.js"
-import { LLMProvider, LLMProviderError } from "./base.js"
+import { loadConfig } from "../config.js";
+import { LLMProvider, LLMProviderError } from "./base.js";
 
-import { GeminiProvider } from "./gemini.js"
-import { OpenAIProvider } from "./openai.js"
-import { OllamaProvider } from "./ollama.js"
-import { AnthropicProvider } from "./anthropic.js"
+import { GeminiProvider } from "./gemini.js";
+import { OpenAIProvider } from "./openai.js";
+import { OllamaProvider } from "./ollama.js";
+import { AnthropicProvider } from "./anthropic.js";
+import { OpenRouterProvider } from "./openrouter.js";
 
-type ProviderConstructor = new (config?: any) => LLMProvider
+type ProviderConstructor = new (config?: any) => LLMProvider;
 
 const PROVIDER_REGISTRY: Record<string, ProviderConstructor> = {
   gemini: GeminiProvider,
   openai: OpenAIProvider,
   ollama: OllamaProvider,
   anthropic: AnthropicProvider,
-}
+  openrouter: OpenRouterProvider,
+};
 
 export function listProviders(): string[] {
-  return Object.keys(PROVIDER_REGISTRY)
+  return Object.keys(PROVIDER_REGISTRY);
 }
 
 export function getProvider(name: string): LLMProvider {
+  const providerName = name.toLowerCase();
 
-  const providerName = name.toLowerCase()
-
-  const Provider = PROVIDER_REGISTRY[providerName]
+  const Provider = PROVIDER_REGISTRY[providerName];
 
   if (!Provider) {
-    throw new LLMProviderError(`Unknown LLM provider '${providerName}'`)
+    throw new LLMProviderError(`Unknown LLM provider '${providerName}'`);
   }
 
-  const config = loadConfig()
+  const config = loadConfig();
 
-  const providerConfig =
-    config?.providers?.[providerName] ?? {}
+  const providerConfig = config?.providers?.[providerName] ?? {};
 
-  return new Provider(providerConfig)
+  return new Provider(providerConfig);
 }
 
-export function getActiveProvider(
-  override?: string
-): LLMProvider {
-
+export function getActiveProvider(override?: string): LLMProvider {
   if (override) {
-    return getProvider(override)
+    return getProvider(override);
   }
 
-  const config = loadConfig()
+  const config = loadConfig();
 
-  const defaultProvider =
-    config?.llm?.provider
+  const defaultProvider = config?.llm?.provider;
 
   if (!defaultProvider) {
     throw new LLMProviderError(
-      "No LLM provider configured. Run 'explainthisrepo init'."
-    )
+      "No LLM provider configured. Run 'explainthisrepo init'.",
+    );
   }
 
-  return getProvider(defaultProvider)
+  return getProvider(defaultProvider);
 }
