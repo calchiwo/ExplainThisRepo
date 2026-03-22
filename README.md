@@ -147,7 +147,7 @@ explainthisrepo init
 
 - `--llm` → Override provider selection
 
-- `--token/-t` → Set GitHub token for private repositories
+- `--token/-t` → Set GitHub token for private repositories and to avoid rate limits
 
 ## Flexible Repository and Local Directory Input
 
