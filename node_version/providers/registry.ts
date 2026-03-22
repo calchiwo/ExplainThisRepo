@@ -4,6 +4,7 @@ import { LLMProvider, LLMProviderError } from "./base.js"
 import { GeminiProvider } from "./gemini.js"
 import { OpenAIProvider } from "./openai.js"
 import { OllamaProvider } from "./ollama.js"
+import { AnthropicProvider } from "./anthropic.js"
 
 type ProviderConstructor = new (config?: any) => LLMProvider
 
@@ -11,6 +12,7 @@ const PROVIDER_REGISTRY: Record<string, ProviderConstructor> = {
   gemini: GeminiProvider,
   openai: OpenAIProvider,
   ollama: OllamaProvider,
+  anthropic: AnthropicProvider,
 }
 
 export function listProviders(): string[] {

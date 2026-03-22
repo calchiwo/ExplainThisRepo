@@ -11,7 +11,8 @@ interface HiddenReadlineInterface extends ReadlineInterface {
 const PROVIDERS: Record<string, string> = {
   "1": "gemini",
   "2": "openai",
-  "3": "ollama"
+  "3": "ollama",
+  "4": "anthropic",
 }
 
 export async function runInit(): Promise<void> {
@@ -69,6 +70,7 @@ async function promptProvider(): Promise<string> {
   err.write("  1) Gemini\n")
   err.write("  2) OpenAI\n")
   err.write("  3) Ollama (local)\n")
+  err.write("  4) Anthropic\n")
 
   const choice = (await prompt("> ")).trim()
 
@@ -125,6 +127,17 @@ async function promptProviderConfig(provider: string): Promise<Record<string, st
       host
     }
 
+  }
+
+  if (provider === "anthropic") {
+
+    const key = (await promptHidden("Anthropic API key: ")).trim()
+
+    if (!key) {
+      throw new Error("API key cannot be empty")
+    }
+
+    return { api_key: key }
   }
 
   throw new Error(`Unsupported provider: ${provider}`)
