@@ -7,7 +7,6 @@ from explain_this_repo.config import write_config
 
 err = Console(stderr=True)
 
-
 PROVIDERS = {
     "1": "gemini",
     "2": "openai",
@@ -120,20 +119,28 @@ def _prompt_provider_config(provider: str) -> Dict[str, str]:
         }
 
         if choice == "5":
-         model = input("Enter model (provider/model): ").strip()
-        if not model:
-            raise RuntimeError("Model cannot be empty")
-    else:
-        model = model_map.get(choice)
-        if not model:
-            raise RuntimeError("Invalid model selection")
+            model = input("Enter model (provider/model): ").strip()
+            if not model:
+                raise RuntimeError("Model cannot be empty")
+        else:
+            model = model_map.get(choice)
+            if not model:
+                raise RuntimeError("Invalid model selection")
 
-    return {
-        "api_key": key,
-        "model": model,
-    }
+        return {
+            "api_key": key,
+            "model": model,
+        }
 
     raise RuntimeError(f"Unsupported provider: {provider}")
+
+
+def _prompt_github_token() -> Dict[str, str]:
+    err.print("\nConfigure GitHub access for private repos and higher rate limits:", style="cyan")
+    token = getpass.getpass("GitHub token (leave empty to skip): ").strip()
+    if not token:
+        return {}
+    return {"token": token}
 
 
 def run_init() -> None:
@@ -145,6 +152,7 @@ def run_init() -> None:
     try:
         provider = _prompt_provider()
         provider_cfg = _prompt_provider_config(provider)
+        github_cfg = _prompt_github_token()
     except KeyboardInterrupt:
         err.print("\nInterrupted.", style="red")
         raise SystemExit(130)
@@ -156,11 +164,19 @@ def run_init() -> None:
         "[llm]",
         f'provider = "{provider}"',
         "",
-        "[providers.%s]" % provider,
+        f"[providers.{provider}]",
     ]
 
     for k, v in provider_cfg.items():
         lines.append(f'{k} = "{v}"')
+
+    if github_cfg:
+        lines.extend([
+            "",
+            "[github]",
+        ])
+        for k, v in github_cfg.items():
+            lines.append(f'{k} = "{v}"')
 
     contents = "\n".join(lines) + "\n"
 
