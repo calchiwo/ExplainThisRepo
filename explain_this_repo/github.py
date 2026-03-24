@@ -11,7 +11,7 @@ def _get_token() -> Optional[str]:
     return os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
 
 
-def _make_session() -> requests.Session:
+def _make_session(token: Optional[str] = None) -> requests.Session:
     session = requests.Session()
 
     headers = {
@@ -19,7 +19,7 @@ def _make_session() -> requests.Session:
         "Accept": "application/vnd.github+json",
     }
 
-    token = _get_token()
+    token = token or _get_token()
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
@@ -166,14 +166,14 @@ def _request_text(
     return None
 
 
-def fetch_repo(owner: str, repo: str) -> dict:
-    session = _make_session()
+def fetch_repo(owner: str, repo: str, token: Optional[str] = None) -> dict:
+    session = _make_session(token)
     url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}"
     return _request_json(session, url)
 
 
-def fetch_readme(owner: str, repo: str) -> str | None:
-    session = _make_session()
+def fetch_readme(owner: str, repo: str, token: Optional[str] = None) -> str | None:
+    session = _make_session(token)
 
     # 1) Try GitHub API raw endpoint
     api_url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/readme"
@@ -208,13 +208,13 @@ def fetch_readme(owner: str, repo: str) -> str | None:
     return None
 
 
-def fetch_tree(owner: str, repo: str) -> list[dict]:
+def fetch_tree(owner: str, repo: str, token: Optional[str] = None) -> list[dict]:
     """
     Uses Git Trees API to fetch full file tree.
     """
-    session = _make_session()
+    session = _make_session(token)
     # get default branch first
-    repo_meta = fetch_repo(owner, repo)
+    repo_meta = fetch_repo(owner, repo, token=token)
     branch = repo_meta.get("default_branch") or "main"
 
     url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
@@ -226,11 +226,16 @@ def fetch_tree(owner: str, repo: str) -> list[dict]:
     return tree
 
 
-def fetch_file(owner: str, repo: str, file_path: str) -> str | None:
+def fetch_file(
+    owner: str,
+    repo: str,
+    file_path: str,
+    token: Optional[str] = None,
+) -> str | None:
     """
     Fetch raw file content for a given path.
     """
-    session = _make_session()
+    session = _make_session(token)
     url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/contents/{file_path}"
     return _request_text(
         session,
@@ -241,8 +246,7 @@ def fetch_file(owner: str, repo: str, file_path: str) -> str | None:
     )
 
 
-def fetch_languages(owner: str, repo: str) -> dict:
-    url = f"https://api.github.com/repos/{owner}/{repo}/languages"
-    r = requests.get(url, headers={"User-Agent": "ExplainThisRepo"})
-    r.raise_for_status()
-    return r.json()
+def fetch_languages(owner: str, repo: str, token: Optional[str] = None) -> dict:
+    session = _make_session(token)
+    url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/languages"
+    return _request_json(session, url)
