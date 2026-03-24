@@ -4,11 +4,31 @@ from typing import Optional
 
 import requests
 
+from explain_this_repo.config import load_config
+
 GITHUB_API_BASE = "https://api.github.com"
 
 
-def _get_token() -> Optional[str]:
-    return os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+def _get_token(token: Optional[str] = None) -> Optional[str]:
+    if token and token.strip():
+        return token.strip()
+
+    try:
+        cfg = load_config() or {}
+        if isinstance(cfg, dict):
+            github_cfg = cfg.get("github", {})
+            if isinstance(github_cfg, dict):
+                cfg_token = github_cfg.get("token")
+                if cfg_token and str(cfg_token).strip():
+                    return str(cfg_token).strip()
+    except Exception:
+        pass
+
+    env_token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+    if env_token and env_token.strip():
+        return env_token.strip()
+
+    return None
 
 
 def _make_session(token: Optional[str] = None) -> requests.Session:
@@ -19,9 +39,9 @@ def _make_session(token: Optional[str] = None) -> requests.Session:
         "Accept": "application/vnd.github+json",
     }
 
-    token = token or _get_token()
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
+    resolved_token = _get_token(token)
+    if resolved_token:
+        headers["Authorization"] = f"Bearer {resolved_token}"
 
     session.headers.update(headers)
     return session
@@ -38,7 +58,10 @@ def _rate_limit_message(response: requests.Response) -> str:
             mins = (wait_s + 59) // 60
             return (
                 "GitHub API rate limit exceeded.\n"
-                f"Try again in ~{mins} minute(s), or set GITHUB_TOKEN to raise limits."
+                f"Try again in ~{mins} minute(s).\n"
+                "Fix:\n"
+                "- Set GITHUB_TOKEN in config or environment\n"
+                "- Or run `explainthisrepo init`\n"
             )
         except Exception:
             pass
@@ -46,7 +69,9 @@ def _rate_limit_message(response: requests.Response) -> str:
     # GitHub sometimes returns secondary rate limit without clean headers
     return (
         "GitHub API rate limit exceeded.\n"
-        "Try again later, or set GITHUB_TOKEN to raise limits."
+        "Fix:\n"
+        "- Set GITHUB_TOKEN in config or environment\n"
+        "- Or run `explainthisrepo init`\n"
     )
 
 
@@ -69,23 +94,23 @@ def _request_json(
             backoff *= 2
             continue
 
-        # Success
         if response.status_code == 200:
             return response.json()
 
-        # Not found
         if response.status_code == 404:
-            raise RuntimeError("Repository not found.")
+            raise RuntimeError(
+                "Repository not found.\n"
+                "If this is a private repository, configure GitHub access:\n"
+                "- Run `explainthisrepo init`\n"
+                "- Or set GITHUB_TOKEN"
+            )
 
-        # Rate limit / throttling
         if response.status_code in (403, 429):
             text_lower = (response.text or "").lower()
 
-            # Primary rate limit headers
             if response.headers.get("X-RateLimit-Remaining") == "0":
                 raise RuntimeError(_rate_limit_message(response))
 
-            # Secondary rate limit
             if "secondary rate limit" in text_lower or "rate limit" in text_lower:
                 if attempt == retries:
                     raise RuntimeError(_rate_limit_message(response))
@@ -93,10 +118,8 @@ def _request_json(
                 backoff *= 2
                 continue
 
-            # Forbidden for other reasons
             raise RuntimeError("GitHub API access forbidden (403).")
 
-        # Temporary server issues
         if 500 <= response.status_code <= 599:
             if attempt == retries:
                 raise RuntimeError(
@@ -106,10 +129,8 @@ def _request_json(
             backoff *= 2
             continue
 
-        # Other errors
         raise RuntimeError(f"GitHub API request failed ({response.status_code}).")
 
-    # Should never reach here
     raise RuntimeError("GitHub request failed unexpectedly.")
 
 
@@ -175,7 +196,6 @@ def fetch_repo(owner: str, repo: str, token: Optional[str] = None) -> dict:
 def fetch_readme(owner: str, repo: str, token: Optional[str] = None) -> str | None:
     session = _make_session(token)
 
-    # 1) Try GitHub API raw endpoint
     api_url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/readme"
     text = _request_text(
         session,
@@ -185,8 +205,6 @@ def fetch_readme(owner: str, repo: str, token: Optional[str] = None) -> str | No
     if text:
         return text
 
-    # 2) Fallback: try common default branches from raw.githubusercontent.com
-    # This avoids GitHub API rate limits entirely.
     branches = ["main", "master"]
     filenames = ["README.md", "readme.md", "README.MD"]
 
@@ -213,7 +231,6 @@ def fetch_tree(owner: str, repo: str, token: Optional[str] = None) -> list[dict]
     Uses Git Trees API to fetch full file tree.
     """
     session = _make_session(token)
-    # get default branch first
     repo_meta = fetch_repo(owner, repo, token=token)
     branch = repo_meta.get("default_branch") or "main"
 
