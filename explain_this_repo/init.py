@@ -136,7 +136,10 @@ def _prompt_provider_config(provider: str) -> Dict[str, str]:
 
 
 def _prompt_github_token() -> Dict[str, str]:
-    err.print("\nConfigure GitHub access for private repos and higher rate limits:", style="cyan")
+    err.print(
+        "\nConfigure GitHub access for private repos and higher rate limits:",
+        style="cyan",
+    )
     token = getpass.getpass("GitHub token (leave empty to skip): ").strip()
     if not token:
         return {}
@@ -171,10 +174,12 @@ def run_init() -> None:
         lines.append(f'{k} = "{v}"')
 
     if github_cfg:
-        lines.extend([
-            "",
-            "[github]",
-        ])
+        lines.extend(
+            [
+                "",
+                "[github]",
+            ]
+        )
         for k, v in github_cfg.items():
             lines.append(f'{k} = "{v}"')
 

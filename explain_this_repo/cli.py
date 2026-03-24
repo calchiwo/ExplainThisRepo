@@ -87,25 +87,6 @@ def _check_url(url: str, timeout: int = 6) -> tuple[bool, str]:
     except Exception as e:
         return False, f"failed ({type(e).__name__}: {e})"
 
-def resolve_github_token(args):
-    import getpass
-
-    # --token <value>
-    if args.token_value:
-        token = args.token_value.strip()
-        return token or None
-
-    # --token (no value) → prompt
-    if args.token:
-        token = getpass.getpass("GitHub token: ").strip()
-        return token or None
-
-    # fallback to env
-    env = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
-    if env and env.strip():
-        return env.strip()
-
-    return None
 
 def _run_provider_diagnostics(provider: object, provider_name: str) -> bool:
 
@@ -158,6 +139,13 @@ def run_doctor(llm_override: str | None = None) -> int:
     print("\nnetwork checks:")
     ok_gh, msg_gh = _check_url("https://api.github.com")
     print(f"- github api: {msg_gh}")
+
+    print("\ngithub auth:")
+
+    if _has_env("GITHUB_TOKEN") or _has_env("GH_TOKEN"):
+        print("- token: set")
+    else:
+        print("- token: not set (limited rate + no private repos)")
 
     print("\nprovider diagnostics:")
 
@@ -221,7 +209,9 @@ def generate_with_exit(prompt: str, llm: str | None = None) -> str:
     except ValueError as e:
         print(f"error: {e}")
         print("\nfix:")
-        print("- Check that the provider name is correct (e.g. gemini, openai, ollama, anthropic, openrouter)")
+        print(
+            "- Check that the provider name is correct (e.g. gemini, openai, ollama, anthropic, openrouter)"
+        )
         print("- Or run: explainthisrepo --doctor")
         raise SystemExit(1)
     except ImportError as e:
@@ -267,9 +257,12 @@ def main():
         "  explainthisrepo --doctor --llm openai\n"
         "  explainthisrepo --doctor --llm ollama\n"
         "  explainthisrepo --version\n"
-        "  explainthisrepo owner/repo --token\n"
-        "  explainthisrepo owner/repo --token=ghp_xxx\n"
-        "  GITHUB_TOKEN=ghp_xxx explainthisrepo owner/repo",
+        "GitHub token:\n"
+        "  Access private repos and higher rate limits\n"
+        "  Run:\n"
+        "   explainthisrepo init\n"
+        "  Or set:\n"
+        "   GITHUB_TOKEN=ghp_xxx explainthisrepo owner/repo\n",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
@@ -283,20 +276,6 @@ def main():
         "--version",
         action="store_true",
         help="Show version",
-    )
-    
-    parser.add_argument(
-        "--token",
-        "-t",
-        action="store_true",
-        help="Prompt for GitHub token securely",
-    )
-    
-    parser.add_argument(
-        "--token-value",
-        metavar="TOKEN",
-        default=None,
-        help="GitHub token value",
     )
 
     parser.add_argument(
@@ -342,7 +321,6 @@ def main():
 
     args = parser.parse_args()
 
-
     if args.command == "init" and args.repository is None:
         from explain_this_repo.init import run_init
 
@@ -355,8 +333,6 @@ def main():
     if args.version:
         print_version()
         return
-
-    token = resolve_github_token(args.token)
 
     if args.llm is not None:
         from explain_this_repo.providers.registry import list_providers
@@ -375,7 +351,7 @@ def main():
 
     if not args.repository:
         parser.error(
-            "repository argument required (or use 'explainthisrepo init') to set up API key"
+            "repository argument required (or use 'explainthisrepo init') to set up API key or GitHub token"
         )
 
     target = args.repository
@@ -401,7 +377,7 @@ def main():
             try:
                 with console.status(f"Fetching {owner}/{repo}…", spinner="dots"):
                     read_result = read_repo_signal_files(owner, repo)
-                    languages = fetch_languages(owner, repo, token=token)
+                    languages = fetch_languages(owner, repo)
             except Exception as e:
                 print(f"error: {e}")
                 raise SystemExit(1)
@@ -419,8 +395,8 @@ def main():
     if not local:
         try:
             with console.status(f"Fetching {owner}/{repo}…", spinner="dots"):
-                repo_data = fetch_repo(owner, repo, token=token)
-                readme = fetch_readme(owner, repo, token=token)
+                repo_data = fetch_repo(owner, repo)
+                readme = fetch_readme(owner, repo)
         except Exception as e:
             print(f"error: {e}")
             raise SystemExit(1)

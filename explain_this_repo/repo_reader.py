@@ -46,7 +46,9 @@ def _score_path(path: str) -> int:
 
     if p.endswith(("main.py", "__main__.py", "cli.py", "cli.ts", "cli.js")):
         return 85
-    if p.endswith(("index.js", "index.ts", "app.js", "app.ts", "server.js", "server.ts")):
+    if p.endswith(
+        ("index.js", "index.ts", "app.js", "app.ts", "server.js", "server.ts")
+    ):
         return 80
 
     if p in {"dockerfile", "compose.yml", "docker-compose.yml"}:
