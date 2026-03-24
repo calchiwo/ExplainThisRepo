@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "explainthisrepo"
-version = "0.9.6"
-description = "The fastest way to understand any codebase in plain English using real project signals. Not blind AI summarizatio"
+version = "0.10.0"
+description = "The fastest way to understand any codebase in plain English using real project signals. Not blind AI summarization"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9,<4.0"
 license = { text = "MIT" }
@@ -14,7 +14,7 @@ authors = [
   { name = "Caleb Wodi", email = "calebwodi33@gmail.com" }
 ]
 
-keywords = ["cli", "github", "repo-analysis", "code-explanation", "developer-tools"]
+keywords = ["cli", "codebase-understanding", "repo-analysis", "code-explanation", "developer-tools"]
 
 dependencies = [
   "requests>=2.31,<3.0",

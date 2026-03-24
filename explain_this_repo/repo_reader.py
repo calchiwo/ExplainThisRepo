@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Optional
 
 from explain_this_repo.github import fetch_file, fetch_tree
 
@@ -14,7 +14,6 @@ class ReadResult:
     key_files: dict[str, str] = field(default_factory=dict)
 
 
-# Hard limits (keep it fast + cheap)
 MAX_FILES = 20
 MAX_TOTAL_CHARS = 150_000
 MAX_FILE_CHARS = 8000
@@ -38,19 +37,13 @@ def _is_noise_file(path: str) -> bool:
 
 
 def _score_path(path: str) -> int:
-    """
-    Higher score = more important.
-    Keep this simple, no overengineering.
-    """
     p = path.lower()
 
-    # identity files
     if p in {"package.json", "pyproject.toml", "requirements.txt", "setup.py"}:
         return 100
     if p in {"readme.md", "readme"}:
         return 90
 
-    # entrypoints
     if p.endswith(("main.py", "__main__.py", "cli.py", "cli.ts", "cli.js")):
         return 85
     if p.endswith(
@@ -58,17 +51,14 @@ def _score_path(path: str) -> int:
     ):
         return 80
 
-    # backend / config
     if p in {"dockerfile", "compose.yml", "docker-compose.yml"}:
         return 75
     if p.endswith(("tsconfig.json", "vite.config.ts", "next.config.js", "vercel.json")):
         return 70
 
-    # common code folders
     if p.startswith(("src/", "app/", "apps/", "packages/", "lib/", "api/")):
         return 60
 
-    # tests might still be signal
     if p.startswith(("tests/", "test/")):
         return 40
 
@@ -76,9 +66,6 @@ def _score_path(path: str) -> int:
 
 
 def _render_tree(tree: list[dict[str, Any]], max_lines: int = 160) -> str:
-    """
-    Compact tree view: list paths only.
-    """
     paths = []
     for item in tree:
         if item.get("type") != "blob":
@@ -109,7 +96,6 @@ def _pick_signal_files(tree: list[dict[str, Any]]) -> list[str]:
             continue
         candidates.append(path)
 
-    # prioritize
     candidates.sort(key=_score_path, reverse=True)
 
     picked = []
@@ -135,12 +121,17 @@ def _format_files_snippets(snips: list[tuple[str, str]]) -> str:
     return "\n".join(out).strip()
 
 
-def read_repo_signal_files(owner: str, repo: str) -> ReadResult:
+def read_repo_signal_files(
+    owner: str,
+    repo: str,
+    token: Optional[str] = None,
+) -> ReadResult:
     key_files: dict[str, str] = {}
-    tree = fetch_tree(owner, repo)
+
+    # token flows here
+    tree = fetch_tree(owner, repo, token=token)
 
     tree_text = _render_tree(tree)
-
     picked = _pick_signal_files(tree)
 
     total = 0
@@ -150,7 +141,7 @@ def read_repo_signal_files(owner: str, repo: str) -> ReadResult:
         if total >= MAX_TOTAL_CHARS:
             break
 
-        content = fetch_file(owner, repo, p)
+        content = fetch_file(owner, repo, p, token=token)
         if not content:
             continue
 

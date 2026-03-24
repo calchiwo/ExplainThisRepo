@@ -126,6 +126,20 @@ explainthisrepo init
 
 > For details about how initialization works, see [INIT.md](INIT.md).
 
+## GitHub token Access (Private Repos & Rate Limits)
+
+ExplainThisRepo supports GitHub authentication for:
+
+- Accessing private repositories
+- Higher API rate limits on public repositories
+
+Run:
+
+```bash
+explainthisrepo init
+```
+
+For step-by-step instructions, see [docs/GITHUB_TOKEN.md](docs/GITHUB_TOKEN.md)
 
 ## Flag options
 
@@ -146,8 +160,6 @@ explainthisrepo init
 - `--doctor` → Check system health and active model diagnostics
 
 - `--llm` → Override provider selection
-
-- `--token/-t` → Set GitHub token for private repositories and to avoid rate limits
 
 ## Flexible Repository and Local Directory Input
 
@@ -268,14 +280,6 @@ When analyzing a local directory:
 - All prompts and outputs remain identical
 
 This allows analysis of projects directly from the local filesystem, without requiring a GitHub repository.
-
-### For private repositories, use the --token/-t option.
-
-Setting a `GITHUB_TOKEN` environment variable is recommended to avoid rate limits when analyzing public repositories.
-
-```bash
-export GITHUB_TOKEN=yourActualTokenHere
-```
 
 ### Version
 
