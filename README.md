@@ -20,6 +20,7 @@ ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, 
 - Derives architectural summaries from repository structure and code signals.
 Not blind AI summarization.
 - Translates complex code structures into plain English
+- Speeds up understanding of unfamiliar codebases
 - Extract architecture signals from configs, entrypoints, and manifests
 - Works with GitHub repositories, local directories, private repositories, and monorepos
 - Outputs the explanation to an `EXPLAIN.md` file in your current directory or prints it directly in the terminal
@@ -46,6 +47,14 @@ pipx install explainthisrepo
 explainthisrepo owner/repo
 ```
 
+After installation, use any of the available commands:
+
+```bash
+explainthisrepo owner/repo
+explain-this-repo owner/repo
+etr owner/repo
+```
+
 To install support for specific models:
 
 ```bash
@@ -54,6 +63,8 @@ pip install explainthisrepo[openai]
 pip install explainthisrepo[anthropic]
 pip install explainthisrepo[groq]
 ```
+
+Replace `owner/repo` with the GitHub repository identifier (e.g., `facebook/react`, `torvalds/linux`).
 
 ### Option 2: Install with npm
 
@@ -71,9 +82,9 @@ Or without install:
 
 ```bash
 npx explainthisrepo owner/repo
-```
 
-Replace `owner/repo` with the GitHub repository identifier (e.g., `facebook/react`).
+# npx explainthisrepo .
+```
 
 ### Option 3: Download standalone binary
 
@@ -176,6 +187,22 @@ explainthisrepo ./path/to/directory
 ```
 
 All inputs are normalized internally to `owner/repo`.
+
+## CLI aliases
+
+ExplainThisRepo ships with multiple command names that all map to the same entrypoint:
+
+- `explainthisrepo` → primary command
+- `explain-this-repo` → readable alias
+- `etr` → short alias for faster typing
+
+All three commands run the same tool and support the same flags and modes.
+
+```bash
+explainthisrepo owner/repo
+explain-this-repo owner/repo
+etr owner/repo
+```
 
 ## Model selection
 
