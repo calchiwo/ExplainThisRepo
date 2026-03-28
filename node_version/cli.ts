@@ -116,9 +116,13 @@ async function runDoctor(llmOverride?: string): Promise<number> {
   console.log(`platform: ${process.platform} ${process.arch}`);
   console.log(`version: ${getPkgVersion()}`);
 
-  console.log("\nenvironment:");
-  console.log(`- GITHUB_TOKEN set: ${hasEnv("GITHUB_TOKEN")}`);
+  console.log("\ngithub auth:");
 
+  if (hasEnv("GITHUB_TOKEN") || hasEnv("GH_TOKEN")) {
+     console.log("-token: set");
+} else {
+  console.log("-token: not set (limited + no private repos)");
+}
   console.log("\nnetwork checks:");
   const gh = await checkUrl("https://api.github.com");
   console.log(`- github api: ${gh.msg}`);
@@ -195,7 +199,7 @@ async function generateWithExit(prompt: string, llm?: string): Promise<string> {
     console.error(`error: ${message}`);
     console.error("\nfix:");
     console.error(
-      "- Check that the provider name is correct (e.g. gemini, openai, ollama)"
+      "- Check that the provider name is correct (e.g. gemini, openai, ollama, anthropic, openrouter)"
     );
     console.error("- Ensure your API key is set for the selected provider");
     console.error("- Or run: explainthisrepo --doctor");
@@ -305,7 +309,7 @@ async function runAnalysis(
       console.error("Failed to fetch repository data.");
       console.error(`error: ${message}`);
       console.error("\nfix:");
-      console.error("- Ensure the repository exists and is public");
+      console.error("- Run explainthisrepo init");
       console.error("- Or set GITHUB_TOKEN to avoid rate limits");
       process.exit(1);
     }
@@ -420,7 +424,7 @@ const program = new Command();
 
 program
   .name("explainthisrepo")
-  .description("CLI that generates plain English explanations of any codebase")
+  .description("The fastest way to understand any codebase in plain English")
   .version(getPkgVersion(), "-v, --version", "Show version")
   .argument(
     "[repository]",
@@ -433,7 +437,7 @@ program
   .option("--stack", "Stack detection mode")
   .option(
     "--llm <provider>",
-    "LLM provider to use (e.g. gemini, openai, ollama). Overrides config default."
+    "LLM provider to use (e.g. gemini, openai, ollama, anthropic, openrouter). Overrides config default."
   )
   .addHelpText(
     "after",
@@ -456,7 +460,15 @@ Examples:
   $ explainthisrepo --doctor
   $ explainthisrepo --doctor --llm gemini
   $ explainthisrepo --doctor --llm openai
-  $ explainthisrepo --doctor --llm ollama`
+  $ explainthisrepo --doctor --llm ollama
+  $ explainthisrepo --version
+  $ GitHub token:
+  $   Access private repos and higher rate limits
+  $   Run:
+  $     explainthisrepo init
+  $   Or set:
+  $     GITHUB_TOKEN=ghp_xxx explainthisrepo owner/repo`
+
   )
   .action(
     async (
