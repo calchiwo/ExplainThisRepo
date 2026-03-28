@@ -162,6 +162,8 @@ for (const path of STACK_KEY_FILES) {
 
   try {
     const content = await fetchFile(owner, repo, path);
+    if (!content) continue;
+
     keyFiles[path] = content.slice(0, 20000);
   } catch {}
 }  
