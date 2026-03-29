@@ -1,6 +1,6 @@
 {
   "name": "explainthisrepo",
-  "version": "0.9.6",
+  "version": "0.10.0",
   "description": "The fastest way to understand any codebase in plain English. Not blind AI summarization",
   "license": "MIT",
   "type": "module",
