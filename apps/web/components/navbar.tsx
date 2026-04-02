@@ -6,6 +6,7 @@ import { useState, useCallback } from "react"
 import Link from "next/link"
 import { Terminal, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { DocSearch } from "@/components/doc-search"
 
 function scrollTo(id: string, duration = 400) {
   const el = document.getElementById(id)
@@ -41,6 +42,14 @@ export function Navbar() {
     []
   )
 
+  const handleSearchSelect = useCallback(
+    (id: string, section: string) => {
+      setMobileOpen(false)
+      scrollTo(section)
+    },
+    []
+  )
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -53,7 +62,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-6 md:flex flex-1 ml-8">
           <a
             href="#features"
             onClick={(e) => handleNav(e, "features")}
@@ -83,9 +92,15 @@ export function Navbar() {
           >
             GitHub
           </Link>
+          <div className="hidden lg:block ml-auto">
+            <DocSearch onSelectResult={handleSearchSelect} />
+          </div>
         </div>
 
-        <div className="hidden md:block">
+        <div className="hidden md:flex md:items-center gap-4">
+          <div className="lg:hidden">
+            <DocSearch onSelectResult={handleSearchSelect} />
+          </div>
           <Button asChild size="sm">
             <a href="#install" onClick={(e) => handleNav(e, "install")}>Get Started</a>
           </Button>
