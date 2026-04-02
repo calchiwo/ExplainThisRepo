@@ -4,7 +4,8 @@ import React from "react"
 
 import { useState, useCallback } from "react"
 import Link from "next/link"
-import { Terminal, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 function scrollTo(id: string, duration = 400) {
@@ -45,9 +46,13 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Terminal className="h-4 w-4 text-primary-foreground" />
-          </div>
+          <Image
+            src="/explainthisrepo.png"
+            alt="ExplainThisRepo logo"
+            width={32}
+            height={32}
+            className="rounded-lg"
+          />
           <span className="text-lg font-semibold tracking-tight text-foreground">
             ExplainThisRepo
           </span>
@@ -62,11 +67,18 @@ export function Navbar() {
             Features
           </a>
           <a
-            href="#modes"
-            onClick={(e) => handleNav(e, "modes")}
+            href="#input-formats"
+            onClick={(e) => handleNav(e, "input-formats")}
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            Modes
+            Input
+          </a>
+          <a
+            href="#configuration"
+            onClick={(e) => handleNav(e, "configuration")}
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Configuration
           </a>
           <a
             href="#install"
@@ -112,11 +124,18 @@ export function Navbar() {
               Features
             </a>
             <a
-              href="#modes"
-              onClick={(e) => handleNav(e, "modes")}
+              href="#input-formats"
+              onClick={(e) => handleNav(e, "input-formats")}
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
-              Modes
+              Input
+            </a>
+            <a
+              href="#configuration"
+              onClick={(e) => handleNav(e, "configuration")}
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Configuration
             </a>
             <a
               href="#install"

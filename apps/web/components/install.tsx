@@ -10,6 +10,7 @@ const tabs = [
     commands: [
       { text: "pip install explainthisrepo", copyable: true },
       { text: "explainthisrepo owner/repo", copyable: true },
+      { text: "explainthisrepo .", copyable: true },
     ],
   },
   {
@@ -17,6 +18,7 @@ const tabs = [
     commands: [
       { text: "pipx install explainthisrepo", copyable: true },
       { text: "explainthisrepo owner/repo", copyable: true },
+      { text: "explainthisrepo .", copyable: true },
     ],
   },
   {
@@ -24,12 +26,21 @@ const tabs = [
     commands: [
       { text: "npm install -g explainthisrepo", copyable: true },
       { text: "explainthisrepo owner/repo", copyable: true },
+      { text: "explainthisrepo .", copyable: true },
     ],
   },
   {
     label: "npx",
     commands: [
       { text: "npx explainthisrepo owner/repo", copyable: true },
+    ],
+  },
+  {
+    label: "Standalone",
+    commands: [
+      { text: "# Download from GitHub Releases", copyable: false },
+      { text: "explainthisrepo owner/repo", copyable: true },
+      { text: "explainthisrepo .", copyable: true },
     ],
   },
 ]
@@ -111,25 +122,39 @@ export function Install() {
                   className="flex items-center justify-between rounded-lg bg-background px-4 py-3"
                 >
                   <span className="text-foreground">
-                    <span className="text-primary mr-2">$</span>
-                    {cmd.text}
+                    {cmd.copyable ? (
+                      <>
+                        <span className="text-primary mr-2">$</span>
+                        {cmd.text}
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">{cmd.text}</span>
+                    )}
                   </span>
-                  <CopyButton text={cmd.text} />
+                  {cmd.copyable && <CopyButton text={cmd.text} />}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* API key note */}
-          <div className="mt-6 rounded-lg border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              <span className="font-medium text-foreground">API Key Required:</span>{" "}
-              ExplainThisRepo uses Gemini models for code analysis. Set your API
-              key with{" "}
-              <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-primary">
-                export GEMINI_API_KEY=&quot;your_key&quot;
-              </code>
-            </p>
+          {/* Configuration note */}
+          <div className="mt-6 rounded-lg border border-border bg-card p-4 space-y-3">
+            <div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                <span className="font-medium text-foreground">First time setup:</span>{" "}
+                Run{" "}
+                <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-primary">
+                  explainthisrepo init
+                </code>{" "}
+                to configure your preferred LLM provider.
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                <span className="font-medium text-foreground">Supported providers:</span>{" "}
+                Gemini, OpenAI, Ollama, Anthropic, Groq, OpenRouter
+              </p>
+            </div>
           </div>
         </div>
       </div>

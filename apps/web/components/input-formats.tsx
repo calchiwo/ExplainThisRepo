@@ -11,7 +11,7 @@ const formats = [
 
 export function InputFormats() {
   return (
-    <section className="border-y border-border bg-card/50 py-24 md:py-32">
+    <section id="input-formats" className="border-y border-border bg-card/50 py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
@@ -19,7 +19,7 @@ export function InputFormats() {
               Flexible Input
             </p>
             <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              Paste any GitHub link
+              Paste any GitHub format
             </h2>
             <p className="mt-4 max-w-lg text-pretty text-muted-foreground leading-relaxed">
               No need to reformat URLs. ExplainThisRepo accepts repositories the
