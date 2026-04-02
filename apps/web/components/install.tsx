@@ -4,7 +4,17 @@ import { useState } from "react"
 import { Check, Copy } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const tabs = [
+interface Command {
+  text: string
+  copyable: boolean
+}
+
+interface Tab {
+  label: string
+  commands: Command[]
+}
+
+const INSTALL_TABS: Tab[] = [
   {
     label: "pip",
     commands: [
@@ -64,11 +74,12 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function Install() {
-  const [activeTab, setActiveTab] = useState(0)
+  const [activeTabIndex, setActiveTabIndex] = useState(0)
 
   return (
     <section id="install" className="py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
+        {/* Section header */}
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-primary">
             Installation
@@ -84,16 +95,16 @@ export function Install() {
 
         <div className="mx-auto max-w-xl">
           <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
-            {/* Tabs */}
+            {/* Tab selector */}
             <div className="flex border-b border-border">
-              {tabs.map((tab, index) => (
+              {INSTALL_TABS.map((tab, index) => (
                 <button
                   key={tab.label}
                   type="button"
-                  onClick={() => setActiveTab(index)}
+                  onClick={() => setActiveTabIndex(index)}
                   className={cn(
                     "flex-1 px-4 py-3 text-sm font-medium transition-colors",
-                    index === activeTab
+                    index === activeTabIndex
                       ? "bg-secondary text-foreground border-b-2 border-primary"
                       : "text-muted-foreground hover:text-foreground"
                   )}
@@ -103,24 +114,24 @@ export function Install() {
               ))}
             </div>
 
-            {/* Commands */}
+            {/* Command list */}
             <div className="p-5 font-mono text-sm space-y-3">
-              {tabs[activeTab].commands.map((cmd) => (
+              {INSTALL_TABS[activeTabIndex].commands.map((cmd) => (
                 <div
                   key={cmd.text}
                   className="flex items-center justify-between rounded-lg bg-background px-4 py-3"
                 >
                   <span className="text-foreground">
-                    <span className="text-primary mr-2">$</span>
+                    <span className="text-primary mr-2" aria-hidden="true">$</span>
                     {cmd.text}
                   </span>
-                  <CopyButton text={cmd.text} />
+                  {cmd.copyable && <CopyButton text={cmd.text} />}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* API key note */}
+          {/* API key setup note */}
           <div className="mt-6 rounded-lg border border-border bg-card p-4">
             <p className="text-sm text-muted-foreground leading-relaxed">
               <span className="font-medium text-foreground">API Key Required:</span>{" "}

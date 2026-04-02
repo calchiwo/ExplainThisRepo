@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react"
 
-const formats = [
+const GITHUB_URL_FORMATS: string[] = [
   "https://github.com/owner/repo",
   "github.com/owner/repo",
   "owner/repo",
@@ -14,6 +14,7 @@ export function InputFormats() {
     <section className="border-y border-border bg-card/50 py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+          {/* Section content */}
           <div>
             <p className="mb-3 text-sm font-medium uppercase tracking-widest text-primary">
               Flexible Input
@@ -28,8 +29,9 @@ export function InputFormats() {
             </p>
           </div>
 
+          {/* Format examples */}
           <div className="space-y-3">
-            {formats.map((format) => (
+            {GITHUB_URL_FORMATS.map((format) => (
               <div
                 key={format}
                 className="group flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 transition-colors hover:border-primary/30"
@@ -37,7 +39,10 @@ export function InputFormats() {
                 <code className="flex-1 font-mono text-sm text-foreground/90 truncate">
                   {format}
                 </code>
-                <ArrowRight className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
+                <ArrowRight 
+                  className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-colors group-hover:text-primary" 
+                  aria-hidden="true"
+                />
                 <code className="hidden font-mono text-sm text-primary sm:block">
                   owner/repo
                 </code>

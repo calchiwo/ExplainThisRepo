@@ -3,7 +3,15 @@
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 
-const modes = [
+interface Mode {
+  flag: string
+  label: string
+  command: string
+  description: string
+  output: string[]
+}
+
+const MODES: Mode[] = [
   {
     flag: "default",
     label: "Default",
@@ -81,11 +89,12 @@ const modes = [
 
 export function Modes() {
   const [activeMode, setActiveMode] = useState(0)
-  const mode = modes[activeMode]
+  const currentMode = MODES[activeMode]
 
   return (
     <section id="modes" className="border-y border-border bg-card/50 py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
+        {/* Section header */}
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-primary">
             Modes
@@ -100,11 +109,11 @@ export function Modes() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-5">
-          {/* Mode selector */}
+          {/* Mode selector buttons */}
           <div className="flex flex-row gap-2 overflow-x-auto lg:col-span-2 lg:flex-col lg:gap-1.5 lg:overflow-x-visible">
-            {modes.map((m, index) => (
+            {MODES.map((mode, index) => (
               <button
-                key={m.flag}
+                key={mode.flag}
                 type="button"
                 onClick={() => setActiveMode(index)}
                 className={cn(
@@ -114,33 +123,34 @@ export function Modes() {
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <code className="font-mono text-xs text-primary">
-                    {m.flag}
-                  </code>
-                </div>
-                <p className="mt-1 text-sm hidden lg:block">{m.description}</p>
+                <code className="font-mono text-xs text-primary">
+                  {mode.flag}
+                </code>
+                <p className="mt-1 text-sm hidden lg:block">{mode.description}</p>
               </button>
             ))}
           </div>
 
-          {/* Terminal preview */}
+          {/* Terminal output preview */}
           <div className="lg:col-span-3">
             <div className="overflow-hidden rounded-xl border border-border bg-background shadow-xl">
+              {/* Terminal header */}
               <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-                <div className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-                <div className="h-3 w-3 rounded-full bg-[#febc2e]" />
-                <div className="h-3 w-3 rounded-full bg-[#28c840]" />
+                <div className="h-3 w-3 rounded-full bg-[#ff5f57]" aria-hidden="true" />
+                <div className="h-3 w-3 rounded-full bg-[#febc2e]" aria-hidden="true" />
+                <div className="h-3 w-3 rounded-full bg-[#28c840]" aria-hidden="true" />
                 <span className="ml-3 text-xs text-muted-foreground font-mono">
-                  {mode.label.toLowerCase()}
+                  {currentMode.label.toLowerCase()}
                 </span>
               </div>
+              
+              {/* Terminal output */}
               <div className="p-5 font-mono text-sm leading-relaxed min-h-[280px]">
                 <div className="text-foreground font-semibold">
-                  $ {mode.command}
+                  $ {currentMode.command}
                 </div>
                 <div className="mt-2">
-                  {mode.output.map((line, i) => (
+                  {currentMode.output.map((line, i) => (
                     <div
                       key={i}
                       className={cn(

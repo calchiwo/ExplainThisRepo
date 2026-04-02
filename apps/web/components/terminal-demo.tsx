@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react"
 
-const lines = [
+type LineType = "command" | "blank" | "info" | "output" | "success"
+
+interface TerminalLine {
+  text: string
+  type: LineType
+  delay: number
+}
+
+const TERMINAL_OUTPUT: TerminalLine[] = [
   { text: "$ explainthisrepo facebook/react", type: "command" as const, delay: 0 },
   { text: "", type: "blank" as const, delay: 800 },
   { text: "Fetching repository data...", type: "info" as const, delay: 1200 },
@@ -40,15 +48,32 @@ const lines = [
   { text: "EXPLAIN.md created successfully.", type: "success" as const, delay: 7600 },
 ]
 
+const getLineColorClass = (type: LineType): string => {
+  switch (type) {
+    case "command":
+      return "text-foreground font-semibold"
+    case "info":
+      return "text-muted-foreground"
+    case "output":
+      return "text-foreground/90"
+    case "success":
+      return "text-primary font-medium"
+    case "blank":
+      return ""
+    default:
+      return ""
+  }
+}
+
 export function TerminalDemo() {
-  const [visibleLines, setVisibleLines] = useState<number>(0)
+  const [visibleLineCount, setVisibleLineCount] = useState<number>(0)
 
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = []
 
-    lines.forEach((line, index) => {
+    TERMINAL_OUTPUT.forEach((line, index) => {
       const timer = setTimeout(() => {
-        setVisibleLines(index + 1)
+        setVisibleLineCount(index + 1)
       }, line.delay)
       timers.push(timer)
     })
@@ -56,41 +81,28 @@ export function TerminalDemo() {
     return () => timers.forEach(clearTimeout)
   }, [])
 
-  const getLineClass = (type: string) => {
-    switch (type) {
-      case "command":
-        return "text-foreground font-semibold"
-      case "info":
-        return "text-muted-foreground"
-      case "output":
-        return "text-foreground/90"
-      case "success":
-        return "text-primary font-medium"
-      default:
-        return ""
-    }
-  }
-
   return (
     <div className="mx-auto w-full max-w-2xl">
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-2xl shadow-primary/5">
+        {/* Terminal header */}
         <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-          <div className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-          <div className="h-3 w-3 rounded-full bg-[#febc2e]" />
-          <div className="h-3 w-3 rounded-full bg-[#28c840]" />
+          <div className="h-3 w-3 rounded-full bg-[#ff5f57]" aria-hidden="true" />
+          <div className="h-3 w-3 rounded-full bg-[#febc2e]" aria-hidden="true" />
+          <div className="h-3 w-3 rounded-full bg-[#28c840]" aria-hidden="true" />
           <span className="ml-3 text-xs text-muted-foreground font-mono">
             terminal
           </span>
         </div>
 
+        {/* Terminal output */}
         <div className="p-5 font-mono text-sm leading-relaxed min-h-[320px]">
-          {lines.slice(0, visibleLines).map((line, index) => (
-            <div key={index} className={getLineClass(line.type)}>
+          {TERMINAL_OUTPUT.slice(0, visibleLineCount).map((line, index) => (
+            <div key={index} className={getLineColorClass(line.type)}>
               {line.text || "\u00A0"}
             </div>
           ))}
-          {visibleLines < lines.length && (
-            <span className="inline-block h-4 w-2 animate-pulse bg-primary" />
+          {visibleLineCount < TERMINAL_OUTPUT.length && (
+            <span className="inline-block h-4 w-2 animate-pulse bg-primary" aria-hidden="true" />
           )}
         </div>
       </div>

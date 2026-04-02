@@ -7,13 +7,13 @@ export function CTA() {
     <section className="py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-12 text-center md:p-20">
-          {/* Subtle glow */}
+          {/* Background accent glow */}
           <div
             className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[600px] rounded-full opacity-[0.05]"
             style={{
-              background:
-                "radial-gradient(ellipse, hsl(160 84% 39%) 0%, transparent 70%)",
+              background: "radial-gradient(ellipse, hsl(160 84% 39%) 0%, transparent 70%)",
             }}
+            aria-hidden="true"
           />
 
           <div className="relative">
@@ -25,11 +25,12 @@ export function CTA() {
               public GitHub repository.
             </p>
 
+            {/* Action buttons */}
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button asChild size="lg" className="gap-2 px-6">
                 <Link href="#install">
                   Install Now
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="gap-2 px-6 bg-transparent">
@@ -38,7 +39,7 @@ export function CTA() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Github className="h-4 w-4" />
+                  <Github className="h-4 w-4" aria-hidden="true" />
                   Star on GitHub
                 </Link>
               </Button>

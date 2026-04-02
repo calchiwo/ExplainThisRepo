@@ -7,7 +7,13 @@ import {
   FileText,
 } from "lucide-react"
 
-const features = [
+interface Feature {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  description: string
+}
+
+const FEATURES: Feature[] = [
   {
     icon: Globe,
     title: "Fetch Any Public Repo",
@@ -50,6 +56,7 @@ export function Features() {
   return (
     <section id="features" className="py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
+        {/* Section header */}
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-primary">
             Features
@@ -63,23 +70,27 @@ export function Features() {
           </p>
         </div>
 
+        {/* Features grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="group rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/30 hover:bg-secondary/50"
-            >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <feature.icon className="h-5 w-5 text-primary" />
+          {FEATURES.map((feature) => {
+            const Icon = feature.icon
+            return (
+              <div
+                key={feature.title}
+                className="group rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/30 hover:bg-secondary/50"
+              >
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Icon className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="mb-2 text-base font-semibold text-foreground">
+                  {feature.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {feature.description}
+                </p>
               </div>
-              <h3 className="mb-2 text-base font-semibold text-foreground">
-                {feature.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {feature.description}
-              </p>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>

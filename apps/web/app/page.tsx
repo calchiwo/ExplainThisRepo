@@ -7,17 +7,19 @@ import { Install } from "@/components/install"
 import { CTA } from "@/components/cta"
 import { Footer } from "@/components/footer"
 
-export default function Page() {
+export default function HomePage() {
   return (
-    <main>
+    <>
       <Navbar />
-      <Hero />
-      <Features />
-      <Modes />
-      <InputFormats />
-      <Install />
-      <CTA />
+      <main className="flex flex-col">
+        <Hero />
+        <Features />
+        <Modes />
+        <InputFormats />
+        <Install />
+        <CTA />
+      </main>
       <Footer />
-    </main>
+    </>
   )
 }
