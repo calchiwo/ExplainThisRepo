@@ -3,6 +3,10 @@ import { Hero } from "@/components/hero"
 import { Features } from "@/components/features"
 import { Modes } from "@/components/modes"
 import { InputFormats } from "@/components/input-formats"
+import { Configuration } from "@/components/configuration"
+import { GithubToken } from "@/components/github-token"
+import { Downloads } from "@/components/downloads"
+import { MoreFeatures } from "@/components/more-features"
 import { Install } from "@/components/install"
 import { CTA } from "@/components/cta"
 import { Footer } from "@/components/footer"
@@ -15,6 +19,10 @@ export default function Page() {
       <Features />
       <Modes />
       <InputFormats />
+      <Configuration />
+      <GithubToken />
+      <Downloads />
+      <MoreFeatures />
       <Install />
       <CTA />
       <Footer />

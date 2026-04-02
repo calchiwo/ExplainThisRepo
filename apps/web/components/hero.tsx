@@ -20,19 +20,17 @@ export function Hero() {
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-1.5">
             <span className="h-2 w-2 rounded-full bg-primary" />
             <span className="text-xs font-medium text-muted-foreground">
-              Available on PyPI and npm
+              Python, Node.js & Standalone Binaries
             </span>
           </div>
 
           <h1 className="max-w-4xl text-balance text-4xl font-bold tracking-tight text-foreground md:text-6xl lg:text-7xl">
-            Understand any GitHub repo{" "}
-            <span className="text-primary">instantly</span>
+            Understand any codebase in{" "}
+            <span className="text-primary">plain English</span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
-            A CLI tool that generates plain-English explanations of public GitHub
-            repositories by analyzing structure, README content, and high-signal
-            files.
+            The fastest way to understand any codebase using real project signals. Not blind AI summarization. ExplainThisRepo analyzes configs, entrypoints, manifests, dependencies, file structure, and high-signal files.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
