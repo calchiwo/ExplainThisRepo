@@ -7,7 +7,6 @@ export function CTA() {
     <section className="py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-12 text-center md:p-20">
-          {/* Subtle glow */}
           <div
             className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[600px] rounded-full opacity-[0.05]"
             style={{

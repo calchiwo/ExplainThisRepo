@@ -10,39 +10,39 @@ import {
 const features = [
   {
     icon: Globe,
-    title: "Fetch Any Public Repo",
+    title: "GitHub & Local Analysis",
     description:
-      "Automatically fetches public GitHub repositories using the GitHub API. Just provide the owner/repo.",
+      "Analyze any public GitHub repository or local directory. Works with private repos when authenticated.",
   },
   {
     icon: FolderTree,
-    title: "Structure Analysis",
+    title: "Real Project Signals",
     description:
-      "Builds a complete file tree summary to understand the project architecture at a glance.",
+      "Derives architectural summaries from configs, entrypoints, manifests, dependencies, and file structure—not blind AI.",
   },
   {
     icon: FileSearch,
-    title: "High-Signal File Detection",
+    title: "High-Signal Files",
     description:
-      "Extracts repo signals from key files like package.json, pyproject.toml, configs, and entrypoints.",
+      "Extracts architecture signals from package.json, pyproject.toml, Dockerfile, configs, and more.",
   },
   {
     icon: Languages,
-    title: "Language Detection",
+    title: "Multiple Explanation Modes",
     description:
-      "Detects programming languages via the GitHub API to provide accurate context for explanations.",
+      "Quick one-liner, simple, detailed with architecture, or pure tech stack detection. Choose your level of detail.",
   },
   {
     icon: Link2,
     title: "Flexible Input Formats",
     description:
-      "Accepts owner/repo, GitHub URLs, issue/PR links, SSH clone links. All normalized automatically.",
+      "Paste any GitHub URL, issue/PR link, SSH clone link, or owner/repo. All inputs auto-normalized internally.",
   },
   {
     icon: FileText,
-    title: "EXPLAIN.md Output",
+    title: "CLI Aliases & Portability",
     description:
-      "Generates a clear, readable EXPLAIN.md file in your current directory with the full explanation.",
+      "Works via pip, npm, npx, or as a standalone binary. Run as explainthisrepo, explain-this-repo, or etr.",
   },
 ]
 
