@@ -17,22 +17,25 @@ export function Hero() {
 
       <div className="relative mx-auto max-w-6xl px-6">
         <div className="mb-16 flex flex-col items-center text-center md:mb-20">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-1.5">
-            <span className="h-2 w-2 rounded-full bg-primary" />
-            <span className="text-xs font-medium text-muted-foreground">
-              Available on PyPI and npm
-            </span>
+          <div className="mb-6 flex items-center justify-center gap-2 text-xs font-medium">
+            <a href="https://pypi.org/project/explainthisrepo/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border bg-secondary hover:bg-secondary/80 transition-colors">
+              <span className="text-primary">PyPI</span>
+            </a>
+            <a href="https://www.npmjs.com/package/explainthisrepo" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border bg-secondary hover:bg-secondary/80 transition-colors">
+              <span className="text-primary">npm</span>
+            </a>
+            <a href="https://github.com/calchiwo/ExplainThisRepo" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border bg-secondary hover:bg-secondary/80 transition-colors">
+              <span className="text-primary">macOS • Linux • Windows</span>
+            </a>
           </div>
 
           <h1 className="max-w-4xl text-balance text-4xl font-bold tracking-tight text-foreground md:text-6xl lg:text-7xl">
             Understand any GitHub repo{" "}
-            <span className="text-primary">instantly</span>
+            <span className="text-primary">in seconds</span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
-            A CLI tool that generates plain-English explanations of public GitHub
-            repositories by analyzing structure, README content, and high-signal
-            files.
+            Analyzes real project signals—structure, configs, manifests, and high-signal files—to generate a clear, plain-English explanation. Not blind AI summarization.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
@@ -54,10 +57,11 @@ export function Hero() {
             </Button>
           </div>
 
-          <div className="mt-6 flex items-center gap-2">
+          <div className="mt-6 flex flex-col items-center gap-3">
             <code className="rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-sm text-muted-foreground">
               pip install explainthisrepo
             </code>
+            <p className="text-xs text-muted-foreground">Works with Python 3.9+ and Node.js</p>
           </div>
         </div>
 

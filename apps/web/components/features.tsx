@@ -5,44 +5,58 @@ import {
   Link2,
   Languages,
   FileText,
+  Settings,
+  Zap,
 } from "lucide-react"
 
 const features = [
   {
     icon: Globe,
-    title: "Fetch Any Public Repo",
+    title: "Public & Private Repos",
     description:
-      "Automatically fetches public GitHub repositories using the GitHub API. Just provide the owner/repo.",
-  },
-  {
-    icon: FolderTree,
-    title: "Structure Analysis",
-    description:
-      "Builds a complete file tree summary to understand the project architecture at a glance.",
+      "Analyze any public GitHub repository instantly. Support for private repos with GitHub token authentication.",
   },
   {
     icon: FileSearch,
-    title: "High-Signal File Detection",
+    title: "Signal-Based Analysis",
     description:
-      "Extracts repo signals from key files like package.json, pyproject.toml, configs, and entrypoints.",
+      "Extracts real signals from configs (package.json, pyproject.toml), manifests, entrypoints, and dependency graphs.",
+  },
+  {
+    icon: FolderTree,
+    title: "Architecture Detection",
+    description:
+      "Builds complete file tree summaries and detects project structure, patterns, and organization at a glance.",
   },
   {
     icon: Languages,
-    title: "Language Detection",
+    title: "Multi-Language Support",
     description:
-      "Detects programming languages via the GitHub API to provide accurate context for explanations.",
+      "Auto-detects programming languages and tech stacks via GitHub API for accurate context.",
   },
   {
     icon: Link2,
-    title: "Flexible Input Formats",
+    title: "Flexible Input",
     description:
-      "Accepts owner/repo, GitHub URLs, issue/PR links, SSH clone links. All normalized automatically.",
+      "Accepts owner/repo, GitHub URLs, issue links, PR links, and SSH clone links—all normalized automatically.",
+  },
+  {
+    icon: Settings,
+    title: "Multiple LLM Models",
+    description:
+      "Choose from Gemini, OpenAI, Anthropic, Groq, Ollama, or OpenRouter. Switch anytime with the --llm flag.",
   },
   {
     icon: FileText,
-    title: "EXPLAIN.md Output",
+    title: "Multiple Output Formats",
     description:
-      "Generates a clear, readable EXPLAIN.md file in your current directory with the full explanation.",
+      "Generate full EXPLAIN.md files, quick summaries, detailed explanations, or stack detection—no LLM required.",
+  },
+  {
+    icon: Zap,
+    title: "Local & Remote Analysis",
+    description:
+      "Works with GitHub repositories, local directories, monorepos, and private projects with proper authentication.",
   },
 ]
 
@@ -63,7 +77,7 @@ export function Features() {
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((feature) => (
             <div
               key={feature.title}

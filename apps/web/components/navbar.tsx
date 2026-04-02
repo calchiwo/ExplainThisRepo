@@ -68,6 +68,14 @@ export function Navbar() {
           >
             Modes
           </a>
+          <Link
+            href="https://github.com/calchiwo/ExplainThisRepo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Docs
+          </Link>
           <a
             href="#install"
             onClick={(e) => handleNav(e, "install")}
@@ -118,6 +126,15 @@ export function Navbar() {
             >
               Modes
             </a>
+            <Link
+              href="https://github.com/calchiwo/ExplainThisRepo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              onClick={() => setMobileOpen(false)}
+            >
+              Docs
+            </Link>
             <a
               href="#install"
               onClick={(e) => handleNav(e, "install")}

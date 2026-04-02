@@ -15,7 +15,7 @@ export function Footer() {
             </span>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
             <Link
               href="https://pypi.org/project/explainthisrepo/"
               target="_blank"
@@ -39,6 +39,14 @@ export function Footer() {
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               GitHub
+            </Link>
+            <Link
+              href="https://github.com/calchiwo/ExplainThisRepo/blob/main/CONTRIBUTING.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Contributing
             </Link>
             <Link
               href="https://x.com/calchiwo"

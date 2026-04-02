@@ -32,6 +32,13 @@ const tabs = [
       { text: "npx explainthisrepo owner/repo", copyable: true },
     ],
   },
+  {
+    label: "Binary",
+    commands: [
+      { text: "curl -L https://github.com/calchiwo/ExplainThisRepo/releases/latest/download/explainthisrepo-darwin-arm64 -o explainthisrepo", copyable: true },
+      { text: "chmod +x explainthisrepo && ./explainthisrepo owner/repo", copyable: true },
+    ],
+  },
 ]
 
 function CopyButton({ text }: { text: string }) {
@@ -120,16 +127,16 @@ export function Install() {
             </div>
           </div>
 
-          {/* API key note */}
-          <div className="mt-6 rounded-lg border border-border bg-card p-4">
+          {/* Configuration note */}
+          <div className="mt-6 rounded-lg border border-border bg-card p-4 space-y-3">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              <span className="font-medium text-foreground">API Key Required:</span>{" "}
-              ExplainThisRepo uses Gemini models for code analysis. Set your API
-              key with{" "}
-              <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-primary">
-                export GEMINI_API_KEY=&quot;your_key&quot;
-              </code>
+              <span className="font-medium text-foreground">Configuration:</span>{" "}
+              Run the <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-xs text-primary">explainthisrepo init</code> command to configure your preferred LLM model and API keys.
             </p>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p><span className="font-medium text-foreground">Supported Models:</span> Gemini, OpenAI, Anthropic, Groq, Ollama, OpenRouter</p>
+              <p><span className="font-medium text-foreground">GitHub Token:</span> Optional for private repos and higher API rate limits</p>
+            </div>
           </div>
         </div>
       </div>

@@ -7,6 +7,8 @@ const formats = [
   "https://github.com/owner/repo/issues/123",
   "https://github.com/owner/repo?tab=readme",
   "git@github.com:owner/repo.git",
+  ".",
+  "./path/to/directory",
 ]
 
 export function InputFormats() {
@@ -19,12 +21,10 @@ export function InputFormats() {
               Flexible Input
             </p>
             <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              Paste any GitHub link
+              GitHub repos or local directories
             </h2>
             <p className="mt-4 max-w-lg text-pretty text-muted-foreground leading-relaxed">
-              No need to reformat URLs. ExplainThisRepo accepts repositories the
-              way you actually copy them. All inputs are normalized internally to
-              owner/repo.
+              Accept any GitHub URL format and normalize to owner/repo. Also supports direct local filesystem analysis without requiring a GitHub repository.
             </p>
           </div>
 

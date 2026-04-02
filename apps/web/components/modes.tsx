@@ -77,6 +77,22 @@ const modes = [
       "Package:    Yarn workspaces (monorepo)",
     ],
   },
+  {
+    flag: "--llm",
+    label: "LLM Selection",
+    command: "explainthisrepo facebook/react --llm openai",
+    description: "Switch between different LLM providers (gemini, openai, etc)",
+    output: [
+      "Fetching repository data...",
+      "Using OpenAI model for analysis...",
+      "Analyzing file tree and structure...",
+      "",
+      "React is a declarative JavaScript library with",
+      "component-based architecture and fiber reconciler...",
+      "",
+      "EXPLAIN.md created successfully.",
+    ],
+  },
 ]
 
 export function Modes() {
