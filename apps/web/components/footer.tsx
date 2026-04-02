@@ -92,6 +92,16 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="https://discord.gg/explainthisrepo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Discord Community
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="https://github.com/calchiwo/ExplainThisRepo/discussions"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -130,24 +140,33 @@ export function Footer() {
               Caleb Wodi
             </Link>
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4 md:justify-end">
             <Link
-              href="https://linkedin.com/in/calchiwo"
+              href="https://linkedin.com/company/explainthisrepo"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="LinkedIn"
+              aria-label="LinkedIn Company"
             >
               LinkedIn
             </Link>
             <Link
-              href="https://x.com/calchiwo"
+              href="https://x.com/explainthisrepo"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Twitter"
             >
               Twitter
+            </Link>
+            <Link
+              href="https://discord.gg/explainthisrepo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Discord"
+            >
+              Discord
             </Link>
             <Link
               href="mailto:caleb@explainthisrepo.com"

@@ -6,7 +6,6 @@ import { ArrowRight, Github } from "lucide-react"
 export function Hero() {
   return (
     <section className="relative overflow-hidden pt-32 pb-20 md:pt-44 md:pb-32">
-      {/* Subtle glow */}
       <div
         className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[800px] rounded-full opacity-[0.07]"
         style={{
@@ -54,7 +53,7 @@ export function Hero() {
 
           <div className="mt-6 flex items-center gap-2">
             <code className="rounded-md border border-border bg-secondary px-3 py-1.5 font-mono text-sm text-muted-foreground">
-              pip install explainthisrepo
+              explainthisrepo owner/repo
             </code>
           </div>
         </div>
