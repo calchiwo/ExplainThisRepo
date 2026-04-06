@@ -262,6 +262,10 @@ def main():
         "  explainthisrepo . --quick\n"
         "  explainthisrepo . --simple\n"
         "  explainthisrepo . --stack\n"
+        "  explainthisrepo owner/repo --output file.md\n"
+        "  explainthisrepo owner/repo --output path/to/file.md\n"
+        "  explainthisrepo owner/repo --output path/to/directory/file.md\n"
+        "  explainthisrepo owner/repo --output path/to/directory\n"
         "  explainthisrepo --doctor\n"
         "  explainthisrepo --doctor --llm gemini\n"
         "  explainthisrepo --doctor --llm openai\n"
@@ -273,7 +277,7 @@ def main():
         "   explainthisrepo init\n"
         "  Or set:\n"
         "   GITHUB_TOKEN=ghp_xxx explainthisrepo owner/repo\n",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=argparse.RawTextHelpFormatter,
     )
 
     parser.add_argument(
@@ -293,6 +297,19 @@ def main():
         metavar="PROVIDER",
         default=None,
         help="LLM provider to use (e.g. gemini, openai, ollama, anthropic, openrouter). Overrides config default.",
+    )
+
+    parser.add_argument(
+        "--output",
+        "-o",
+        metavar="FILE",
+        default="EXPLAIN.md",
+        help=(
+            "Specify a custom output file path (default: EXPLAIN.md).\n"
+            "Supports formats like .md, .txt, or .doc.\n"
+            "Nested paths to save output (e.g path/, path/to/file.md, or path/to/directory/)\n"
+            "Directories are created automatically if they don't exist\n"
+        ),
     )
 
     parser.add_argument(
@@ -492,13 +509,14 @@ def main():
     with console.status("Generating explanation…", spinner="dots"):
         output = generate_with_exit(prompt, llm=llm)
 
-    print("Writing EXPLAIN.md...")
-    write_output(output)
+    print(f"Writing {args.output}...")
+    write_output(output, args.output)
 
     word_count = len(output.split())
-    print("EXPLAIN.md generated successfully 🎉")
+    print(f"{args.output} generated successfully 🎉")
     print(f"Words: {word_count}")
-    print("Open EXPLAIN.md to read it.")
+    print(f"Location: {os.path.abspath(args.output)}")
+    print(f"Open {args.output} to read it.")
 
 
 def _run():
