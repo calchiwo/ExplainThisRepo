@@ -134,6 +134,12 @@ jobs:
         working-directory: node_version
         run: npm pack --dry-run
 
+      - name: Publish npm package
+        working-directory: node_version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
