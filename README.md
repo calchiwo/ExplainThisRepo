@@ -318,6 +318,28 @@ When analyzing a local directory:
 
 This allows analysis of projects directly from the local filesystem, without requiring a GitHub repository.
 
+
+### Custom output
+
+- `--output`, `-o` → Specify output file or directory (default: `EXPLAIN.md`)
+
+Write to a specific file:
+
+```bash
+explainthisrepo owner/repo --output notes.md
+```
+
+Write to a nested path:
+```bash
+explainthisrepo owner/repo --output path/to/file.md
+```
+
+Write to a directory (creates EXPLAIN.md inside):
+
+```bash
+explainthisrepo owner/repo --output path/to/directory
+```
+
 ### Version
 
 Check the installed CLI version:
