@@ -22,7 +22,7 @@ Not blind AI summarization.
 - Translates complex code structures into plain English
 - Speeds up understanding of unfamiliar codebases
 - Extract architecture signals from configs, entrypoints, and manifests
-- Works with GitHub repositories, local directories, private repositories, and monorepos
+- Works with GitHub repositories, local directories, private repositories, individual files and monorepos
 - Outputs the explanation to an `EXPLAIN.md` file in your current directory or prints it directly in the terminal
 - Multiple explanation modes (quick, simple, detailed)
 
@@ -182,6 +182,8 @@ For step-by-step instructions, see [docs/GITHUB_TOKEN.md](docs/GITHUB_TOKEN.md)
 
 - `--llm` → Override provider selection
 
+- `--output` / `-o` → Specify output file or directory (default: `EXPLAIN.md`)
+
 ## Flexible Repository and Local Directory Input
 
 Accepts various formats for repository input, full GitHub URLs (with or without https), `owner/repo` format, issue links, query strings, and SSH clone links
@@ -318,6 +320,28 @@ When analyzing a local directory:
 
 This allows analysis of projects directly from the local filesystem, without requiring a GitHub repository.
 
+
+## File Analysis
+
+ExplanThisRepo analyzes individual files directly
+
+```bash
+explainthisrepo ./path/to/file.py
+```
+
+Supports all explanation modes:
+
+```bash
+explainthisrepo ./file.py --quick
+explainthisrepo ./file.py --simple
+explainthisrepo ./file.py --detailed
+```
+
+When analyzing a file:
+- The file is read safely with encoding and size limits
+- Structure and basic signals (size, lines, type) are extracted
+- The explanation focuses on purpose, logic, and behavior
+- This makes it easy to understand unfamiliar files without scanning entire repositories.
 
 ### Custom output
 
