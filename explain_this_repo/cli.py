@@ -9,11 +9,18 @@ from urllib.parse import urlparse
 
 from rich.console import Console
 
+from explain_this_repo.file_reader import read_local_file
 from explain_this_repo.generate import generate_explanation
 from explain_this_repo.github import fetch_languages, fetch_readme, fetch_repo
 from explain_this_repo.local_reader import read_local_repo_signal_files
-from explain_this_repo.prompt import (build_prompt, build_quick_prompt,
-                                      build_simple_prompt)
+from explain_this_repo.prompt import (
+    build_file_prompt,
+    build_file_quick_prompt,
+    build_file_simple_prompt,
+    build_prompt,
+    build_quick_prompt,
+    build_simple_prompt,
+)
 from explain_this_repo.repo_reader import read_repo_signal_files
 from explain_this_repo.stack_detector import detect_stack
 from explain_this_repo.stack_printer import print_stack
@@ -99,7 +106,6 @@ def _check_url(url: str, timeout: int = 6) -> tuple[bool, str]:
 
 
 def _run_provider_diagnostics(provider: object, provider_name: str) -> bool:
-
     try:
         result = provider.doctor()
     except AttributeError:
@@ -239,6 +245,267 @@ def generate_with_exit(prompt: str, llm: str | None = None) -> str:
         raise SystemExit(1)
 
 
+def _classify_target(target: str) -> str:
+    if os.path.isfile(target):
+        return "file"
+    if os.path.isdir(target):
+        return "directory"
+    return "github"
+
+
+def _extract_file_signals(read_result) -> dict:
+    return {
+        "line_count": read_result.content.count("\n") + 1,
+        "extension": read_result.extension,
+        "size_bytes": read_result.size_bytes,
+    }
+
+
+def _handle_file_mode(args, llm: str | None) -> None:
+    if args.stack:
+        print("error: --stack is not supported for file targets")
+        raise SystemExit(1)
+
+    file_path = os.path.abspath(args.repository)
+
+    try:
+        with console.status("Reading file…", spinner="dots"):
+            read_result = read_local_file(file_path)
+    except (FileNotFoundError, ValueError, OSError) as e:
+        print(f"error: {e}")
+        raise SystemExit(1)
+
+    print(f"Analyzing file: {args.repository}")
+
+    signals = _extract_file_signals(read_result)
+
+    if args.quick:
+        prompt = build_file_quick_prompt(
+            path=read_result.path,
+            extension=read_result.extension,
+            content=read_result.content,
+        )
+
+        with console.status("Generating explanation…", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Quick summary 🎉")
+        print(output.strip())
+        return
+
+    if args.simple:
+        prompt = build_file_simple_prompt(
+            path=read_result.path,
+            extension=read_result.extension,
+            content=read_result.content,
+            signals=signals,
+        )
+
+        with console.status("Generating explanation…", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Simple summary 🎉")
+        print(output.strip())
+        return
+
+    prompt = build_file_prompt(
+        path=read_result.path,
+        extension=read_result.extension,
+        size_bytes=read_result.size_bytes,
+        content=read_result.content,
+        signals=signals,
+        detailed=args.detailed,
+    )
+
+    with console.status("Generating explanation…", spinner="dots"):
+        output = generate_with_exit(prompt, llm=llm)
+
+    print(f"Writing {args.output}...")
+    write_output(output, args.output)
+
+    word_count = len(output.split())
+    print(f"{args.output} generated successfully 🎉")
+    print(f"Words: {word_count}")
+    print(f"Location: {os.path.abspath(args.output)}")
+    print(f"Open {args.output} to read it.")
+
+
+def _handle_directory_mode(args, llm: str | None) -> None:
+    local_path = os.path.abspath(args.repository)
+
+    print(f"Analyzing local directory: {args.repository}")
+
+    if args.stack:
+        with console.status("Reading repository files…", spinner="dots"):
+            read_result = read_local_repo_signal_files(local_path)
+
+        report = detect_stack(
+            languages={},
+            tree=read_result.tree,
+            key_files=read_result.key_files,
+        )
+
+        print_stack(report, args.repository, "")
+        return
+
+    if args.quick:
+        with console.status("Reading repository files…", spinner="dots"):
+            read_result = read_local_repo_signal_files(local_path)
+
+        readme_content = read_result.key_files.get(
+            next(
+                (k for k in read_result.key_files if k.lower().startswith("readme")),
+                "",
+            ),
+            None,
+        )
+
+        prompt = build_quick_prompt(
+            repo_name=local_path,
+            description=None,
+            readme=readme_content,
+        )
+
+        with console.status("Generating explanation…", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Quick summary 🎉")
+        print(output.strip())
+        return
+
+    if args.simple:
+        with console.status("Reading repository files…", spinner="dots"):
+            read_result = read_local_repo_signal_files(local_path)
+
+        prompt = build_simple_prompt(
+            repo_name=local_path,
+            description=None,
+            readme=None,
+            tree_text=read_result.tree_text,
+        )
+
+        with console.status("Generating explanation…", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Simple summary 🎉")
+        print(output.strip())
+        return
+
+    with console.status("Reading repository files…", spinner="dots"):
+        read_result = read_local_repo_signal_files(local_path)
+
+    prompt = build_prompt(
+        repo_name=local_path,
+        description=None,
+        readme=None,
+        detailed=args.detailed,
+        tree_text=read_result.tree_text,
+        files_text=read_result.files_text,
+    )
+
+    with console.status("Generating explanation…", spinner="dots"):
+        output = generate_with_exit(prompt, llm=llm)
+
+    print(f"Writing {args.output}...")
+    write_output(output, args.output)
+
+    word_count = len(output.split())
+    print(f"{args.output} generated successfully 🎉")
+    print(f"Words: {word_count}")
+    print(f"Location: {os.path.abspath(args.output)}")
+    print(f"Open {args.output} to read it.")
+
+
+def _handle_github_mode(args, llm: str | None) -> None:
+    try:
+        owner, repo = resolve_repo_target(args.repository)
+    except ValueError as e:
+        print(f"error: {e}")
+        raise SystemExit(1)
+
+    if args.stack:
+        try:
+            with console.status(f"Fetching {owner}/{repo}…", spinner="dots"):
+                read_result = read_repo_signal_files(owner, repo)
+                languages = fetch_languages(owner, repo)
+        except Exception as e:
+            print(f"error: {e}")
+            raise SystemExit(1)
+
+        report = detect_stack(
+            languages=languages,
+            tree=read_result.tree,
+            key_files=read_result.key_files,
+        )
+
+        print_stack(report, f"{owner}/{repo}", "")
+        return
+
+    try:
+        with console.status(f"Fetching {owner}/{repo}…", spinner="dots"):
+            repo_data = fetch_repo(owner, repo)
+            readme = fetch_readme(owner, repo)
+    except Exception as e:
+        print(f"error: {e}")
+        raise SystemExit(1)
+
+    if args.quick:
+        prompt = build_quick_prompt(
+            repo_name=repo_data.get("full_name"),
+            description=repo_data.get("description"),
+            readme=readme,
+        )
+
+        with console.status("Generating explanation…", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Quick summary 🎉")
+        print(output.strip())
+        return
+
+    if args.simple:
+        with console.status("Reading repository files…", spinner="dots"):
+            read_result = safe_read_repo_files(owner, repo)
+
+        prompt = build_simple_prompt(
+            repo_name=repo_data.get("full_name"),
+            description=repo_data.get("description"),
+            readme=readme,
+            tree_text=read_result.tree_text if read_result else None,
+        )
+
+        with console.status("Generating explanation…", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Simple summary 🎉")
+        print(output.strip())
+        return
+
+    with console.status("Reading repository files…", spinner="dots"):
+        read_result = safe_read_repo_files(owner, repo)
+
+    prompt = build_prompt(
+        repo_name=repo_data.get("full_name"),
+        description=repo_data.get("description"),
+        readme=readme,
+        detailed=args.detailed,
+        tree_text=read_result.tree_text if read_result else None,
+        files_text=read_result.files_text if read_result else None,
+    )
+
+    with console.status("Generating explanation…", spinner="dots"):
+        output = generate_with_exit(prompt, llm=llm)
+
+    print(f"Writing {args.output}...")
+    write_output(output, args.output)
+
+    word_count = len(output.split())
+    print(f"{args.output} generated successfully 🎉")
+    print(f"Words: {word_count}")
+    print(f"Location: {os.path.abspath(args.output)}")
+    print(f"Open {args.output} to read it.")
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="explainthisrepo",
@@ -262,6 +529,10 @@ def main():
         "  explainthisrepo . --quick\n"
         "  explainthisrepo . --simple\n"
         "  explainthisrepo . --stack\n"
+        "  explainthisrepo ./path/to/file.py\n"
+        "  explainthisrepo ./path/to/file.py --quick\n"
+        "  explainthisrepo ./path/to/file.py --simple\n"
+        "  explainthisrepo ./path/to/file.py --detailed\n"
         "  explainthisrepo owner/repo --output file.md\n"
         "  explainthisrepo owner/repo --output path/to/file.md\n"
         "  explainthisrepo owner/repo --output path/to/directory/file.md\n"
@@ -321,7 +592,7 @@ def main():
     parser.add_argument(
         "repository",
         nargs="?",
-        help="GitHub repository (owner/repo or URL) or local directories",
+        help="GitHub repository (owner/repo or URL), local directory, or local file",
     )
 
     mode_group = parser.add_mutually_exclusive_group()
@@ -381,142 +652,14 @@ def main():
             "repository argument required (or use 'explainthisrepo init') to set up API key or GitHub token"
         )
 
-    target = args.repository
+    mode = _classify_target(args.repository)
 
-    local = os.path.exists(target)
-
-    if local:
-        local_path = os.path.abspath(target)
-        print(f"Analyzing local directory: {target}")
+    if mode == "file":
+        _handle_file_mode(args, llm)
+    elif mode == "directory":
+        _handle_directory_mode(args, llm)
     else:
-        try:
-            owner, repo = resolve_repo_target(target)
-        except ValueError as e:
-            print(f"error: {e}")
-            raise SystemExit(1)
-
-    if args.stack:
-        if local:
-            with console.status("Reading repository files…", spinner="dots"):
-                read_result = read_local_repo_signal_files(local_path)
-            languages = {}
-        else:
-            try:
-                with console.status(f"Fetching {owner}/{repo}…", spinner="dots"):
-                    read_result = read_repo_signal_files(owner, repo)
-                    languages = fetch_languages(owner, repo)
-            except Exception as e:
-                print(f"error: {e}")
-                raise SystemExit(1)
-
-        report = detect_stack(
-            languages=languages,
-            tree=read_result.tree,
-            key_files=read_result.key_files,
-        )
-
-        label = target if local else f"{owner}/{repo}"
-        print_stack(report, label, "")
-        return
-
-    if not local:
-        try:
-            with console.status(f"Fetching {owner}/{repo}…", spinner="dots"):
-                repo_data = fetch_repo(owner, repo)
-                readme = fetch_readme(owner, repo)
-        except Exception as e:
-            print(f"error: {e}")
-            raise SystemExit(1)
-    else:
-        repo_data = {}
-        readme = None
-
-    # QUICK MODE
-    if args.quick:
-        if local:
-            with console.status("Reading repository files…", spinner="dots"):
-                read_result = read_local_repo_signal_files(local_path)
-            readme_content = read_result.key_files.get(
-                next(
-                    (
-                        k
-                        for k in read_result.key_files
-                        if k.lower().startswith("readme")
-                    ),
-                    "",
-                ),
-                None,
-            )
-            prompt = build_quick_prompt(
-                repo_name=local_path,
-                description=None,
-                readme=readme_content,
-            )
-        else:
-            prompt = build_quick_prompt(
-                repo_name=repo_data.get("full_name"),
-                description=repo_data.get("description"),
-                readme=readme,
-            )
-
-        with console.status("Generating explanation…", spinner="dots"):
-            output = generate_with_exit(prompt, llm=llm)
-
-        print("Quick summary 🎉")
-        print(output.strip())
-        return
-
-    # SIMPLE MODE
-    if args.simple:
-        if local:
-            with console.status("Reading repository files…", spinner="dots"):
-                read_result = read_local_repo_signal_files(local_path)
-        else:
-            with console.status("Reading repository files…", spinner="dots"):
-                read_result = safe_read_repo_files(owner, repo)
-
-        prompt = build_simple_prompt(
-            repo_name=local_path if local else repo_data.get("full_name"),
-            description=None if local else repo_data.get("description"),
-            readme=None if local else readme,
-            tree_text=read_result.tree_text if read_result else None,
-        )
-
-        with console.status("Generating explanation…", spinner="dots"):
-            output = generate_with_exit(prompt, llm=llm)
-
-        print("Simple summary 🎉")
-        print(output.strip())
-        return
-
-    # NORMAL / DETAILED MODE
-    if local:
-        with console.status("Reading repository files…", spinner="dots"):
-            read_result = read_local_repo_signal_files(local_path)
-    else:
-        with console.status("Reading repository files…", spinner="dots"):
-            read_result = safe_read_repo_files(owner, repo)
-
-    prompt = build_prompt(
-        repo_name=local_path if local else repo_data.get("full_name"),
-        description=None if local else repo_data.get("description"),
-        readme=None if local else readme,
-        detailed=args.detailed,
-        tree_text=read_result.tree_text if read_result else None,
-        files_text=read_result.files_text if read_result else None,
-    )
-
-    with console.status("Generating explanation…", spinner="dots"):
-        output = generate_with_exit(prompt, llm=llm)
-
-    print(f"Writing {args.output}...")
-    write_output(output, args.output)
-
-    word_count = len(output.split())
-    print(f"{args.output} generated successfully 🎉")
-    print(f"Words: {word_count}")
-    print(f"Location: {os.path.abspath(args.output)}")
-    print(f"Open {args.output} to read it.")
+        _handle_github_mode(args, llm)
 
 
 def _run():
