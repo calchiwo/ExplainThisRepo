@@ -3,6 +3,7 @@
 _The fastest way to understand any codebase in plain English using real project signals. Not blind AI summarization._
 
 ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, dependencies graph, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase does and how it is organized in plain English.
+This is a deterministic repo signal extractor that feeds LLMs correctly.
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -23,7 +24,7 @@ Not blind AI summarization.
 - Speeds up understanding of unfamiliar codebases
 - Extract architecture signals from configs, entrypoints, and manifests
 - Works with GitHub repositories, local directories, private repositories, individual files and monorepos
-- Outputs the explanation to an `EXPLAIN.md` file in your current directory or prints it directly in the terminal
+- Outputs the explanation to an `EXPLAIN.md` file in your current directory, prints it directly in the terminal, or a specified output file (`.txt`, `.pdf`, `.docs`)
 - Multiple explanation modes (quick, simple, detailed)
 
 ## Installation
@@ -345,7 +346,7 @@ When analyzing a file:
 
 ### Custom output
 
-- `--output`, `-o` → Specify output file or directory (default: `EXPLAIN.md`)
+`--output`, `-o` → Specify output file or directory (default: `EXPLAIN.md`)
 
 Write to a specific file:
 
