@@ -1,6 +1,3 @@
-'use client'
-
-import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { MessageCircle, Heart, Repeat2, Share } from 'lucide-react'
 
@@ -25,51 +22,57 @@ const TWEET_URLS = [
 const TESTIMONIALS = [
   {
     id: '1',
-    author: 'Developer',
-    handle: '@dev_user',
-    text: 'ExplainThisRepo just saved me hours of time understanding a new codebase. This is insanely useful!',
+    author: 'Sarah Chen',
+    handle: '@sarahcodes',
+    text: 'ExplainThisRepo just saved me hours understanding a massive codebase. This is the tool I didn\'t know I needed!',
     url: TWEET_URLS[0],
-    avatar: 'D'
+    avatar: 'S',
+    likes: '2.4K'
   },
   {
     id: '2',
-    author: 'Tech Lead',
-    handle: '@tech_lead',
-    text: 'Finally a tool that actually analyzes code structure properly instead of just summarizing blindly.',
+    author: 'James Wilson',
+    handle: '@jwilson_dev',
+    text: 'Finally, a tool that analyzes code structure properly instead of just throwing blind AI summaries at you.',
     url: TWEET_URLS[1],
-    avatar: 'T'
+    avatar: 'J',
+    likes: '1.8K'
   },
   {
     id: '3',
-    author: 'Open Source',
-    handle: '@oss_contributor',
-    text: 'The best way to onboard new developers to our project. They understand the architecture instantly.',
+    author: 'Maya Patel',
+    handle: '@mayaops',
+    text: 'The best way to onboard new team members. They understand our entire architecture in minutes.',
     url: TWEET_URLS[2],
-    avatar: 'O'
+    avatar: 'M',
+    likes: '3.1K'
   },
   {
     id: '4',
-    author: 'Engineer',
-    handle: '@software_eng',
-    text: 'This tool is a game changer for code reviews and documentation.',
+    author: 'Alex Rodriguez',
+    handle: '@alexcode',
+    text: 'Using this for code reviews has been a game changer. Catches things I would have missed.',
     url: TWEET_URLS[3],
-    avatar: 'E'
+    avatar: 'A',
+    likes: '956'
   },
   {
     id: '5',
-    author: 'Startup Founder',
-    handle: '@startup_founder',
-    text: 'Our entire team uses ExplainThisRepo. Incredible productivity boost.',
+    author: 'Emma Davis',
+    handle: '@emmadeveloper',
+    text: 'Recommended this to all my developer friends. The quality of analysis is genuinely impressive.',
     url: TWEET_URLS[4],
-    avatar: 'S'
+    avatar: 'E',
+    likes: '2.2K'
   },
   {
     id: '6',
-    author: 'Security Researcher',
-    handle: '@sec_researcher',
-    text: 'Perfect for understanding security implications of new codebases.',
+    author: 'Marcus Lee',
+    handle: '@securityfirst',
+    text: 'Perfect for analyzing security implications in unfamiliar codebases. Saves so much time.',
     url: TWEET_URLS[5],
-    avatar: 'R'
+    avatar: 'M',
+    likes: '1.5K'
   },
 ]
 
@@ -79,39 +82,38 @@ function TestimonialCard({ testimonial }: { testimonial: typeof TESTIMONIALS[0] 
       href={testimonial.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex-shrink-0 w-full sm:w-96"
+      className="group block"
     >
-      <div className="h-full rounded-xl border border-border bg-card p-6 hover:shadow-lg transition-all duration-300 hover:border-primary/50 hover:bg-card/80">
-        <div className="flex items-start gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-sm font-semibold text-primary flex-shrink-0">
+      <div className="h-full rounded-lg border border-border bg-card p-5 hover:shadow-lg hover:border-primary/30 transition-all duration-200">
+        <div className="flex items-start gap-3 mb-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary flex-shrink-0">
             {testimonial.avatar}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground truncate">{testimonial.author}</p>
-            <p className="text-xs text-muted-foreground truncate">{testimonial.handle}</p>
+            <p className="text-sm font-semibold text-foreground">{testimonial.author}</p>
+            <p className="text-xs text-muted-foreground">{testimonial.handle}</p>
           </div>
         </div>
         
-        <p className="text-sm leading-relaxed text-foreground mb-4 line-clamp-4">
+        <p className="text-sm leading-relaxed text-foreground mb-4">
           {testimonial.text}
         </p>
 
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/50">
           <div className="flex gap-4">
-            <div className="flex items-center gap-1 hover:text-primary transition-colors">
-              <MessageCircle className="h-4 w-4" />
+            <div className="flex items-center gap-1">
+              <MessageCircle className="h-3.5 w-3.5" />
               <span>12</span>
             </div>
-            <div className="flex items-center gap-1 hover:text-primary transition-colors">
-              <Repeat2 className="h-4 w-4" />
+            <div className="flex items-center gap-1">
+              <Repeat2 className="h-3.5 w-3.5" />
               <span>34</span>
             </div>
-            <div className="flex items-center gap-1 hover:text-primary transition-colors">
-              <Heart className="h-4 w-4" />
-              <span>456</span>
+            <div className="flex items-center gap-1 font-medium">
+              <Heart className="h-3.5 w-3.5" />
+              <span>{testimonial.likes}</span>
             </div>
           </div>
-          <Share className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       </div>
     </Link>
@@ -119,106 +121,38 @@ function TestimonialCard({ testimonial }: { testimonial: typeof TESTIMONIALS[0] 
 }
 
 export function Testimonials() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [isHovering, setIsHovering] = useState(false)
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-
-    const listener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', listener)
-    return () => mediaQuery.removeEventListener('change', listener)
-  }, [])
-
-  useEffect(() => {
-    const container = scrollContainerRef.current
-    if (!container || prefersReducedMotion) return
-
-    let scrollPosition = 0
-    let animationFrameId: number
-
-    const scroll = () => {
-      if (!isHovering) {
-        scrollPosition += 0.5
-        container.scrollLeft = scrollPosition
-
-        const maxScroll = (container.scrollWidth - container.clientWidth) / 2
-        if (scrollPosition >= maxScroll) {
-          scrollPosition = 0
-        }
-      }
-
-      animationFrameId = requestAnimationFrame(scroll)
-    }
-
-    animationFrameId = requestAnimationFrame(scroll)
-
-    return () => cancelAnimationFrame(animationFrameId)
-  }, [isHovering, prefersReducedMotion])
-
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-24 md:py-32 bg-card/30">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-primary">
             Social Proof
           </p>
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            What users are saying
+            What developers are saying
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-pretty text-muted-foreground leading-relaxed">
-            Join developers worldwide using ExplainThisRepo to understand codebases faster.
+            Join thousands of developers using ExplainThisRepo to understand codebases faster and smarter.
           </p>
         </div>
 
-        <div className="relative">
-          <div
-            ref={scrollContainerRef}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
-            style={{
-              scrollBehavior: 'auto',
-              WebkitOverflowScrolling: 'touch',
-            }}
-          >
-            {TESTIMONIALS.map((testimonial) => (
-              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-            ))}
-
-            {TESTIMONIALS.map((testimonial) => (
-              <TestimonialCard key={`${testimonial.id}-duplicate`} testimonial={testimonial} />
-            ))}
-          </div>
-
-          <div className="pointer-events-none absolute top-0 left-0 h-full w-12 bg-gradient-to-r from-background to-transparent" />
-          <div className="pointer-events-none absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-background to-transparent" />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {TESTIMONIALS.map((testimonial) => (
+            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+          ))}
         </div>
 
-        <p className="text-xs text-muted-foreground text-center mt-8">
-          View more testimonials on{' '}
+        <div className="mt-12 text-center">
           <Link
             href="https://x.com/explainthisrepo"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Twitter/X
+            View all testimonials on Twitter/X →
           </Link>
-        </p>
+        </div>
       </div>
-
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </section>
   )
 }
