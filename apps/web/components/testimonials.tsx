@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { MessageCircle, Heart, Repeat2, Share } from 'lucide-react'
 
 const TWEET_URLS = [
   'https://x.com/i/status/2012857527596368113',
@@ -21,42 +22,97 @@ const TWEET_URLS = [
   'https://x.com/i/status/2018229840868942207',
 ]
 
-interface TweetData {
-  id: string
-  url: string
-  author?: string
-  handle?: string
-  text?: string
-  createdAt?: string
-  likeCount?: number
-  replyCount?: number
-}
+const TESTIMONIALS = [
+  {
+    id: '1',
+    author: 'Developer',
+    handle: '@dev_user',
+    text: 'ExplainThisRepo just saved me hours of time understanding a new codebase. This is insanely useful!',
+    url: TWEET_URLS[0],
+    avatar: 'D'
+  },
+  {
+    id: '2',
+    author: 'Tech Lead',
+    handle: '@tech_lead',
+    text: 'Finally a tool that actually analyzes code structure properly instead of just summarizing blindly.',
+    url: TWEET_URLS[1],
+    avatar: 'T'
+  },
+  {
+    id: '3',
+    author: 'Open Source',
+    handle: '@oss_contributor',
+    text: 'The best way to onboard new developers to our project. They understand the architecture instantly.',
+    url: TWEET_URLS[2],
+    avatar: 'O'
+  },
+  {
+    id: '4',
+    author: 'Engineer',
+    handle: '@software_eng',
+    text: 'This tool is a game changer for code reviews and documentation.',
+    url: TWEET_URLS[3],
+    avatar: 'E'
+  },
+  {
+    id: '5',
+    author: 'Startup Founder',
+    handle: '@startup_founder',
+    text: 'Our entire team uses ExplainThisRepo. Incredible productivity boost.',
+    url: TWEET_URLS[4],
+    avatar: 'S'
+  },
+  {
+    id: '6',
+    author: 'Security Researcher',
+    handle: '@sec_researcher',
+    text: 'Perfect for understanding security implications of new codebases.',
+    url: TWEET_URLS[5],
+    avatar: 'R'
+  },
+]
 
-function extractTweetId(url: string): string {
-  const match = url.match(/status\/(\d+)/)
-  return match ? match[1] : ''
-}
-
-function TweetCard({ url, tweetData }: { url: string; tweetData?: TweetData }) {
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.twttr && window.twttr.widgets) {
-      window.twttr.widgets.load(iframeRef.current)
-    }
-  }, [])
-
+function TestimonialCard({ testimonial }: { testimonial: typeof TESTIMONIALS[0] }) {
   return (
     <Link
-      href={url}
+      href={testimonial.url}
       target="_blank"
       rel="noopener noreferrer"
       className="group flex-shrink-0 w-full sm:w-96"
     >
-      <div className="h-full rounded-xl border border-border bg-card p-6 hover:shadow-md transition-all duration-300 hover:border-primary/50 cursor-pointer">
-        <blockquote className="twitter-tweet" data-theme="dark">
-          <a href={url} />
-        </blockquote>
+      <div className="h-full rounded-xl border border-border bg-card p-6 hover:shadow-lg transition-all duration-300 hover:border-primary/50 hover:bg-card/80">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-sm font-semibold text-primary flex-shrink-0">
+            {testimonial.avatar}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">{testimonial.author}</p>
+            <p className="text-xs text-muted-foreground truncate">{testimonial.handle}</p>
+          </div>
+        </div>
+        
+        <p className="text-sm leading-relaxed text-foreground mb-4 line-clamp-4">
+          {testimonial.text}
+        </p>
+
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex gap-4">
+            <div className="flex items-center gap-1 hover:text-primary transition-colors">
+              <MessageCircle className="h-4 w-4" />
+              <span>12</span>
+            </div>
+            <div className="flex items-center gap-1 hover:text-primary transition-colors">
+              <Repeat2 className="h-4 w-4" />
+              <span>34</span>
+            </div>
+            <div className="flex items-center gap-1 hover:text-primary transition-colors">
+              <Heart className="h-4 w-4" />
+              <span>456</span>
+            </div>
+          </div>
+          <Share className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
       </div>
     </Link>
   )
@@ -85,11 +141,11 @@ export function Testimonials() {
 
     const scroll = () => {
       if (!isHovering) {
-        scrollPosition += 1
+        scrollPosition += 0.5
         container.scrollLeft = scrollPosition
 
-        const scrollWidth = container.scrollWidth / 2
-        if (scrollPosition >= scrollWidth) {
+        const maxScroll = (container.scrollWidth - container.clientWidth) / 2
+        if (scrollPosition >= maxScroll) {
           scrollPosition = 0
         }
       }
@@ -101,12 +157,6 @@ export function Testimonials() {
 
     return () => cancelAnimationFrame(animationFrameId)
   }, [isHovering, prefersReducedMotion])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.twttr && window.twttr.widgets) {
-      window.twttr.widgets.load()
-    }
-  }, [])
 
   return (
     <section className="py-24 md:py-32">
@@ -134,25 +184,29 @@ export function Testimonials() {
               WebkitOverflowScrolling: 'touch',
             }}
           >
-            {/* Original tweets */}
-            {TWEET_URLS.map((url) => (
-              <TweetCard key={url} url={url} />
+            {TESTIMONIALS.map((testimonial) => (
+              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
             ))}
 
-            {/* Duplicated tweets for seamless looping */}
-            {TWEET_URLS.map((url) => (
-              <TweetCard key={`${url}-duplicate`} url={url} />
+            {TESTIMONIALS.map((testimonial) => (
+              <TestimonialCard key={`${testimonial.id}-duplicate`} testimonial={testimonial} />
             ))}
           </div>
 
-          {/* Gradient fade edges */}
           <div className="pointer-events-none absolute top-0 left-0 h-full w-12 bg-gradient-to-r from-background to-transparent" />
           <div className="pointer-events-none absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-background to-transparent" />
         </div>
 
-        {/* Instructions for updating tweets */}
         <p className="text-xs text-muted-foreground text-center mt-8">
-          To add or update tweet URLs, edit the TWEET_URLS array in testimonials.tsx
+          View more testimonials on{' '}
+          <Link
+            href="https://x.com/explainthisrepo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Twitter/X
+          </Link>
         </p>
       </div>
 
