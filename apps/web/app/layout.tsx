@@ -78,6 +78,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
+      <head>
+        <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
+      </head>
       <body className="font-sans antialiased">
         {children}
         <Analytics />
