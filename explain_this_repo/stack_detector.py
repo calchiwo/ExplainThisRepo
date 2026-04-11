@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 StackReport = Dict[str, List[str]]
 
 
 def detect_stack(
-    languages: Dict[str, int], tree: list[dict], key_files: Dict[str, str]
+    languages: Dict[str, int],
+    tree: list[dict[str, Any] | str],
+    key_files: Dict[str, str],
 ) -> StackReport:
     report: StackReport = {
         "languages": [],
@@ -22,7 +24,10 @@ def detect_stack(
     report["languages"] = sorted(languages.keys())
 
     # --- Package managers ---
-    paths = {item.get("path", "").lower() for item in tree}
+    paths = {
+        item.lower() if isinstance(item, str) else item.get("path", "").lower()
+        for item in tree
+    }
 
     if "pnpm-lock.yaml" in paths:
         report["package_managers"].append("pnpm")

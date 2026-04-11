@@ -13,14 +13,10 @@ from explain_this_repo.file_reader import read_local_file
 from explain_this_repo.generate import generate_explanation
 from explain_this_repo.github import fetch_languages, fetch_readme, fetch_repo
 from explain_this_repo.local_reader import read_local_repo_signal_files
-from explain_this_repo.prompt import (
-    build_file_prompt,
-    build_file_quick_prompt,
-    build_file_simple_prompt,
-    build_prompt,
-    build_quick_prompt,
-    build_simple_prompt,
-)
+from explain_this_repo.prompt import (build_file_prompt,
+                                      build_file_quick_prompt,
+                                      build_file_simple_prompt, build_prompt,
+                                      build_quick_prompt, build_simple_prompt)
 from explain_this_repo.repo_reader import read_repo_signal_files
 from explain_this_repo.stack_detector import detect_stack
 from explain_this_repo.stack_printer import print_stack
