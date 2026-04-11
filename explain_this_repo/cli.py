@@ -11,7 +11,12 @@ from rich.console import Console
 
 from explain_this_repo.file_reader import read_local_file
 from explain_this_repo.generate import generate_explanation
-from explain_this_repo.github import fetch_languages, fetch_readme, fetch_repo
+from explain_this_repo.github import (
+    fetch_file_result,
+    fetch_languages,
+    fetch_readme,
+    fetch_repo,
+)
 from explain_this_repo.local_reader import read_local_repo_signal_files
 from explain_this_repo.prompt import (build_file_prompt,
                                       build_file_quick_prompt,
@@ -65,6 +70,21 @@ def resolve_repo_target(target: str) -> tuple[str, str]:
             return owner, repo
 
     raise ValueError("Invalid format. Use owner/repo or a GitHub repo URL")
+
+
+def resolve_github_file_target(target: str) -> tuple[str, str, str]:
+    parts = [p for p in target.strip().split("/") if p]
+    if len(parts) < 3:
+        raise ValueError("Invalid format. Use owner/repo/path/to/file")
+
+    owner = parts[0]
+    repo = parts[1]
+    path = "/".join(parts[2:])
+
+    if not owner or not repo or not path:
+        raise ValueError("Invalid format. Use owner/repo/path/to/file")
+
+    return owner, repo, path
 
 
 try:
@@ -246,7 +266,19 @@ def _classify_target(target: str) -> str:
         return "file"
     if os.path.isdir(target):
         return "directory"
+    if _looks_like_github_file_target(target):
+        return "github_file"
     return "github"
+
+
+def _looks_like_github_file_target(target: str) -> bool:
+    value = target.strip()
+    if not value:
+        return False
+    if value.startswith(("http://", "https://", "git@github.com:", "github.com/")):
+        return False
+    parts = [p for p in value.split("/") if p]
+    return len(parts) >= 3
 
 
 def _extract_file_signals(read_result) -> dict:
@@ -321,6 +353,80 @@ def _handle_file_mode(args, llm: str | None) -> None:
 
     word_count = len(output.split())
     print(f"{args.output} generated successfully 🎉")
+    print(f"Words: {word_count}")
+    print(f"Location: {os.path.abspath(args.output)}")
+    print(f"Open {args.output} to read it.")
+
+
+def _handle_github_file_mode(args, llm: str | None) -> None:
+    if args.stack:
+        print("error: --stack is not supported for GitHub file targets")
+        raise SystemExit(1)
+
+    try:
+        owner, repo, file_path = resolve_github_file_target(args.repository)
+    except ValueError as e:
+        print(f"error: {e}")
+        raise SystemExit(1)
+
+    try:
+        with console.status(f"Fetching {owner}/{repo}/{file_path}...", spinner="dots"):
+            read_result = fetch_file_result(owner, repo, file_path)
+    except Exception as e:
+        print(f"error: {e}")
+        raise SystemExit(1)
+
+    display_path = f"{owner}/{repo}/{read_result.path}"
+    print(f"Analyzing GitHub file: {display_path}")
+
+    signals = _extract_file_signals(read_result)
+
+    if args.quick:
+        prompt = build_file_quick_prompt(
+            path=display_path,
+            extension=read_result.extension,
+            content=read_result.content,
+        )
+
+        with console.status("Generating explanation...", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Quick summary")
+        print(output.strip())
+        return
+
+    if args.simple:
+        prompt = build_file_simple_prompt(
+            path=display_path,
+            extension=read_result.extension,
+            content=read_result.content,
+            signals=signals,
+        )
+
+        with console.status("Generating explanation...", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Simple summary")
+        print(output.strip())
+        return
+
+    prompt = build_file_prompt(
+        path=display_path,
+        extension=read_result.extension,
+        size_bytes=read_result.size_bytes,
+        content=read_result.content,
+        signals=signals,
+        detailed=args.detailed,
+    )
+
+    with console.status("Generating explanation...", spinner="dots"):
+        output = generate_with_exit(prompt, llm=llm)
+
+    print(f"Writing {args.output}...")
+    write_output(output, args.output)
+
+    word_count = len(output.split())
+    print(f"{args.output} generated successfully")
     print(f"Words: {word_count}")
     print(f"Location: {os.path.abspath(args.output)}")
     print(f"Open {args.output} to read it.")
@@ -515,6 +621,10 @@ def main():
         "  explainthisrepo owner/repo --quick\n"
         "  explainthisrepo owner/repo --simple\n"
         "  explainthisrepo owner/repo --stack\n"
+        "  explainthisrepo owner/repo/path/to/file.py\n"
+        "  explainthisrepo owner/repo/path/to/file.py --quick\n"
+        "  explainthisrepo owner/repo/path/to/file.py --simple\n"
+        "  explainthisrepo owner/repo/path/to/file.py --detailed\n"
         "  explainthisrepo init\n"
         "  explainthisrepo owner/repo --llm gemini\n"
         "  explainthisrepo owner/repo --llm openai\n"
@@ -654,6 +764,8 @@ def main():
         _handle_file_mode(args, llm)
     elif mode == "directory":
         _handle_directory_mode(args, llm)
+    elif mode == "github_file":
+        _handle_github_file_mode(args, llm)
     else:
         _handle_github_mode(args, llm)
 
