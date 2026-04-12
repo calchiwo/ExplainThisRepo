@@ -2,8 +2,7 @@
 
 _The fastest way to understand any codebase in plain English using real project signals. Not blind AI summarization._
 
-ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, dependencies graph, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase does and how it is organized in plain English.
-This is a deterministic repo signal extractor that feeds LLMs correctly.
+ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, dependencies graph, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase actually does and how it is organized in plain English.
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -20,11 +19,14 @@ This is a deterministic repo signal extractor that feeds LLMs correctly.
 - Understand any GitHub repository in seconds
 - Derives architectural summaries from repository structure and code signals.
 Not blind AI summarization.
+- Deterministic repo signal extractor that feeds LLMs correctly
 - Translates complex code structures into plain English
 - Speeds up understanding of unfamiliar codebases
+- Solves the "**garbage in, garbage out**" problem specifically for codebases
 - Extract architecture signals from configs, entrypoints, and manifests
 - Works with GitHub repositories, local directories, private repositories, individual files and monorepos
-- Outputs the explanation to an `EXPLAIN.md` file in your current directory, prints it directly in the terminal, or a specified output file (`.txt`, `.pdf`, `.docs`)
+- Zero-cloning and remote analysis
+- Outputs the explanation to an `EXPLAIN.md` file in your current directory, prints it directly in the terminal, or a specified output file (`.txt`, `.pdf`, `.docx`)
 - Multiple explanation modes (quick, simple, detailed)
 
 ## Installation
