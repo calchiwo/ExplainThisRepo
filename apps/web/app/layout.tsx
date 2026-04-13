@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains' })
 
 export const metadata: Metadata = {
-  title: 'ExplainThisRepo | Understand Any Codebase in Plain English',
+  title: 'ExplainThisRepo: Understand Any Codebase in Plain English',
   description: 'The fastest way to understand any codebase using real project signals. Analyze GitHub repos, local directories, and get clear explanations without blind AI summarization. Python, Node.js & standalone binaries available.',
   keywords: [
     'GitHub',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     siteName: 'ExplainThisRepo',
     images: [
       {
-        url: '/og.png',
+        url: 'apps/web/og.png',
         width: 512,
         height: 512,
         alt: 'ExplainThisRepo Logo'
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     description: 'Analyze GitHub repositories and local codebases using real project signals, not blind AI summarization. Get instant explanations with ExplainThisRepo CLI',
     site: '@explainthisrepo',
     creator: '@calchiwo',
-    images: ['/og.png']
+    images: ['apps/web/og.png']
   },
   robots: {
     index: true,
