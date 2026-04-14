@@ -112,11 +112,23 @@ def _request_json(
             )
 
         if response.status_code in (403, 429):
+            text_lower = (response.text or "").lower()
+
             if response.headers.get("X-RateLimit-Remaining") == "0":
                 raise RuntimeError(_rate_limit_message(response))
 
+            if "secondary rate limit" in text_lower or "rate limit" in text_lower:
+                if attempt == retries:
+                    raise RuntimeError(_rate_limit_message(response))
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+
+            if "resource not accessible by integration" in text_lower or "private" in text_lower:
+                raise RuntimeError("GitHub API access forbidden (403).")
+
             if attempt == retries:
-                raise RuntimeError(_rate_limit_message(response))
+                raise RuntimeError("GitHub API access forbidden (403).")
 
             time.sleep(backoff)
             backoff *= 2
@@ -163,8 +175,24 @@ def _request_text(
             return None
 
         if response.status_code in (403, 429):
+            text_lower = (response.text or "").lower()
+
+            if response.headers.get("X-RateLimit-Remaining") == "0":
+                return None
+
+            if "secondary rate limit" in text_lower or "rate limit" in text_lower:
+                if attempt == retries:
+                    return None
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+
+            if "resource not accessible by integration" in text_lower or "private" in text_lower:
+                return None
+
             if attempt == retries:
                 return None
+
             time.sleep(backoff)
             backoff *= 2
             continue
@@ -239,11 +267,28 @@ def _request_contents_json(
             raise RuntimeError(f"GitHub 404: {owner}/{repo}/{path} not found.")
 
         if response.status_code in (403, 429):
+            text_lower = (response.text or "").lower()
+
             if response.headers.get("X-RateLimit-Remaining") == "0":
                 raise RuntimeError(_rate_limit_message(response))
 
+            if "secondary rate limit" in text_lower or "rate limit" in text_lower:
+                if attempt == retries:
+                    raise RuntimeError(_rate_limit_message(response))
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+
+            if "resource not accessible by integration" in text_lower or "private" in text_lower:
+                raise RuntimeError(
+                    f"GitHub API access forbidden (403) for {owner}/{repo}/{path}.\n"
+                    "If this is a private repository, check your GitHub token permissions."
+                )
+
             if attempt == retries:
-                raise RuntimeError(_rate_limit_message(response))
+                raise RuntimeError(
+                    f"GitHub API access forbidden (403) for {owner}/{repo}/{path}."
+                )
 
             time.sleep(backoff)
             backoff *= 2
@@ -282,6 +327,22 @@ def fetch_readme(owner: str, repo: str, token: Optional[str] = None) -> str | No
     )
     if text:
         return text
+
+    branches = ["main", "master"]
+    filenames = ["README.md", "readme.md", "README.MD"]
+
+    for branch in branches:
+        for name in filenames:
+            raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{name}"
+            raw = _request_text(
+                session,
+                raw_url,
+                accept="text/plain",
+                timeout=10,
+                retries=2,
+            )
+            if raw:
+                return raw
 
     return None
 
@@ -326,7 +387,6 @@ def fetch_file_result(
 ) -> FileReadResult:
     normalized_path = _normalize_github_path(file_path)
     session = _make_session(token)
-
     url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/contents/{_quote_github_path(normalized_path)}"
 
     payload = _request_contents_json(
@@ -379,6 +439,50 @@ def fetch_file_result(
         size_bytes=size_bytes,
         max_bytes=max_bytes,
     )
+
+
+def fetch_directory_contents(
+    owner: str,
+    repo: str,
+    directory_path: str,
+    token: Optional[str] = None,
+) -> list[dict]:
+    normalized_path = _normalize_github_path(directory_path)
+    session = _make_session(token)
+    url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/contents/{_quote_github_path(normalized_path)}"
+
+    payload = _request_contents_json(
+        session,
+        url,
+        owner=owner,
+        repo=repo,
+        path=normalized_path,
+    )
+
+    if isinstance(payload, dict):
+        entry_type = str(payload.get("type") or "").lower()
+        if entry_type == "file":
+            raise RuntimeError(
+                f"GitHub path resolves to a file, not a directory: {owner}/{repo}/{normalized_path}"
+            )
+        raise RuntimeError(
+            f"GitHub path does not resolve to a directory: {owner}/{repo}/{normalized_path}"
+        )
+
+    if not isinstance(payload, list):
+        raise RuntimeError(
+            f"GitHub API returned unexpected data for {owner}/{repo}/{normalized_path}."
+        )
+
+    directory_items: list[dict] = []
+    for item in payload:
+        if not isinstance(item, dict):
+            raise RuntimeError(
+                f"GitHub directory listing contains unexpected data for {owner}/{repo}/{normalized_path}."
+            )
+        directory_items.append(item)
+
+    return directory_items
 
 
 def fetch_languages(owner: str, repo: str, token: Optional[str] = None) -> dict:

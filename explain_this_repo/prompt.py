@@ -303,3 +303,230 @@ Output rules:
 {_SECURITY_INSTRUCTION}
 """
     return prompt.strip()
+
+
+def _directory_entry_text(entry: object) -> str:
+    if isinstance(entry, dict):
+        path = entry.get("path") or entry.get("name")
+        entry_type = entry.get("type")
+        if path and entry_type:
+            return f"{path} ({entry_type})"
+        if path:
+            return str(path)
+        if entry_type:
+            return str(entry_type)
+        return str(entry)
+    return str(entry)
+
+
+def _format_directory_value(value: object, max_items: int = 20) -> str:
+    if value is None:
+        return ""
+
+    if isinstance(value, str):
+        text = value.strip()
+        return text
+
+    if isinstance(value, dict):
+        items = list(value.items())
+        if not items:
+            return ""
+
+        if all(isinstance(v, (int, float)) for _, v in items):
+            items = sorted(items, key=lambda kv: (-kv[1], str(kv[0])))
+
+        lines = [f"- {k}: {v}" for k, v in items[:max_items]]
+        return "\n".join(lines)
+
+    try:
+        items = list(value)
+    except TypeError:
+        text = str(value).strip()
+        return text
+
+    if not items:
+        return ""
+
+    lines = [f"- {_directory_entry_text(item)}" for item in items[:max_items]]
+    return "\n".join(lines)
+
+
+def _format_directory_metadata(directory_path: str) -> str:
+    return f"""<directory_metadata>
+Path: {escape_for_prompt_block(directory_path)}
+</directory_metadata>"""
+
+
+def _format_directory_signals(signals: dict | None, max_items: int = 20) -> str:
+    if not signals:
+        return "<directory_signals>\nNo signals extracted\n</directory_signals>"
+
+    parts: list[str] = []
+
+    file_count = signals.get("file_count")
+    if file_count is not None:
+        parts.append(f"File count: {file_count}")
+
+    dir_count = signals.get("dir_count")
+    if dir_count is not None:
+        parts.append(f"Directory count: {dir_count}")
+
+    files = signals.get("files") or signals.get("file_names")
+    if files:
+        formatted = _format_directory_value(files, max_items=max_items)
+        if formatted:
+            parts.append(f"Files:\n{formatted}")
+
+    subdirectories = signals.get("subdirectories") or signals.get("directories")
+    if subdirectories:
+        formatted = _format_directory_value(subdirectories, max_items=max_items)
+        if formatted:
+            parts.append(f"Subdirectories:\n{formatted}")
+
+    extensions = signals.get("extensions") or signals.get("extension_distribution")
+    if extensions:
+        formatted = _format_directory_value(extensions, max_items=max_items)
+        if formatted:
+            parts.append(f"Extension distribution:\n{formatted}")
+
+    known_keys = {
+        "file_count",
+        "dir_count",
+        "files",
+        "file_names",
+        "subdirectories",
+        "directories",
+        "extensions",
+        "extension_distribution",
+    }
+
+    extra_parts: list[str] = []
+    for key, value in signals.items():
+        if key in known_keys:
+            continue
+        formatted = _format_directory_value(value, max_items=max_items)
+        if formatted:
+            extra_parts.append(f"{key}:\n{formatted}")
+
+    if extra_parts:
+        parts.append("Other signals:\n" + "\n\n".join(extra_parts))
+
+    text = "\n\n".join(parts) if parts else "No signals extracted"
+    return f"<directory_signals>\n{escape_for_prompt_block(text)}\n</directory_signals>"
+
+
+def build_directory_prompt(
+    directory_path: str,
+    signals: dict | None = None,
+    detailed: bool = False,
+) -> str:
+    metadata = _format_directory_metadata(directory_path)
+    signals_block = _format_directory_signals(
+        signals, max_items=40 if detailed else 20
+    )
+
+    prompt = f"""You are a senior software engineer.
+
+Explain this directory clearly.
+
+{metadata}
+
+{signals_block}
+
+Instructions:
+- Explain what this directory is responsible for.
+- Explain what kinds of files and subdirectories exist here.
+- Explain what role it plays in the system.
+- Do not invent missing context.
+- If something is unclear, say so.
+- Avoid hype or marketing language.
+- Be concise and practical.
+- Use clear markdown headings.
+
+{_SECURITY_INSTRUCTION}
+""".strip()
+
+    if detailed:
+        prompt += """
+
+Additional instructions:
+- Describe the most important files and subdirectories.
+- Mention patterns and boundaries if they can be inferred from the provided signals.
+- Explain how this directory fits into the repository if that can be inferred.
+"""
+
+    prompt += """
+
+Output format:
+# Overview
+# What this directory does
+# What is inside
+# Role in the system
+# Notes or limitations
+"""
+
+    return prompt.strip()
+
+
+def build_directory_quick_prompt(
+    directory_path: str,
+    signals: dict | None = None,
+) -> str:
+    metadata = _format_directory_metadata(directory_path)
+    signals_block = _format_directory_signals(signals, max_items=8)
+
+    prompt = f"""You are a senior software engineer.
+
+Write a ONE-SENTENCE plain-English definition of what this GitHub directory is for.
+
+{metadata}
+
+{signals_block}
+
+Rules:
+- Output MUST be exactly 1 sentence.
+- Plain English.
+- No markdown.
+- No quotes.
+- No bullet points.
+- No extra text.
+- Do not invent details not present in the directory listing and signals.
+
+{_SECURITY_INSTRUCTION}
+"""
+    return prompt.strip()
+
+
+def build_directory_simple_prompt(
+    directory_path: str,
+    signals: dict | None = None,
+) -> str:
+    metadata = _format_directory_metadata(directory_path)
+    signals_block = _format_directory_signals(signals, max_items=12)
+
+    prompt = f"""You are a senior software engineer.
+
+Summarize this GitHub directory in a concise bullet-point format.
+
+{metadata}
+
+{signals_block}
+
+Output style rules:
+- Plain English.
+- No markdown.
+- Do NOT use headings like "Overview", "What this directory does", etc.
+- Start with exactly this line:
+Key points from the directory:
+- Then output 3 to 5 bullets only.
+- Each bullet MUST start with: ⬤
+- Each bullet title should be 1–3 words only.
+- Each bullet body should be 1–2 lines max.
+- Base bullets strictly on the provided directory listing and signals.
+- Do NOT invent details not present in the input.
+- Optional ending:
+Also interesting:
+
+{_SECURITY_INSTRUCTION}
+"""
+    return prompt.strip()

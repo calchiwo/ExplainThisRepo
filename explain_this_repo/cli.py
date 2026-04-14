@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import os
 import platform
@@ -13,6 +15,7 @@ from rich.console import Console
 from explain_this_repo.file_reader import read_local_file
 from explain_this_repo.generate import generate_explanation
 from explain_this_repo.github import (
+    fetch_directory_contents,
     fetch_file_result,
     fetch_languages,
     fetch_readme,
@@ -20,6 +23,9 @@ from explain_this_repo.github import (
 )
 from explain_this_repo.local_reader import read_local_repo_signal_files
 from explain_this_repo.prompt import (
+    build_directory_prompt,
+    build_directory_quick_prompt,
+    build_directory_simple_prompt,
     build_file_prompt,
     build_file_quick_prompt,
     build_file_simple_prompt,
@@ -313,7 +319,7 @@ def _classify_target(target: str) -> str:
     if os.path.isdir(target):
         return "directory"
     if _looks_like_github_file_target(target):
-        return "github_file"
+        return "github_directory"
     return "github"
 
 
@@ -323,6 +329,43 @@ def _extract_file_signals(read_result) -> dict:
         "extension": read_result.extension,
         "size_bytes": read_result.size_bytes,
     }
+
+
+def _extract_directory_signals(contents: list[dict]) -> dict:
+    files: list[str] = []
+    directories: list[str] = []
+    extensions: dict[str, int] = {}
+
+    for entry in contents:
+        if not isinstance(entry, dict):
+            continue
+
+        entry_type = str(entry.get("type") or "").lower()
+        name = str(entry.get("name") or entry.get("path") or "").strip()
+
+        if not name:
+            continue
+
+        if entry_type == "dir":
+            directories.append(name)
+            continue
+
+        files.append(name)
+        extension = os.path.splitext(name)[1].lower().lstrip(".") or "no_extension"
+        extensions[extension] = extensions.get(extension, 0) + 1
+
+    files.sort(key=str.lower)
+    directories.sort(key=str.lower)
+    extensions = dict(sorted(extensions.items(), key=lambda item: (-item[1], item[0])))
+
+    return {
+        "files": files,
+        "directories": directories,
+        "file_count": len(files),
+        "dir_count": len(directories),
+        "extensions": extensions,
+    }
+
 
 def _handle_file_mode(args, llm: str | None) -> None:
     if args.stack:
@@ -399,22 +442,29 @@ def _handle_file_mode(args, llm: str | None) -> None:
     print(f"Open {args.output} to read it.")
 
 
-def _handle_github_file_mode(args, llm: str | None) -> None:
+def _handle_github_file_mode(
+    args,
+    llm: str | None,
+    owner: str | None = None,
+    repo: str | None = None,
+    file_path: str | None = None,
+) -> None:
     if args.stack:
         print("error: --stack is not supported for GitHub file targets")
         raise SystemExit(1)
 
-    try:
-        owner, repo, file_path = resolve_github_file_target(args.repository)
-    except ValueError as e:
-        print(f"error: {str(e)}")
-        raise SystemExit(1)
+    if owner is None or repo is None or file_path is None:
+        try:
+            owner, repo, file_path = resolve_github_file_target(args.repository)
+        except ValueError as e:
+            print(f"error: {e}")
+            raise SystemExit(1)
 
     try:
         with console.status(f"Fetching {owner}/{repo}/{file_path}...", spinner="dots"):
             read_result = fetch_file_result(owner, repo, file_path)
     except Exception as e:
-        print(f"error: {str(e)}")
+        print(f"error: {e}")
         raise SystemExit(1)
 
     display_path = f"{owner}/{repo}/{read_result.path}"
@@ -456,6 +506,94 @@ def _handle_github_file_mode(args, llm: str | None) -> None:
         extension=read_result.extension,
         size_bytes=read_result.size_bytes,
         content=read_result.content,
+        signals=signals,
+        detailed=args.detailed,
+    )
+
+    with console.status("Generating explanation...", spinner="dots"):
+        output = generate_with_exit(prompt, llm=llm)
+
+    print(f"Writing {args.output}...")
+    write_output(output, args.output)
+
+    word_count = len(output.split())
+    print(f"{args.output} generated successfully 🎉")
+    print(f"Words: {word_count}")
+    print(f"Location: {os.path.abspath(args.output)}")
+    print(f"Open {args.output} to read it.")
+
+
+def _handle_github_directory_mode(
+    args,
+    llm: str | None,
+    owner: str | None = None,
+    repo: str | None = None,
+    directory_path: str | None = None,
+) -> None:
+    if args.stack:
+        print("error: --stack is not supported for GitHub directory targets")
+        raise SystemExit(1)
+
+    if owner is None or repo is None or directory_path is None:
+        try:
+            owner, repo, directory_path = resolve_github_file_target(args.repository)
+        except ValueError as e:
+            print(f"error: {e}")
+            raise SystemExit(1)
+
+    try:
+        with console.status(f"Fetching {owner}/{repo}/{directory_path}...", spinner="dots"):
+            contents = fetch_directory_contents(owner, repo, directory_path)
+    except Exception as e:
+        message = str(e).strip()
+        lowered = message.lower()
+
+        if "file" in lowered and "directory" in lowered:
+            _handle_github_file_mode(
+                args,
+                llm,
+                owner=owner,
+                repo=repo,
+                file_path=directory_path,
+            )
+            return
+
+        print(f"error: {message}")
+        raise SystemExit(1)
+
+    display_path = f"{owner}/{repo}/{directory_path}"
+    print(f"Analyzing GitHub directory: {display_path}")
+
+    signals = _extract_directory_signals(contents)
+
+    if args.quick:
+        prompt = build_directory_quick_prompt(
+            directory_path=display_path,
+            signals=signals,
+        )
+
+        with console.status("Generating explanation...", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Quick summary 🎉")
+        print(output.strip())
+        return
+
+    if args.simple:
+        prompt = build_directory_simple_prompt(
+            directory_path=display_path,
+            signals=signals,
+        )
+
+        with console.status("Generating explanation...", spinner="dots"):
+            output = generate_with_exit(prompt, llm=llm)
+
+        print("Simple summary 🎉")
+        print(output.strip())
+        return
+
+    prompt = build_directory_prompt(
+        directory_path=display_path,
         signals=signals,
         detailed=args.detailed,
     )
@@ -662,10 +800,10 @@ def main():
         "  explainthisrepo owner/repo --quick\n"
         "  explainthisrepo owner/repo --simple\n"
         "  explainthisrepo owner/repo --stack\n"
-        "  explainthisrepo owner/repo/path/to/file.py\n"
-        "  explainthisrepo owner/repo/path/to/file.py --quick\n"
-        "  explainthisrepo owner/repo/path/to/file.py --simple\n"
-        "  explainthisrepo owner/repo/path/to/file.py --detailed\n"
+        "  explainthisrepo owner/repo/packages/react-dom\n"
+        "  explainthisrepo owner/repo/packages/react-dom --quick\n"
+        "  explainthisrepo owner/repo/packages/react-dom --simple\n"
+        "  explainthisrepo owner/repo/packages/react-dom --detailed\n"
         "  explainthisrepo init\n"
         "  explainthisrepo owner/repo --llm gemini\n"
         "  explainthisrepo owner/repo --llm openai\n"
@@ -739,7 +877,7 @@ def main():
     parser.add_argument(
         "repository",
         nargs="?",
-        help="GitHub repository (owner/repo or URL), local directory, GitHub file, or local file",
+        help="GitHub repository (owner/repo or URL), GitHub file or directory path, local directory, or local file",
     )
 
     mode_group = parser.add_mutually_exclusive_group()
@@ -805,8 +943,8 @@ def main():
         _handle_file_mode(args, llm)
     elif mode == "directory":
         _handle_directory_mode(args, llm)
-    elif mode == "github_file":
-        _handle_github_file_mode(args, llm)
+    elif mode == "github_directory":
+        _handle_github_directory_mode(args, llm)
     else:
         _handle_github_mode(args, llm)
 
