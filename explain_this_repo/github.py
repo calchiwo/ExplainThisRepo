@@ -211,11 +211,20 @@ def _request_text(
 
 def _normalize_github_path(file_path: str) -> str:
     cleaned = file_path.strip()
+
     while cleaned.startswith("./"):
         cleaned = cleaned[2:]
-    cleaned = cleaned.lstrip("/")
+
+    cleaned = cleaned.replace("\\", "/")
+
+    while "//" in cleaned:
+        cleaned = cleaned.replace("//", "/")
+
+    cleaned = cleaned.strip("/")
+
     if not cleaned:
         raise RuntimeError("GitHub file path is empty.")
+
     return cleaned
 
 
