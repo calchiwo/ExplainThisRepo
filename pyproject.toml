@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "explainthisrepo"
-version = "0.24.1"
+version = "0.25.0"
 description = "The fastest way to understand any codebase in plain English using real project signals. Not blind AI summarization"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9,<4.0"
@@ -18,7 +18,7 @@ keywords = ["cli", "codebase-understanding", "repo-analysis", "code-explanation"
 
 dependencies = [
   "requests>=2.31,<3.0",
-  "rich>=14.3.3"
+  "rich>=15.0.0"
 ]
 
 classifiers = [
