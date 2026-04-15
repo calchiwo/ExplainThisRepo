@@ -38,6 +38,14 @@ run-node:
 doctor-node:
 	node node_version/dist/cli.js --doctor
 
+# .NET targets
+build-dotnet:
+	cd dotnet_version && dotnet build
+
+pack-dotnet:
+	cd dotnet_version && dotnet pack -c Release
+
 clean:
 	rm -rf dist build *.egg-info
 	rm -rf node_version/dist node_version/node_modules
+	rm -rf dotnet_version/bin dotnet_version/obj dotnet_version/nupkg

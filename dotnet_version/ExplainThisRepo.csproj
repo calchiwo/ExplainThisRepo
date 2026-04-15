@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>explainthisrepo</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <Version>0.25.3</Version>
+    
+    <Authors>Caleb Wodi</Authors>
+    <Description>The fastest way to understand any codebase in plain English.</Description>
+    <RepositoryUrl>https://github.com/calchiwo/ExplainThisRepo</RepositoryUrl>
+    <PackageProjectUrl>https://explainthisrepo.com/</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="native\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

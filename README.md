@@ -97,7 +97,19 @@ ExplainThisRepo uses a hybrid architecture:
 
 > The npm and pip versions run the same core engine.
 
-### Option 3: Download standalone binary
+### Option 3: Install with .NET Tool (C# Global Tool)
+
+Install globally and use forever (requires .NET 8, 9, or 10):
+
+```bash
+dotnet tool install -g ExplainThisRepo
+explainthisrepo owner/repo
+
+# dotnet tool install -g ExplainThisRepo
+# explainthisrepo .
+```
+
+### Option 4: Download standalone binary
 
 Prebuilt standalone binaries are available for macOS, Linux, and Windows.
 

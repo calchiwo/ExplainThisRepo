@@ -90,15 +90,17 @@ jobs:
       - name: Rehydrate native folder
         shell: bash
         run: |
-          mkdir -p node_version/dist/native release
+          mkdir -p node_version/dist/native dotnet_version/native release
 
           for artifact in artifacts/*; do
             [ -d "$artifact" ] || continue
             target="$(basename "$artifact")"
 
             mkdir -p "node_version/dist/native/$target"
+            mkdir -p "dotnet_version/native/$target"
 
             cp "$artifact"/explainthisrepo* "node_version/dist/native/$target/"
+            cp "$artifact"/explainthisrepo* "dotnet_version/native/$target/"
             cp "$artifact"/explainthisrepo* release/
           done
 
@@ -133,6 +135,26 @@ jobs:
       - name: Package check
         working-directory: node_version
         run: npm pack --dry-run
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build and Pack .NET Global Tool
+        working-directory: dotnet_version
+        run: dotnet pack -c Release
+
+      - name: Add .NET Tool Package to Release
+        shell: bash
+        run: cp dotnet_version/nupkg/*.nupkg release/
+
+      - name: Publish to NuGet (Optional)
+        working-directory: dotnet_version
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        if: ${{ env.NUGET_API_KEY != '' }}
+        run: dotnet nuget push nupkg/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2

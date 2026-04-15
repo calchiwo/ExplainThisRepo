@@ -152,3 +152,8 @@ artifacts/
 
 # macOS debug
 *.dSYM
+
+# .NET
+dotnet_version/bin/
+dotnet_version/obj/
+dotnet_version/nupkg/
