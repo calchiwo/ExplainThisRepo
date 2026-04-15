@@ -1,72 +1,126 @@
 # Contributing to ExplainThisRepo
 
-Thanks for contributing to ExplainThisRepo.
+Thanks for contributing.
 
-ExplainThisRepo is a CLI tool that generates plain-English explanations of codebases by analyzing repository structure, README content, and high-signal files.
+ExplainThisRepo is a CLI that explains codebases using real project signals, not blind AI guessing.
 
-The project consists of:
+## System Reality (Read This First)
 
-- A Python CLI (published on PyPI)
+The architecture is not symmetric.
 
-- A Node CLI with feature parity (published on npm)
+- **Python** → core system (source of truth)
+- **PyInstaller** → builds native binaries
+- **Node** → thin launcher only (npm distribution)
 
-Both share the same architecture and behavior.
+> If you misunderstand this, you will break the system.
+
+### Hard rule
+
+All logic lives in Python.
+Node must remain a launcher.
+
+## Architecture Overview
+
+### Python Core (`explain_this_repo/`)
+
+This is the product.
+
+It handles:
+
+- Repository analysis (GitHub + local)
+- Signal extraction (entrypoints, configs, manifests, structure)
+- Dependency graph understanding
+- Prompt construction
+- LLM provider routing
+- Output generation (`EXPLAIN.md`, stdout, custom formats)
+- CLI flags and behavior
+- Config and initialization (`init`)
+- Diagnostics (`--doctor`)
+
+If behavior changes, it happens here.
+
+### Native Binaries (PyInstaller)
+
+Python is compiled into platform-specific executables:
+
+- macOS
+- Linux
+- Windows
+
+These binaries are what users actually run via npm.
+
+### Node Layer (`node_version/`)
+
+This is distribution only.
+
+**Node does:**
+
+- Detect platform
+- Select correct binary
+- Execute it with user args
+
+**Node does NOT:**
+
+- Analyze repositories
+- Read files
+- Call LLMs
+- Build prompts
+- Detect stacks
+- Handle config
+
+> If you add logic here, you are doing it wrong.
 
 ## Ways to Contribute
 
-Contributions are welcome in several areas:
+Focus on the actual system, not the wrapper.
 
-- Bug fixes
+### High value contributions
 
-- CLI UX improvements (flags, output clarity, error messages)
-
-- Support for additional repository layouts (monorepos, unconventional entrypoints)
-
-- New CLI features or flags
-
-- Documentation improvements
-
+- Improve signal extraction accuracy
+- Better entrypoint detection
+- Better handling of monorepos
+- Reduce hallucination via stronger grounding
+- Improve prompt construction
+- Improve output clarity and structure
+- Add or improve LLM providers
+- Performance improvements (IO, parsing, API usage)
+- Error handling and diagnostics
 - Test coverage
 
-- Improvements to the LLM provider architecture
+### Low value contributions
+
+- Adding logic to Node launcher
+- Cosmetic abstractions that increase complexity
+- Features that rely on guessing instead of signals
 
 ## Before You Start
 
-Before opening a pull request:
-
-1. Check existing issues or open a new one describing the problem.
-
-2. Keep pull requests small and focused.
-
-3. Prefer fixes that reduce edge cases and improve reliability.
-
-4. Avoid introducing unnecessary dependencies or complexity.
-
+1. Check existing issues or open one
+2. Keep PRs small and surgical
+3. Prefer correctness over cleverness
+4. Reduce edge cases, don't multiply them
+5. Don't introduce unnecessary dependencies
 
 ## Development Setup
 
-Requirements
+### Requirements
 
 - Python 3.9+
-
 - Node.js 18+
-
 - pip
-
 - npm
-
 - make
 
-## Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/calchiwo/ExplainThisRepo.git
 cd ExplainThisRepo
 ```
 
-## Python Development
+## Python Development (Core)
 
-The Python implementation is the reference CLI distributed on PyPI.
+This is where you work.
 
 ### Install dependencies
 
@@ -74,7 +128,7 @@ The Python implementation is the reference CLI distributed on PyPI.
 make install
 ```
 
-### Install development dependencies
+### Install developement dependencies
 
 ```bash
 make dev
@@ -82,173 +136,178 @@ make dev
 
 ### Install editable package
 
-This allows running the CLI directly from the local source:
+This allows running the CLI directly from the local sourc
 
 ```bash
 pip install -e .
 ```
 
-## Running the Python CLI
+### Run CLI (Python)
 
 ```bash
 python -m explain_this_repo facebook/react
 ```
 
-## Running Diagnostics
+### Diagnostics
 
 ```bash
 make doctor
 ```
 
-Equivalent command:
+Equivalent:
 
 ```bash
 python -m explain_this_repo --doctor
 ```
 
-## Running Tests
+### Tests
 
 ```bash
 make test
 ```
 
-## Linting
+### Linting
 
 ```bash
 make lint
 ```
 
-## Code Formatting
+### Formatting
 
 ```bash
 make format
 ```
 
-This runs:
+Runs:
 
-- black
+- `black`
+- `isort`
 
-- isort
-
-
-## Build the Python Package
+### Build Python Package
 
 ```bash
 make build
 ```
 
-## Publish to PyPI
+### Build Native Binaries
 
 Maintainers only:
 
+Any change to core logic requires rebuilding binaries.
+
+> If you don't do this, npm users are running stale logic.
+
+Use PyInstaller via project scripts:
+
 ```bash
-make publish
+make build-binaries
 ```
 
-## Node CLI Development
+## Node Launcher Development
 
-ExplainThisRepo also ships a Node.js CLI with feature parity published to npm.
+Location: `node_version/`
 
-The Node implementation mirrors the Python CLI architecture and behavior while using the Node ecosystem (TypeScript, npm distribution).
+This layer must stay minimal.
 
-Both CLIs support:
+### Allowed changes
 
-- Repository analysis (GitHub or local directories)
+- Platform detection fixes
+- Binary resolution fixes
+- Packaging improvements
 
-- Multiple explanation modes (`--quick`, `--simple`, `--detailed`)
+### Not allowed
 
-- Stack detection
+- Business logic
+- Feature additions
+- CLI behavior changes
 
-- Diagnostics (`--doctor`)
+If you need any of those:
 
-- Pluggable LLM providers (`gemini`, `openai`, `ollama`)
+→ change Python  
+→ rebuild binaries
 
-
-The Python and Node implementations evolve together to maintain consistent CLI behavior across ecosystems.
-
-### Build Node CLI
+### Build Node package
 
 ```bash
 make build-node
 ```
 
-### Run Node CLI
+### Run Node locally
 
 ```bash
-make run-node
+node node_version/dist/cli.js facebook/react
 ```
-### Run Node diagnostics
 
-```bash
-make doctor-node
-```
+## LLM Provider Architecture
+
+Providers are pluggable.
+
+Each provider:
+
+- Implements a common interface
+- Is resolved via provider registry
+- Must be deterministic in structure, not prompt guessing
+
+Current providers include:
+
+- Gemini
+- OpenAI
+- Ollama
+- Anthropic
+- Groq
+- OpenRouter
+
+### Contribution rules
+
+- No provider-specific hacks leaking into core logic
+- Keep interface clean and consistent
+- Fail loudly and clearly
 
 ## Code Style Guidelines
 
-When contributing code:
-
-- Keep functions small and focused
-
-- Prefer explicit logic over clever abstractions
-
-- Avoid unnecessary dependencies
-
-- Handle errors with clear, actionable messages
-
-- Preserve CLI output stability when possible
+- Small, focused functions
+- Explicit logic over cleverness
+- Deterministic behavior > heuristic guessing
+- Clear error messages
+- Stable CLI output
 
 ## Pull Requests
 
-Before submitting a PR, ensure:
+Before submitting a PR, ensure::
 
-- [ ] The change is clearly described
-- [ ] The change is tested locally
-- [ ] Documentation is updated if behavior changed
-- [ ] The PR is small and focused
+- [ ] Change is necessary and scoped
+- [ ] Tested locally (Python CLI)
+- [ ] Binaries rebuilt if core changed
+- [ ] No logic added to Node layer
+- [ ] Docs updated if behavior changed
 
 ## Commit Messages
 
-Prefer Conventional Commits:
+Use [Conventional Commits](https://www.conventionalcommits.org/):
 
-```bash
-feat: add new feature
+```
+feat: add feature
 fix: resolve bug
-docs: update documentation
-refactor: internal code change
-chore: maintenance change
+docs: update docs
+refactor: internal change
+chore: maintenance
 ```
 
 ## Reporting Bugs
 
-When opening an issue, include:
+Include:
 
-- Operating system (Windows / macOS / Linux / Termux)
-
-- Python version
-
-- Node version
-
+- OS (Windows / macOS / Linux / Termux)
+- Python version (if using pip)
+- Node version (if using npm)
 - Command executed
-
 - Full error output
+- Target repo (`owner/repo`)
 
-- Repository used for reproduction (`owner/repo`)
+## What Will Get Your PR Rejected
 
-
-## Architecture Notes
-
-ExplainThisRepo uses a pluggable LLM provider architecture.
-
-Providers implement the ``LLMProvider`` interface and are resolved through the provider registry.
-
-Current supported providers:
-
-- Gemini
-
-- OpenAI
-
-- Ollama
-
----
-
-Thanks for helping improve ExplainThisRepo.
+- Logic added to Node launcher
+- Features that bypass signal extraction
+- Prompt hacks instead of system fixes
+- Over-engineering simple paths
+- Breaking CLI output consistency
