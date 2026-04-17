@@ -88,6 +88,77 @@ Output format:
     return prompt.strip()
 
 
+def build_repo_map_prompt(
+    repo_name: str,
+    description: str | None,
+    readme: str | None,
+    tree_text: str | None = None,
+    files_text: str | None = None,
+) -> str:
+    metadata = _format_metadata(repo_name, description)
+    readme_content = readme[:6000] if readme else None
+    tree_content = tree_text[:12000] if tree_text else None
+    files_content = files_text[:30000] if files_text else None
+
+    readme_block = _format_block("readme", readme_content, "No README provided")
+    tree_block = _format_block("repo_structure", tree_content, "No file tree provided")
+    files_block = _format_block(
+        "high_signal_files",
+        files_content,
+        "No high-signal files provided",
+    )
+
+    return f"""You are a senior systems-minded software engineer.
+
+Your task is to map this system before a developer changes it.
+
+{metadata}
+
+{readme_block}
+
+{tree_block}
+
+{files_block}
+
+Rules:
+- Use only the provided repository metadata, README, tree, and high-signal file snippets.
+- Do not invent runtime commands, services, frameworks, owners, or behavior.
+- Do not guess from weak signals. Put missing or uncertain information in Open Questions.
+- Prefer concrete file paths over vague descriptions.
+- Explain what to inspect before editing, debugging, extending, or refactoring.
+- Prioritize where a developer should start reading and why.
+- Keep it concise enough to be useful in a terminal-generated markdown file.
+- Avoid hype, marketing language, and generic advice.
+
+{_SECURITY_INSTRUCTION}
+
+Output exactly this markdown structure:
+# Repo Map
+
+## Start Here
+- List 3 to 7 files or directories to read first.
+- For each item, explain the reason in one short sentence.
+
+## Main Flow
+- Describe the execution or user flow only when supported by the provided signals.
+- Use file paths when the evidence supports them.
+
+## Important Files
+- Group important files by responsibility.
+- Each bullet must include the path and why it matters.
+
+## Architecture
+- Explain the major boundaries, modules, or layers visible from the signals.
+- Do not include architecture claims that are not supported by the provided signals.
+
+## Ignore First
+- List generated, dependency, asset, cache, or low-signal areas a newcomer can skip at first.
+
+## Open Questions
+- List missing context that the map cannot determine from the provided signals.
+""".strip()
+
+
 def build_quick_prompt(
     repo_name: str,
     description: str | None,
