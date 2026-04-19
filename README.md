@@ -92,9 +92,9 @@ explainthisrepo owner/repo
 # explainthisrepo ./path/to/file.py
 # explainthisrepo owner/repo/path/to/file.py
 # explainthisrepo owner/repo/path/to/directory
-</details>
-</pre>
 </code>
+</pre>
+</details>
 
 Or without install:
 
@@ -135,7 +135,7 @@ Download the latest release:
 [github.com/calchiwo/ExplainThisRepo/releases/latest](https://github.com/calchiwo/ExplainThisRepo/releases/latest)
 
 Or install directly:
-
+<details>
 macOS
 
 ```bash
@@ -154,6 +154,7 @@ Windows (PowerShell)
 ```powershell
 curl -L https://github.com/calchiwo/ExplainThisRepo/releases/latest/download/explainthisrepo-win-x64.exe -o explainthisrepo.exe
 ```
+</details>
 
 ## Configuration
 
@@ -360,6 +361,8 @@ explainthisrepo ./path/to/directory
 
 This works with all existing modes:
 
+<details>
+
 ```bash
 explainthisrepo . --quick
 explainthisrepo . --simple
@@ -367,6 +370,8 @@ explainthisrepo . --detailed
 explainthisrepo . --stack
 explainthisrepo . --map
 ```
+
+</details>
 
 When analyzing a local directory:
 - Repository structure is derived from the filesystem
@@ -387,11 +392,15 @@ explainthisrepo ./path/to/file.py
 
 Supports all explanation modes:
 
+<details>
+
 ```bash
 explainthisrepo ./file.py --quick
 explainthisrepo ./file.py --simple
 explainthisrepo ./file.py --detailed
 ```
+
+</details>
 
 When analyzing a file:
 - The file is read safely with encoding and size limits
@@ -408,11 +417,15 @@ explainthisrepo owner/repo/path/to/file.py
 ```
 Supports all explanation modes:
 
+<details>
+
 ```bash
 explainthisrepo owner/repo/path/to/file.py --quick
 explainthisrepo owner/repo/path/to/file.py --simple
 explainthisrepo owner/repo/path/to/file.py --detailed
 ```
+
+</details>
 
 When analyzing a GitHub file:
 - The file is fetched directly via the GitHub API
@@ -442,11 +455,16 @@ ExplainThisRepo can analyze a specific directory inside a GitHub repository with
 explainthisrepo owner/repo/path/to/directory
 ```
 Supports all explanation modes:
+
+<details>
+
 ```bash
 explainthisrepo owner/repo/path/to/directory --quick
 explainthisrepo owner/repo/path/to/directory --simple
 explainthisrepo owner/repo/path/to/directory --detailed
 ```
+
+</details>
 
 When analyzing a GitHub directory:
 
