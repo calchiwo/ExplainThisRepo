@@ -535,6 +535,12 @@ you can also run ExplainThisRepo using the Node.js version:
 npx explainthisrepo owner/repo
 ```
 
+## Philosophy
+
+I built this project with a personal motivation: my mum makes me fall in love with life again. That feeling of mental clarity, simplicity, grounded understanding and appreciation is what I wanted to bring into how developers understand codebases.
+
+I believe understanding code should feel less overwhelming and more approachable. If this tool still makes you feel overwhelmed when reading code, I failed.
+
 ## Special Thanks
 
 - @Spectra010s for implementing the Node.js version of ExplainThisRepo and improving installation support for mobile environments like Termux
