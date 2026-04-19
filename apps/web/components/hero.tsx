@@ -29,7 +29,7 @@ export function Hero() {
           </h1>
 
           <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
-            The fastest way to understand any codebase using real project signals. Not blind AI summarization. ExplainThisRepo analyzes configs, entrypoints, manifests, dependencies, file structure, and high-signal files.
+            The fastest way to understand any codebase using real project signals. Not blind AI summarization. ExplainThisRepo analyzes configs files, entrypoints, manifests, dependencies, file structure, and high-signal files.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">

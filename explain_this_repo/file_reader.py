@@ -8,7 +8,7 @@ _SAMPLE_SIZE = 4_096
 
 
 @dataclass(frozen=True, slots=True)
-class LocalFileReadResult:
+class FileReadResult:
     path: str
     name: str
     extension: str
@@ -93,7 +93,36 @@ def _decode_text(raw: bytes) -> str:
     raise ValueError("file appears to be binary or uses an unsupported text encoding")
 
 
-def read_local_file(path: str, max_bytes: int = _MAX_DEFAULT_BYTES) -> LocalFileReadResult:
+def build_file_read_result(
+    *,
+    path: str,
+    raw: bytes,
+    size_bytes: int,
+    max_bytes: int = _MAX_DEFAULT_BYTES,
+) -> FileReadResult:
+    if max_bytes <= 0:
+        raise ValueError("max_bytes must be greater than 0")
+
+    bounded = raw[:max_bytes]
+    sample = bounded[:_SAMPLE_SIZE]
+
+    if _is_probably_binary(sample):
+        raise ValueError("binary files are not supported")
+
+    content = _decode_text(bounded)
+
+    file_path = Path(path)
+    return FileReadResult(
+        path=path,
+        name=file_path.name,
+        extension=file_path.suffix.lower().lstrip("."),
+        size_bytes=size_bytes,
+        content=content,
+        is_text=True,
+    )
+
+
+def read_local_file(path: str, max_bytes: int = _MAX_DEFAULT_BYTES) -> FileReadResult:
     if max_bytes <= 0:
         raise ValueError("max_bytes must be greater than 0")
 
@@ -112,17 +141,9 @@ def read_local_file(path: str, max_bytes: int = _MAX_DEFAULT_BYTES) -> LocalFile
     except OSError as exc:
         raise OSError(f"Could not read file '{path}': {exc}") from exc
 
-    sample = raw[:_SAMPLE_SIZE]
-    if _is_probably_binary(sample):
-        raise ValueError("binary files are not supported")
-
-    content = _decode_text(raw)
-
-    return LocalFileReadResult(
+    return build_file_read_result(
         path=str(file_path.resolve()),
-        name=file_path.name,
-        extension=file_path.suffix.lower().lstrip("."),
+        raw=raw,
         size_bytes=size_bytes,
-        content=content,
-        is_text=True,
+        max_bytes=max_bytes,
     )

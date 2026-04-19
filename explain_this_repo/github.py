@@ -4,32 +4,16 @@ import base64
 import binascii
 import os
 import time
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Optional
 from urllib.parse import quote
 
 import requests
 
 from explain_this_repo.config import load_config
+from explain_this_repo.file_reader import FileReadResult, build_file_read_result
 
 GITHUB_API_BASE = "https://api.github.com"
 _MAX_FILE_BYTES = 32_000
-_SAMPLE_SIZE = 4_096
-
-
-@dataclass(frozen=True, slots=True)
-class GitHubFileReadResult:
-    owner: str
-    repo: str
-    path: str
-    name: str
-    extension: str
-    size_bytes: int
-    content: str
-    is_text: bool
-    sha: str | None = None
-    encoding: str | None = None
 
 
 def _get_token(token: Optional[str] = None) -> Optional[str]:
@@ -140,12 +124,20 @@ def _request_json(
                 backoff *= 2
                 continue
 
-            raise RuntimeError("GitHub API access forbidden (403).")
+            if "resource not accessible by integration" in text_lower or "private" in text_lower:
+                raise RuntimeError("GitHub API access forbidden (403).")
+
+            if attempt == retries:
+                raise RuntimeError("GitHub API access forbidden (403).")
+
+            time.sleep(backoff)
+            backoff *= 2
+            continue
 
         if 500 <= response.status_code <= 599:
             if attempt == retries:
                 raise RuntimeError(
-                    f"GitHub API server error ({response.status_code}). Try again later."
+                    f"GitHub API server error ({response.status_code})."
                 )
             time.sleep(backoff)
             backoff *= 2
@@ -195,7 +187,15 @@ def _request_text(
                 backoff *= 2
                 continue
 
-            return None
+            if "resource not accessible by integration" in text_lower or "private" in text_lower:
+                return None
+
+            if attempt == retries:
+                return None
+
+            time.sleep(backoff)
+            backoff *= 2
+            continue
 
         if 500 <= response.status_code <= 599:
             if attempt == retries:
@@ -211,11 +211,20 @@ def _request_text(
 
 def _normalize_github_path(file_path: str) -> str:
     cleaned = file_path.strip()
+
     while cleaned.startswith("./"):
         cleaned = cleaned[2:]
-    cleaned = cleaned.lstrip("/")
+
+    cleaned = cleaned.replace("\\", "/")
+
+    while "//" in cleaned:
+        cleaned = cleaned.replace("//", "/")
+
+    cleaned = cleaned.strip("/")
+
     if not cleaned:
         raise RuntimeError("GitHub file path is empty.")
+
     return cleaned
 
 
@@ -236,82 +245,6 @@ def _decode_base64_content(content: str) -> bytes:
         return base64.b64decode(cleaned, validate=True)
     except (ValueError, binascii.Error) as e:
         raise RuntimeError("Failed to decode GitHub base64 file content.") from e
-
-
-def _text_ratio(value: str) -> float:
-    if not value:
-        return 1.0
-
-    visible = 0
-    for ch in value:
-        if ch.isprintable() or ch in "\n\r\t":
-            visible += 1
-    return visible / len(value)
-
-
-def _is_probably_binary(sample: bytes) -> bool:
-    if not sample:
-        return False
-
-    if sample.startswith(
-        (
-            b"\xef\xbb\xbf",
-            b"\xff\xfe",
-            b"\xfe\xff",
-            b"\xff\xfe\x00\x00",
-            b"\x00\x00\xfe\xff",
-        )
-    ):
-        return False
-
-    if b"\x00" in sample:
-        for encoding in (
-            "utf-16",
-            "utf-16-le",
-            "utf-16-be",
-            "utf-32",
-            "utf-32-le",
-            "utf-32-be",
-        ):
-            try:
-                decoded = sample.decode(encoding)
-            except UnicodeDecodeError:
-                continue
-            if _text_ratio(decoded) >= 0.7:
-                return False
-        return True
-
-    control = 0
-    for byte in sample:
-        if byte in (9, 10, 13, 12, 8):
-            continue
-        if byte < 32 or byte == 127:
-            control += 1
-
-    return control / len(sample) > 0.3
-
-
-def _decode_text(raw: bytes) -> str:
-    encodings = (
-        "utf-8",
-        "utf-8-sig",
-        "utf-16",
-        "utf-16-le",
-        "utf-16-be",
-        "cp1252",
-        "latin-1",
-    )
-
-    for encoding in encodings:
-        try:
-            text = raw.decode(encoding)
-        except UnicodeDecodeError:
-            continue
-
-        if _text_ratio(text) >= 0.6:
-            return text
-
-    raise RuntimeError("GitHub file appears to be binary or uses an unsupported text encoding.")
 
 
 def _request_contents_json(
@@ -361,9 +294,14 @@ def _request_contents_json(
                     "If this is a private repository, check your GitHub token permissions."
                 )
 
-            raise RuntimeError(
-                f"GitHub API access forbidden (403) for {owner}/{repo}/{path}."
-            )
+            if attempt == retries:
+                raise RuntimeError(
+                    f"GitHub API access forbidden (403) for {owner}/{repo}/{path}."
+                )
+
+            time.sleep(backoff)
+            backoff *= 2
+            continue
 
         if 500 <= response.status_code <= 599:
             if attempt == retries:
@@ -455,7 +393,7 @@ def fetch_file_result(
     file_path: str,
     token: Optional[str] = None,
     max_bytes: int = _MAX_FILE_BYTES,
-) -> GitHubFileReadResult:
+) -> FileReadResult:
     normalized_path = _normalize_github_path(file_path)
     session = _make_session(token)
     url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/contents/{_quote_github_path(normalized_path)}"
@@ -479,35 +417,9 @@ def fetch_file_result(
         )
 
     entry_type = str(payload.get("type") or "").lower()
-    if entry_type == "dir":
-        raise RuntimeError(
-            f"GitHub path resolves to a directory, not a file: {owner}/{repo}/{normalized_path}"
-        )
-
-    if entry_type and entry_type not in {"file", "symlink", "submodule"}:
-        raise RuntimeError(
-            f"GitHub path does not resolve to a file: {owner}/{repo}/{normalized_path}"
-        )
-
-    if entry_type in {"symlink", "submodule"}:
+    if entry_type != "file":
         raise RuntimeError(
             f"GitHub path does not resolve to a regular file: {owner}/{repo}/{normalized_path}"
-        )
-
-    size_value = payload.get("size")
-    try:
-        size_bytes = int(size_value) if size_value is not None else None
-    except Exception:
-        size_bytes = None
-
-    if size_bytes is not None and size_bytes > max_bytes:
-        raise RuntimeError(
-            f"GitHub file too large: {owner}/{repo}/{normalized_path} ({size_bytes} bytes, limit {max_bytes} bytes)"
-        )
-
-    if payload.get("truncated") is True:
-        raise RuntimeError(
-            f"GitHub file is truncated and cannot be explained safely: {owner}/{repo}/{normalized_path}"
         )
 
     encoding = str(payload.get("encoding") or "").lower()
@@ -524,42 +436,62 @@ def fetch_file_result(
 
     raw = _decode_base64_content(content_field)
 
-    if len(raw) > max_bytes:
-        raise RuntimeError(
-            f"GitHub file too large: {owner}/{repo}/{normalized_path} ({len(raw)} bytes, limit {max_bytes} bytes)"
-        )
+    size_value = payload.get("size")
+    try:
+        size_bytes = int(size_value) if size_value is not None else len(raw)
+    except Exception:
+        size_bytes = len(raw)
 
-    if _is_probably_binary(raw[:_SAMPLE_SIZE]):
-        raise RuntimeError(
-            f"binary GitHub files are not supported: {owner}/{repo}/{normalized_path}"
-        )
+    return build_file_read_result(
+        path=normalized_path,
+        raw=raw,
+        size_bytes=size_bytes,
+        max_bytes=max_bytes,
+    )
 
-    text = _decode_text(raw)
-    if not text.strip():
-        raise RuntimeError(
-            f"GitHub file content is empty: {owner}/{repo}/{normalized_path}"
-        )
 
-    name = Path(normalized_path).name
-    extension = Path(normalized_path).suffix.lower().lstrip(".")
-    sha = payload.get("sha")
-    if sha is not None:
-        sha = str(sha)
+def fetch_directory_contents(
+    owner: str,
+    repo: str,
+    directory_path: str,
+    token: Optional[str] = None,
+) -> list[dict]:
+    normalized_path = _normalize_github_path(directory_path)
+    session = _make_session(token)
+    url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/contents/{_quote_github_path(normalized_path)}"
 
-    reported_size = size_bytes if size_bytes is not None else len(raw)
-
-    return GitHubFileReadResult(
+    payload = _request_contents_json(
+        session,
+        url,
         owner=owner,
         repo=repo,
         path=normalized_path,
-        name=name,
-        extension=extension,
-        size_bytes=reported_size,
-        content=text,
-        is_text=True,
-        sha=sha,
-        encoding=encoding,
     )
+
+    if isinstance(payload, dict):
+        entry_type = str(payload.get("type") or "").lower()
+        if entry_type == "file":
+            raise RuntimeError(
+                f"GitHub path resolves to a file, not a directory: {owner}/{repo}/{normalized_path}"
+            )
+        raise RuntimeError(
+            f"GitHub path does not resolve to a directory: {owner}/{repo}/{normalized_path}"
+        )
+
+    if not isinstance(payload, list):
+        raise RuntimeError(
+            f"GitHub API returned unexpected data for {owner}/{repo}/{normalized_path}."
+        )
+
+    directory_items: list[dict] = []
+    for item in payload:
+        if not isinstance(item, dict):
+            raise RuntimeError(
+                f"GitHub directory listing contains unexpected data for {owner}/{repo}/{normalized_path}."
+            )
+        directory_items.append(item)
+
+    return directory_items
 
 
 def fetch_languages(owner: str, repo: str, token: Optional[str] = None) -> dict:

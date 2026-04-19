@@ -1,4 +1,4 @@
-.PHONY: setup install dev test build publish clean lint format doctor build-node run-node doctor-node
+.PHONY: setup install dev test build publish clean lint format doctor build-node build-binaries run-node doctor-node build-dotnet pack-dotnet
 
 setup: install dev
 
@@ -32,6 +32,9 @@ doctor:
 build-node:
 	cd node_version && npm install && npm run build
 
+build-binaries:
+	python scripts/build_pyinstaller.py
+
 run-node:
 	node node_version/dist/cli.js facebook/react
 
@@ -47,5 +50,7 @@ pack-dotnet:
 
 clean:
 	rm -rf dist build *.egg-info
+	rm -rf __pycache__ explain_this_repo/__pycache__
 	rm -rf node_version/dist node_version/node_modules
+	rm -f node_version/*.tgz *.tgz
 	rm -rf dotnet_version/bin dotnet_version/obj dotnet_version/nupkg

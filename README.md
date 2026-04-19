@@ -2,8 +2,7 @@
 
 _The fastest way to understand any codebase in plain English using real project signals. Not blind AI summarization._
 
-ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, dependencies graph, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase does and how it is organized in plain English.
-This is a deterministic repo signal extractor that feeds LLMs correctly.
+ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, dependencies graph, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase actually does and how it is organized in plain English.
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -20,11 +19,14 @@ This is a deterministic repo signal extractor that feeds LLMs correctly.
 - Understand any GitHub repository in seconds
 - Derives architectural summaries from repository structure and code signals.
 Not blind AI summarization.
+- Deterministic repo signal extractor that feeds LLMs correctly
 - Translates complex code structures into plain English
 - Speeds up understanding of unfamiliar codebases
+- Solves the "**garbage in, garbage out**" problem specifically for codebases
 - Extract architecture signals from configs, entrypoints, and manifests
 - Works with GitHub repositories, local directories, private repositories, individual files and monorepos
-- Outputs the explanation to an `EXPLAIN.md` file in your current directory, prints it directly in the terminal, or a specified output file (`.txt`, `.pdf`, `.docs`)
+- Zero-cloning and remote analysis
+- Outputs the explanation to an `EXPLAIN.md` file in your current directory, prints it directly in the terminal, or a specified output file (`.txt`, `.pdf`, `.docx`)
 - Multiple explanation modes (quick, simple, detailed)
 
 ## Installation
@@ -37,8 +39,11 @@ Requirements: Python 3.9+
 pip install explainthisrepo
 explainthisrepo owner/repo
 
-# pip install explainthisrepo
 # explainthisrepo .
+# explainthisrepo ./path/to/directory
+# explainthisrepo ./path/to/file.py
+# explainthisrepo owner/repo/path/to/file.py
+# explainthisrepo owner/repo/path/to/directory
 ```
 
 Alternatively,
@@ -74,18 +79,37 @@ Install globally and use forever:
 ```bash
 npm install -g explainthisrepo
 explainthisrepo owner/repo
-
-# npm install -g explainthisrepo
-# explainthisrepo .
 ```
+
+<details>
+<pre>
+<code>
+# explainthisrepo .
+# explainthisrepo ./path/to/directory
+# explainthisrepo ./path/to/file.py
+# explainthisrepo owner/repo/path/to/file.py
+# explainthisrepo owner/repo/path/to/directory
+</details>
+</pre>
+</code>
 
 Or without install:
 
 ```bash
 npx explainthisrepo owner/repo
-
-# npx explainthisrepo .
 ```
+
+<details>
+<pre>
+<code>
+# npx explainthisrepo .
+# npx explainthisrepo ./path/to/directory
+# npx explainthisrepo ./path/to/file.py
+# npx explainthisrepo owner/repo/path/to/file.py
+# npx explainthisrepo owner/repo/path/to/directory
+</code>
+</pre>
+</details>
 
 ## How it works
 
@@ -207,6 +231,7 @@ explainthisrepo github.com/owner/repo
 explainthisrepo https://github.com/owner/repo/issues/123
 explainthisrepo https://github.com/owner/repo?tab=readme
 explainthisrepo git@github.com:owner/repo.git
+explainthisrepo owner/repo/path/to/directory
 explainthisrepo owner/repo/path/to/file.py
 explainthisrepo .
 explainthisrepo ./path/to/directory
@@ -390,6 +415,34 @@ This is different from local file analysis:
 ```bash
 explainthisrepo ./path/to/file.py
 ```
+
+## GitHub Directory Analysis
+
+ExplainThisRepo can analyze a specific directory inside a GitHub repository without cloning it.
+
+```bash
+explainthisrepo owner/repo/path/to/directory
+```
+Supports all explanation modes:
+```bash
+explainthisrepo owner/repo/path/to/directory --quick
+explainthisrepo owner/repo/path/to/directory --simple
+explainthisrepo owner/repo/path/to/directory --detailed
+```
+
+When analyzing a GitHub directory:
+
+- Directory contents are fetched via the GitHub API
+
+- Only structure and metadata are used (no full repo fetch)
+
+- Signals include files, subdirectories, and extension distribution
+
+- The explanation focuses on the directory’s role and structure
+
+
+`--stack` is not supported for directory targets.
+
 ### Custom output
 
 `--output`, `-o` → Specify output file or directory (default: `EXPLAIN.md`)
