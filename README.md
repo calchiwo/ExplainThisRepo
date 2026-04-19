@@ -347,6 +347,8 @@ The map focuses on:
 - files or folders to ignore first
 - open questions that cannot be determined from repo signals
 
+![Repo map Output](assets/repo-map-command-output.png)
+
 ## Local Directory Analysis
 
 ExplainThisRepo can analyze local directories directly in the terminal, using the same modes and output formats as GitHub repositories
