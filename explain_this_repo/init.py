@@ -22,48 +22,50 @@ def _prompt_provider() -> str:
     import readchar
 
     options = [
-        "  1) Gemini",
-        "  2) OpenAI",
-        "  3) Ollama (local or cloud-routed)",
-        "  4) Anthropic (Claude)",
-        "  5) Groq",
-        "  6) OpenRouter",
+        "1) Gemini",
+        "2) OpenAI",
+        "3) Ollama (local or cloud-routed)",
+        "4) Anthropic (Claude)",
+        "5) Groq",
+        "6) OpenRouter",
     ]
 
-    err.print("Select LLM provider:", style="bold")
-    err.print()
-    for line in options:
-        err.print(line)
-    err.print("> ", end="", soft_wrap=True)
+    print("Select LLM provider:\n")
+    for opt in options:
+        print(f"  {opt}")
+    print(" > ", end="", flush=True)
 
     index = None
     total_lines = len(options) + 2
 
-    def move_up(n: int):
+    def move_up(n):
         sys.stdout.write(f"\033[{n}A")
 
-    def clear_line():
-        sys.stdout.write("\033[2K")
+    def move_down(n):
+        sys.stdout.write(f"\033[{n}B")
 
-    def redraw_line(i, selected):
+    def clear_line():
+        sys.stdout.write("\033[2K\r")
+
+    def draw_option(i, selected):
         move_up(total_lines - i)
         clear_line()
         if selected:
-            sys.stdout.write(f"> {options[i].strip()}\n")
+            sys.stdout.write(f"> {options[i]}\n")
         else:
-            sys.stdout.write(f"{options[i]}\n")
+            sys.stdout.write(f"  {options[i]}\n")
+        move_down(total_lines - i - 1)
         sys.stdout.flush()
-        sys.stdout.write(f"\033[{total_lines - i - 1}B")
 
-    def redraw_prompt(active: bool):
+    def draw_prompt(active):
         move_up(1)
         clear_line()
         if active:
-            sys.stdout.write("> ")
+            sys.stdout.write(" > ")
         else:
             sys.stdout.write("")
+        move_down(1)
         sys.stdout.flush()
-        sys.stdout.write("\033[1B")
 
     while True:
         key = readchar.readkey()
@@ -71,37 +73,38 @@ def _prompt_provider() -> str:
         if key in (readchar.key.UP, readchar.key.DOWN):
             if index is None:
                 index = len(options) - 1 if key == readchar.key.UP else 0
-                redraw_prompt(False)
-                redraw_line(index, True)
+                draw_prompt(False)
+                draw_option(index, True)
             else:
                 prev = index
+
                 if key == readchar.key.UP:
                     if index == 0:
-                        redraw_line(index, False)
+                        draw_option(index, False)
                         index = None
-                        redraw_prompt(True)
+                        draw_prompt(True)
                         continue
                     index -= 1
                 else:
                     if index == len(options) - 1:
-                        redraw_line(index, False)
+                        draw_option(index, False)
                         index = None
-                        redraw_prompt(True)
+                        draw_prompt(True)
                         continue
                     index += 1
 
-                redraw_line(prev, False)
-                redraw_line(index, True)
+                draw_option(prev, False)
+                draw_option(index, True)
 
         elif key == readchar.key.ENTER:
             if index is not None:
-                sys.stdout.write("\n")
+                print()
                 return PROVIDERS[str(index + 1)]
             else:
                 choice = input().strip()
                 provider = PROVIDERS.get(choice)
                 if not provider:
-                    err.print("error: invalid provider selection", style="red")
+                    print("error: invalid provider selection")
                     raise SystemExit(1)
                 return provider
 
@@ -111,7 +114,7 @@ def _prompt_provider() -> str:
             choice = key + input().strip()
             provider = PROVIDERS.get(choice)
             if not provider:
-                err.print("error: invalid provider selection", style="red")
+                print("error: invalid provider selection")
                 raise SystemExit(1)
             return provider
 
