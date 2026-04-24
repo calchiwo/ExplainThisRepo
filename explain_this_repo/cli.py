@@ -872,46 +872,71 @@ def _handle_github_mode(args, llm: str | None) -> None:
 def main():
     parser = argparse.ArgumentParser(
         prog="explainthisrepo",
-        description="The fastest way to understand any codebase in plain English",
-        epilog="Examples:\n"
+        description="The fastest way to understand any codebase in plain English. Not blind AI guessing",
+        epilog=
+        "Aliases:\n\n"
+        "  etr                        # short alias for faster typing\n"
+        "  explain-this-repo          # readable alias\n"
+        "  explainthisrepo            # primary command\n\n"
+
+        "Input formats:\n\n"
         "  explainthisrepo owner/repo\n"
         "  explainthisrepo https://github.com/owner/repo\n"
         "  explainthisrepo github.com/owner/repo\n"
         "  explainthisrepo git@github.com:owner/repo.git\n"
+        "  explainthisrepo owner/repo/path/to/directory\n"
+        "  explainthisrepo owner/repo/path/to/file.py\n"
+        "  explainthisrepo .\n"
+        "  explainthisrepo ./path/to/directory\n"
+        "  explainthisrepo ./path/to/file.py\n\n"
+
+        "Modes:\n\n"
         "  explainthisrepo owner/repo --detailed\n"
         "  explainthisrepo owner/repo --quick\n"
         "  explainthisrepo owner/repo --simple\n"
         "  explainthisrepo owner/repo --stack\n"
-        "  explainthisrepo owner/repo --map\n"
-        "  explainthisrepo owner/repo/packages/react-dom\n"
-        "  explainthisrepo owner/repo/packages/react-dom --quick\n"
-        "  explainthisrepo owner/repo/packages/react-dom --simple\n"
-        "  explainthisrepo owner/repo/packages/react-dom --detailed\n"
-        "  explainthisrepo init\n"
-        "  explainthisrepo owner/repo --llm gemini\n"
-        "  explainthisrepo owner/repo --llm openai\n"
-        "  explainthisrepo owner/repo --llm ollama\n"
+        "  explainthisrepo owner/repo --map\n\n"
+
+        "Local directories analysis:\n\n"
         "  explainthisrepo .\n"
         "  explainthisrepo ./path/to/directory\n"
         "  explainthisrepo . --detailed\n"
         "  explainthisrepo . --quick\n"
         "  explainthisrepo . --simple\n"
         "  explainthisrepo . --stack\n"
-        "  explainthisrepo . --map\n"
+        "  explainthisrepo . --map\n\n"
+
+        "Files and directories analysis:\n\n"
+        "  explainthisrepo owner/repo/path/to/directory\n"
+        "  explainthisrepo owner/repo/path/to/directory --quick\n"
+        "  explainthisrepo owner/repo/path/to/directory --simple\n"
+        "  explainthisrepo owner/repo/path/to/directory --detailed\n"
         "  explainthisrepo ./path/to/file.py\n"
         "  explainthisrepo ./path/to/file.py --quick\n"
         "  explainthisrepo ./path/to/file.py --simple\n"
-        "  explainthisrepo ./path/to/file.py --detailed\n"
+        "  explainthisrepo ./path/to/file.py --detailed\n\n"
+
+        "Providers:\n\n"
+        "  explainthisrepo owner/repo --llm gemini\n"
+        "  explainthisrepo owner/repo --llm openai\n"
+        "  explainthisrepo owner/repo --llm ollama\n"
+        "  explainthisrepo owner/repo --llm anthropic\n"
+        "  explainthisrepo owner/repo --llm groq\n"
+        "  explainthisrepo owner/repo --llm openrouter\n\n"
+
+        "Output:\n\n"
         "  explainthisrepo owner/repo --output file.md\n"
         "  explainthisrepo owner/repo --output path/to/file.md\n"
         "  explainthisrepo owner/repo --output path/to/directory/file.md\n"
-        "  explainthisrepo owner/repo --output path/to/directory\n"
+        "  explainthisrepo owner/repo --output path/to/directory\n\n"
+
+        "Setup:\n\n"
+        "  explainthisrepo init\n"
         "  explainthisrepo --doctor\n"
-        "  explainthisrepo --doctor --llm gemini\n"
-        "  explainthisrepo --doctor --llm openai\n"
-        "  explainthisrepo --doctor --llm ollama\n"
-        "  explainthisrepo --version\n"
-        "GitHub token:\n"
+        "  explainthisrepo --doctor --llm <model name>\n"
+        "  explainthisrepo --version\n\n"
+
+        "GitHub token:\n\n"
         "  Access private repos and higher rate limits\n"
         "  Run:\n"
         "   explainthisrepo init\n"
@@ -968,27 +993,27 @@ def main():
     mode_group.add_argument(
         "--quick",
         action="store_true",
-        help="Quick summary mode",
+        help="Quick, fast overview mode",
     )
     mode_group.add_argument(
         "--simple",
         action="store_true",
-        help="Simple summary mode",
+        help="Simplified summary mode",
     )
     mode_group.add_argument(
         "--detailed",
         action="store_true",
-        help="Detailed explanation mode",
+        help="Full detailed breakdown mode",
     )
     mode_group.add_argument(
         "--stack",
         action="store_true",
-        help="Stack detection mode",
+        help="Stack detection mode. No LLM calls are made",
     )
     mode_group.add_argument(
         "--map",
         action="store_true",
-        help="Map the system before changing it",
+        help="Navigation system map that shows where to start, what matters and what to ignore before touching it",
     )
 
     args = parser.parse_args()
