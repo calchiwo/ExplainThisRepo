@@ -30,13 +30,15 @@ def _prompt_provider() -> str:
         "6) OpenRouter",
     ]
 
-    print("Select LLM provider:\n")
-    for opt in options:
-        print(f"  {opt}")
-    print(" > ", end="", flush=True)
+    err.print("Select LLM provider:", style="bold")
+    err.print()
 
-    index = None
-    total_lines = len(options) + 2
+    for opt in options:
+        err.print(f"  {opt}")
+
+    err.print(" > ", end="")
+
+    index = None  # None = input mode
 
     def move_up(n):
         sys.stdout.write(f"\033[{n}A")
@@ -47,25 +49,29 @@ def _prompt_provider() -> str:
     def clear_line():
         sys.stdout.write("\033[2K\r")
 
-    def draw_option(i, selected):
-        move_up(total_lines - i)
+    def update_line(i, selected):
+        # lines: title + blank + options + prompt
+        # option line position from bottom = (len(options) - i + 1)
+        offset = len(options) - i + 1
+
+        move_up(offset)
         clear_line()
+
         if selected:
-            sys.stdout.write(f"> {options[i]}\n")
+            sys.stdout.write(f"> {options[i]}")
         else:
-            sys.stdout.write(f"  {options[i]}\n")
-        move_down(total_lines - i - 1)
+            sys.stdout.write(f"  {options[i]}")
+
+        move_down(offset)
         sys.stdout.flush()
 
-    def draw_prompt(active):
+    def update_prompt(active):
         move_up(1)
         clear_line()
         if active:
             sys.stdout.write(" > ")
-        else:
-            sys.stdout.write("")
-        move_down(1)
         sys.stdout.flush()
+        move_down(1)
 
     while True:
         key = readchar.readkey()
@@ -73,28 +79,28 @@ def _prompt_provider() -> str:
         if key in (readchar.key.UP, readchar.key.DOWN):
             if index is None:
                 index = len(options) - 1 if key == readchar.key.UP else 0
-                draw_prompt(False)
-                draw_option(index, True)
+                update_prompt(False)
+                update_line(index, True)
             else:
                 prev = index
 
                 if key == readchar.key.UP:
                     if index == 0:
-                        draw_option(index, False)
+                        update_line(index, False)
                         index = None
-                        draw_prompt(True)
+                        update_prompt(True)
                         continue
                     index -= 1
                 else:
                     if index == len(options) - 1:
-                        draw_option(index, False)
+                        update_line(index, False)
                         index = None
-                        draw_prompt(True)
+                        update_prompt(True)
                         continue
                     index += 1
 
-                draw_option(prev, False)
-                draw_option(index, True)
+                update_line(prev, False)
+                update_line(index, True)
 
         elif key == readchar.key.ENTER:
             if index is not None:
@@ -104,7 +110,7 @@ def _prompt_provider() -> str:
                 choice = input().strip()
                 provider = PROVIDERS.get(choice)
                 if not provider:
-                    print("error: invalid provider selection")
+                    err.print("error: invalid provider selection", style="red")
                     raise SystemExit(1)
                 return provider
 
@@ -114,7 +120,7 @@ def _prompt_provider() -> str:
             choice = key + input().strip()
             provider = PROVIDERS.get(choice)
             if not provider:
-                print("error: invalid provider selection")
+                err.print("error: invalid provider selection", style="red")
                 raise SystemExit(1)
             return provider
 
