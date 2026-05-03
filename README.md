@@ -1,8 +1,8 @@
 # ExplainThisRepo
 
-_The fastest way to understand any codebase in plain English using real project signals. Not blind AI guessing._
+_The fastest way to understand any unfamiliar codebase using real project signals. Not blind AI guessing. Signals first. LLM second_
 
-ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, dependencies graph, file structure and high-signal files producing a clear, structured `EXPLAIN.md` that explains what the codebase actually does and how it is organized in plain English.
+ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, dependencies graph, structures and high-signal files producing a clear, structured `EXPLAIN.md` that shows you what the codebase actually does, how it is organized, where to start, what to ignore, and what matters before touching unfamiliar codebases.
 
 [![PyPI Version](https://img.shields.io/pypi/v/explainthisrepo?color=blue)](https://pypi.org/project/explainthisrepo/)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/explainthisrepo?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/explainthisrepo)
@@ -17,19 +17,16 @@ ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, 
 ## Key Features
 
 - Understand any GitHub repository in seconds
-- Derives architectural summaries from repository structure and code signals.
-Not blind AI guessing
-- Deterministic repo signal extractor that feeds LLMs correctly. Signals first. LLM second
-- Translates complex code structures into plain English
+- System map that shows you where to start, what to ignore, what matters and why
+- Deterministic repo signal extractor that feeds LLMs correctly.
 - Speeds up understanding of unfamiliar codebases
 - Solves the "**garbage in, garbage out**" problem specifically for codebases
-- Extract architecture signals from configs, entrypoints, and manifests
-- System map that shows you where to start, what matters and what to ignore
-- Works with GitHub repositories, Local repositories, GitHub directories, local directories, GitHub files and local files 
+- Multiple modes (quick, simple, detailed) that translates complex repository structure and code signals into architectural summaries. Not blind AI guessing. Signals first. LLM second
+- Works with GitHub repositories, local repositories, GitHub directories, local directories, GitHub files and local files
 - Supports private repositories and monorepos
 - Zero-cloning and remote analysis
+- Extract architecture signals from configs, entrypoints, and manifests
 - Outputs the explanation to an `EXPLAIN.md` file in your current directory, prints it directly in the terminal, or a specified output file (`.txt`, `.pdf`, `.docx`, `.md`)
-- Multiple explanation modes (quick, simple, detailed)
 - Additional tools: stack detection, repo map
 
 ## Installation
@@ -75,7 +72,7 @@ pip install explainthisrepo[groq]
 
 Replace `owner/repo` with the GitHub repository identifier (e.g., `facebook/react`, `torvalds/linux`).
 
-### Option 2: Install with npm (prebuilt binary, no Python required)
+### Option 2: Install with npm (prebuilt binary, no Python install required)
 
 Install globally and use forever:
 
@@ -87,11 +84,11 @@ explainthisrepo owner/repo
 <details>
 <pre>
 <code>
-# explainthisrepo .
-# explainthisrepo ./path/to/directory
-# explainthisrepo ./path/to/file.py
-# explainthisrepo owner/repo/path/to/file.py
-# explainthisrepo owner/repo/path/to/directory
+explainthisrepo .
+explainthisrepo ./path/to/directory
+explainthisrepo ./path/to/file.py
+explainthisrepo owner/repo/path/to/file.py
+explainthisrepo owner/repo/path/to/directory
 </code>
 </pre>
 </details>
@@ -105,22 +102,22 @@ npx explainthisrepo owner/repo
 <details>
 <pre>
 <code>
-# npx explainthisrepo .
-# npx explainthisrepo ./path/to/directory
-# npx explainthisrepo ./path/to/file.py
-# npx explainthisrepo owner/repo/path/to/file.py
-# npx explainthisrepo owner/repo/path/to/directory
+npx explainthisrepo .
+npx explainthisrepo ./path/to/directory
+npx explainthisrepo ./path/to/file.py
+npx explainthisrepo owner/repo/path/to/file.py
+npx explainthisrepo owner/repo/path/to/directory
 </code>
 </pre>
 </details>
 
 ## How it works
 
-ExplainThisRepo uses a hybrid architecture:
+ExplainThisRepo uses a single source of truth architecture:
 
-- Python → core implementation (analysis, prompts, providers, output)
-- npm → launches prebuilt native binaries (no Python install required)
-- pip → installs the full Python package
+- Python is the core implementation (analysis, prompts, providers, output)
+- npm launches prebuilt native binaries (no Python install required)
+- pip installs the full Python package
 
 > The npm and pip versions run the same core engine.
 
@@ -130,9 +127,7 @@ Prebuilt standalone binaries are available for macOS, Linux, and Windows.
 
 > Standalone binaries require no Python or Node installation and run as a single executable.
 
-Download the latest release:
-
-[github.com/calchiwo/ExplainThisRepo/releases/latest](https://github.com/calchiwo/ExplainThisRepo/releases/latest)
+Download the latest release: [ExplainThisRepo latest releases](https://github.com/calchiwo/ExplainThisRepo/releases/latest)
 
 Or install directly:
 <details>
@@ -144,6 +139,7 @@ chmod +x explainthisrepo
 ```
 
 Linux
+
 ```bash
 curl -L https://github.com/calchiwo/ExplainThisRepo/releases/latest/download/explainthisrepo-linux-x64 -o explainthisrepo
 chmod +x explainthisrepo
@@ -174,7 +170,7 @@ explainthisrepo init
 # or npx explainthisrepo init
 ```
 
-> For details about how initialization works, see [docs/INIT.md](docs/INIT.md).
+> For details about how initialization works, see [docs/INIT.md](https://github.com/calchiwo/ExplainThisRepo/blob/main/docs/INIT.md).
 
 ## GitHub token Access (Private Repos & Rate Limits)
 
@@ -561,7 +557,7 @@ I believe understanding code should feel less overwhelming and more approachable
 
 ## Special Thanks
 
-- @Spectra010s for implementing the Node.js version of ExplainThisRepo and improving installation support for mobile environments like Termux
+- @Spectra010s for implementing the initial Node.js version of ExplainThisRepo and improving installation support for mobile environments like Termux
 - @HalxDocs for implementing the `--detailed` mode for deeper architectural explanations
 
 ## Contributions
