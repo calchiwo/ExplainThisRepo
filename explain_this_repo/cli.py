@@ -872,12 +872,12 @@ def _handle_github_mode(args, llm: str | None) -> None:
 def main():
     parser = argparse.ArgumentParser(
         prog="explainthisrepo",
-        description="The fastest way to understand any codebase in plain English. Not blind AI guessing",
+        description="The fastest way to understand any unfamiliar codebase using real project signals. Not blind AI guessing. Signals first. LLM second.",
         epilog=
         "Aliases:\n\n"
-        "  etr                        # short alias for faster typing\n"
-        "  explain-this-repo          # readable alias\n"
-        "  explainthisrepo            # primary command\n\n"
+        "  etr                          short alias for faster typing\n"
+        "  explain-this-repo            readable alias\n"
+        "  explainthisrepo              primary command\n\n"
 
         "Input formats:\n\n"
         "  explainthisrepo owner/repo\n"
@@ -941,7 +941,10 @@ def main():
         "  Run:\n"
         "   explainthisrepo init\n"
         "  Or set:\n"
-        "   GITHUB_TOKEN=ghp_xxx explainthisrepo owner/repo\n",
+        "   GITHUB_TOKEN=ghp_xxx explainthisrepo owner/repo\n\n"
+
+        "Support:\n\n"
+        "  Report bugs or feedback to caleb@explainthisrepo.com",
         formatter_class=argparse.RawTextHelpFormatter,
     )
 
