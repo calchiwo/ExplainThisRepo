@@ -154,6 +154,10 @@ jobs:
             exit 1
           fi
 
+      - name: Sync package metadata
+        working-directory: node_version
+        run: npm run sync-meta
+
       - name: Build package tarball
         working-directory: node_version
         run: npm pack
