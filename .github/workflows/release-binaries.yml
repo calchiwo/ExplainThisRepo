@@ -135,7 +135,13 @@ jobs:
         working-directory: node_version
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
-          npm version $VERSION --no-git-tag-version
+          CURRENT=$(node -p "require('./package.json').version")
+
+          if [ "$VERSION" != "$CURRENT" ]; then
+            npm version $VERSION --no-git-tag-version
+          else
+            echo "Version already matches tag, skipping"
+          fi
 
       - name: Check if version exists
         working-directory: node_version
