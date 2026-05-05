@@ -25,9 +25,6 @@ jobs:
           - target: darwin-arm64
             runner: macos-latest
 
-          - target: darwin-x64
-            runner: macos-latest
-
           - target: linux-x64
             runner: ubuntu-latest
 
@@ -152,7 +149,7 @@ jobs:
           fi
 
       - name: Build package tarball
-        wogsrking-directory: node_version
+        working-directory: node_version
         run: npm pack
 
       - name: Verify package contains native binaries
