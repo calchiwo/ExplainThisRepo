@@ -6,10 +6,10 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>explainthisrepo</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <Version>0.25.3</Version>
+    <Version>0.26.3</Version>
     
     <Authors>Caleb Wodi</Authors>
-    <Description>The fastest way to understand any codebase in plain English.</Description>
+    <Description>The fastest way to understand any unfamiliar codebase using real project signals. Not blind AI guessing. Signals first. LLM second.</Description>
     <RepositoryUrl>https://github.com/calchiwo/ExplainThisRepo</RepositoryUrl>
     <PackageProjectUrl>https://explainthisrepo.com/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

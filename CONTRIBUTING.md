@@ -8,16 +8,17 @@ ExplainThisRepo is a CLI that explains codebases using real project signals, not
 
 The architecture is not symmetric.
 
-- **Python** → core system (source of truth)
-- **PyInstaller** → builds native binaries
-- **Node** → thin launcher only (npm distribution)
+- Python is the core system and source of truth
+- PyInstaller builds the native binaries
+- Node is a thin launcher for npm distribution
+- .NET is also a thin launcher for dotnet tool distribution
 
 > If you misunderstand this, you will break the system.
 
 ### Hard rule
 
 All logic lives in Python.
-Node must remain a launcher.
+Node and .NET layer must remain a launcher.
 
 ## Architecture Overview
 
@@ -49,15 +50,15 @@ Python is compiled into platform-specific executables:
 
 These binaries are what users actually run via npm.
 
-### Node Layer (`node_version/`)
+### Node Launcher and Distribution Layer (`node_version/`)
 
 This is distribution only.
 
 **Node does:**
 
 - Detect platform
-- Select correct binary
-- Execute it with user args
+- Select correct bundeled binary
+- Execute it with user arguments
 
 **Node does NOT:**
 
@@ -70,9 +71,30 @@ This is distribution only.
 
 > If you add logic here, you are doing it wrong.
 
+### .NET Launcher and Distribution Layer (`dotnet_version/`)
+
+This is distribution only.
+
+**.NET does:**
+
+- Detect platform
+- Select correct bundeled binary
+- Execute it with user arguments
+
+**.NET does NOT:**
+
+- Analyze repositories
+- Read files
+- Call LLMs
+- Build prompts
+- Detect stacks
+- Handle config
+
+> If behavior changes, it belongs in Python, not in the launchers.
+
 ## Ways to Contribute
 
-Focus on the actual system, not the wrapper.
+Focus on the actual system, not the launchers.
 
 ### High value contributions
 
@@ -107,6 +129,7 @@ Focus on the actual system, not the wrapper.
 
 - Python 3.9+
 - Node.js 18+
+- .NET 8, 9, or 10
 - pip
 - npm
 - make
@@ -193,9 +216,9 @@ make build
 
 Maintainers only:
 
-Any change to core logic requires rebuilding binaries.
+Any change to core logic requires rebuilding binaries for all shipped targets.
 
-> If you don't do this, npm users are running stale logic.
+Use the project build scripts and release workflow. Do not hand-edit bundled binaries
 
 Use PyInstaller via project scripts:
 
@@ -203,11 +226,9 @@ Use PyInstaller via project scripts:
 make build-binaries
 ```
 
-## Node Launcher Development
+**Release builds produce native binaries for npm, .NET, and GitHub Release assets from the same PyInstaller output.**
 
-Location: `node_version/`
-
-This layer must stay minimal.
+The Node and .NET launchers both rely on bundled binaries, so release artifacts must match the target platform exactly.
 
 ### Allowed changes
 
@@ -225,18 +246,6 @@ If you need any of those:
 
 → change Python  
 → rebuild binaries
-
-### Build Node package
-
-```bash
-make build-node
-```
-
-### Run Node locally
-
-```bash
-node node_version/dist/cli.js facebook/react
-```
 
 ## LLM Provider Architecture
 
@@ -276,9 +285,9 @@ Current providers include:
 Before submitting a PR, ensure::
 
 - [ ] Change is necessary and scoped
-- [ ] Tested locally (Python CLI)
+- [ ] Tested locally
 - [ ] Binaries rebuilt if core changed
-- [ ] No logic added to Node layer
+- [ ] No logic added to Node or .NET layer
 - [ ] Docs updated if behavior changed
 
 ## Commit Messages
@@ -307,6 +316,7 @@ Include:
 ## What Will Get Your PR Rejected
 
 - Logic added to Node launcher
+- Logic added to .NET launcher
 - Features that bypass signal extraction
 - Prompt hacks instead of system fixes
 - Over-engineering simple paths

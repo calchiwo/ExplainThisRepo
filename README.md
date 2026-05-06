@@ -111,27 +111,41 @@ npx explainthisrepo owner/repo/path/to/directory
 </pre>
 </details>
 
-## How it works
+### Option 3: Install with .NET (C# Global Tool)
 
-ExplainThisRepo uses a single source of truth architecture:
-
-- Python is the core implementation (analysis, prompts, providers, output)
-- npm launches prebuilt native binaries (no Python install required)
-- pip installs the full Python package
-
-> The npm and pip versions run the same core engine.
-
-### Option 3: Install with .NET Tool (C# Global Tool)
-
-Install globally and use forever (requires .NET 8, 9, or 10):
+Requirements: .NET 8, 9, or 10:
 
 ```bash
-dotnet tool install -g ExplainThisRepo
+dotnet tool install -g explainthisrepo
 explainthisrepo owner/repo
 
-# dotnet tool install -g ExplainThisRepo
+# dotnet tool install -g explainthisrepo
 # explainthisrepo .
 ```
+
+## How it works
+
+ExplainThisRepo has one core engine and multiple distribution layers.
+
+- Python is the source of truth for analysis, prompts, providers, and output
+- npm ships the Node launcher plus prebuilt native binaries
+- .NET ships the same native binary as a global tool and publishes to NuGet
+- GitHub Releases publish the standalone binaries
+
+The Node and .NET layers are launchers only. They detect the current platform, locate the matching bundled binary, and execute it with the user’s arguments.
+
+The same native binary is what actually performs the work.
+
+## Distribution model
+
+ExplainThisRepo is shipped in multiple ways:
+
+- `pip` for Python users
+- `npm` for Node users
+- `dotnet tool` for .NET users
+- standalone binaries for direct download
+
+All of them run the same core Python engine compiled into native binaries.
 
 ### Option 4: Download standalone binary
 
@@ -571,6 +585,7 @@ I believe understanding code should feel less overwhelming and more approachable
 
 - @Spectra010s for implementing the initial Node.js version of ExplainThisRepo and improving installation support for mobile environments like Termux
 - @HalxDocs for implementing the `--detailed` mode for deeper architectural explanations
+- @Manuel-Technologies for implementing the .NET global tool launcher and NuGet distribution support
 
 ## Contributions
 
