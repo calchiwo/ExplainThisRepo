@@ -448,14 +448,11 @@ Use the `--doctor` flag to verify the environment, network connectivity, and API
 explainthisrepo --doctor
 ```
 
-## Termux (Android) install notes
+## Termux (Android)
 
-Termux has some environment limitations that can make `pip install explainthisrepo` fail to create the `explainthisrepo` command in `$PREFIX/bin`.
+ExplainThisRepo supports Termux on Android.
 
-However, it's recommended you install using:
-
-```bash
-pip 
+For installation notes, PATH setup, Gemini support, and mobile-specific recommendations: see [docs/TERMUX.md](https://github.com/calchiwo/ExplainThisRepo/blob/main/docs/TERMUX.md)
 
 ## Philosophy
 
