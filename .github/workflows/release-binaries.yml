@@ -183,10 +183,6 @@ jobs:
         working-directory: dotnet_version
         run: dotnet pack -c Release
 
-      - name: Add .NET Tool Package to Release
-        shell: bash
-        run: cp dotnet_version/nupkg/*.nupkg release/
-
       - name: Publish to NuGet
         working-directory: dotnet_version
         env:
