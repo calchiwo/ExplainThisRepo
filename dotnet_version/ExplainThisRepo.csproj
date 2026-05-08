@@ -13,10 +13,16 @@
     <RepositoryUrl>https://github.com/calchiwo/ExplainThisRepo</RepositoryUrl>
     <PackageProjectUrl>https://explainthisrepo.com/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Update="native\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None include="../REAME.md" Pack="true" PackagePath="\" />
+    <None include="../LICENSE" Pack="true" PackagePath="\" />
+  <ItemGroup>
 
 </Project>
