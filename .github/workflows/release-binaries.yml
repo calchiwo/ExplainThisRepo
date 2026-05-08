@@ -145,7 +145,7 @@ jobs:
             echo "Version already matches tag, skipping"
           fi
 
-      - name: Check if version exists
+      - name: Check if npm version exists
         working-directory: node_version
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
@@ -179,9 +179,35 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Sync .NET version with tag
+        working-directory: dotnet_version
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+
+          CURRENT=$(grep -oPm1 "(?<=<Version>)[^<]+" ExplainThisRepo.csproj)
+
+          if [ "$VERSION" != "$CURRENT" ]; then
+            sed -i "s|<Version>.*</Version>|<Version>$VERSION</Version>|" ExplainThisRepo.csproj
+          else
+            echo "Version already matches tag, skipping"
+          fi
+
       - name: Build and Pack .NET Global Tool
         working-directory: dotnet_version
         run: dotnet pack -c Release
+
+      - name: Check if NuGet version exists
+        working-directory: dotnet_version
+        shell: bash
+        run: |
+          PACKAGE_ID=$(grep -oPm1 "(?<=<ToolCommandName>)[^<]+" ExplainThisRepo.csproj)
+          VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" ExplainThisRepo.csproj)
+
+          if curl -fsSL "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID,,}/index.json" | grep "\"$VERSION\"" >/dev/null; then
+            echo "Version already exists on NuGet"
+            exit 1
+          fi
 
       - name: Publish to NuGet
         working-directory: dotnet_version
