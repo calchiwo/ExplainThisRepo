@@ -59,6 +59,10 @@ Repository = "https://github.com/calchiwo/ExplainThisRepo"
 explainthisrepo = "explain_this_repo.cli:main"
 explain-this-repo = "explain_this_repo.cli:main"
 etr = "explain_this_repo.cli:main"
+ExplainThisRepo = "explain_this_repo.cli:main"
+explain = "explain_this_repo.cli:main"
+explainthis = "explain_this_repo.cli:main"
+explain-this = "explain_this_repo.cli:main"
 
 [tool.black]
 line-length = 88
