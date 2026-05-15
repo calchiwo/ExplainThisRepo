@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "explainthisrepo"
-version = "0.27.0"
+version = "0.27.2"
 description = "The fastest way to understand any unfamiliar codebase using real project signals. Not blind AI guessing. Signals first. LLM second"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9,<4.0"

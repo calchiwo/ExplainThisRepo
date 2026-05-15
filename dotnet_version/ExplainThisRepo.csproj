@@ -7,7 +7,7 @@
     <ToolCommandName>explainthisrepo</ToolCommandName>
     <PackageId>ExplainThisRepo</PackageId>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <Version>0.27.0</Version>
+    <Version>0.27.2</Version>
     
     <Authors>Caleb Wodi</Authors>
     <Description>The fastest way to understand any unfamiliar codebase using real project signals. Not blind AI guessing. Signals first. LLM second.</Description>
