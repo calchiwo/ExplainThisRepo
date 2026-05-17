@@ -58,6 +58,12 @@ pipx install explainthisrepo
 npm install -g explainthisrepo
 ```
 
+Alternatively
+
+```bash
+npx explainthisrepo owner/repo
+```
+
 #### .NET
 
 ```bash
@@ -70,18 +76,38 @@ dotnet tool install -g ExplainThisRepo
 explainthisrepo owner/repo
 ```
 
-After installation, use any of the available commands:
+After installation, use any of the available command names:
 
 ```bash
 explainthisrepo owner/repo
 explain-this-repo owner/repo
 etr owner/repo
+explain owner/repo
 ```
 
 Replace `owner/repo` with the GitHub repository identifier (e.g., `facebook/react`, `torvalds/linux`).
 
 
-For full installation instructions, platform-specific notes, standalone binaries, Termux support, and advanced setup: [docs/INSTALLATION.md](https://github.com/calchiwo/ExplainThisRepo/blob/main/docs/INSTALLATION.md)
+For full installation instructions, platform-specific notes, standalone binaries, and advanced setup: [docs/INSTALLATION.md](https://github.com/calchiwo/ExplainThisRepo/blob/main/docs/INSTALLATION.md)
+
+## Flexible Input Types
+
+Accepts various formats for repository input, full GitHub URLs (with or without https), `owner/repo` format, issue links, query strings, and SSH clone links
+
+```bash
+explainthisrepo https://github.com/owner/repo
+explainthisrepo github.com/owner/repo
+explainthisrepo https://github.com/owner/repo/issues/123
+explainthisrepo https://github.com/owner/repo?tab=readme
+explainthisrepo git@github.com:owner/repo.git
+explainthisrepo owner/repo/path/to/directory
+explainthisrepo owner/repo/path/to/file.py
+explainthisrepo .
+explainthisrepo ./path/to/directory
+explainthisrepo ./path/to/file.py
+```
+
+GitHub repo inputs are normalized internally to `owner/repo`.
 
 ## Configuration
 
@@ -119,8 +145,6 @@ ExplainThisRepo supports GitHub authentication for:
 - Accessing private repositories
 - Higher API rate limits on public repositories
 
-Run:
-
 ```bash
 explainthisrepo init
 ```
@@ -151,25 +175,6 @@ For step-by-step instructions, see [docs/GITHUB_TOKEN.md](https://github.com/cal
 
 - `--output` / `-o` → Specify output file or directory (default: `EXPLAIN.md`)
 
-## Flexible Input Types
-
-Accepts various formats for repository input, full GitHub URLs (with or without https), `owner/repo` format, issue links, query strings, and SSH clone links
-
-```bash
-explainthisrepo https://github.com/owner/repo
-explainthisrepo github.com/owner/repo
-explainthisrepo https://github.com/owner/repo/issues/123
-explainthisrepo https://github.com/owner/repo?tab=readme
-explainthisrepo git@github.com:owner/repo.git
-explainthisrepo owner/repo/path/to/directory
-explainthisrepo owner/repo/path/to/file.py
-explainthisrepo .
-explainthisrepo ./path/to/directory
-explainthisrepo ./path/to/file.py
-```
-
-GitHub inputs are normalized internally to `owner/repo`.
-
 ## CLI aliases
 
 ExplainThisRepo ships with multiple command names that all map to the same entrypoint:
@@ -177,14 +182,11 @@ ExplainThisRepo ships with multiple command names that all map to the same entry
 - `explainthisrepo` → primary command
 - `explain-this-repo` → readable alias
 - `etr` → short alias for faster typing
+- `explain` → to figure out when overwhelmed in unfamiliar codebase
+- `ExplainThisRepo` → useful name command for backup
+- `explain-this` / `explainthis` → fun word play command
 
 All three commands run the same tool and support the same flags and modes.
-
-```bash
-explainthisrepo owner/repo
-explain-this-repo owner/repo
-etr owner/repo
-```
 
 ## Model selection
 

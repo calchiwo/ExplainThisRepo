@@ -1,6 +1,6 @@
 {
   "name": "explainthisrepo",
-  "version": "0.27.0",
+  "version": "0.27.2",
   "description": "The fastest way to understand any unfamiliar codebase using real project signals. Not blind AI guessing. Signals first. LLM second",
   "license": "MIT",
   "type": "module",
