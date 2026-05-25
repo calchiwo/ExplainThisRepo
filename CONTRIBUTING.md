@@ -92,6 +92,27 @@ This is distribution only.
 
 > If behavior changes, it belongs in Python, not in the launchers.
 
+## Release Architecture
+
+ExplainThisRepo uses a build-time normalization release system.
+
+`pyproject.toml` is the only version source of truth.
+
+CI materializes release state before tooling runs by rewriting generated metadata:
+
+- package.json
+- package-lock.json
+- ExplainThisRepo.csproj
+- generated version files
+
+Contributors:
+
+- Edit only `pyproject.toml`
+- Do not manually edit generated version fields
+- Do not introduce tooling before materialization
+
+See: [Release Architecture](docs/release-architecture.md)
+
 ## Ways to Contribute
 
 Focus on the actual system, not the launchers.
