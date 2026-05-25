@@ -44,6 +44,22 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
+      - name: Validate git tag matches pyproject version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" != refs/tags/* ]]; then
+            echo "This workflow must run from a git tag"
+            exit 1
+          fi
+
+          TAG="${GITHUB_REF#refs/tags/v}"
+          VERSION="$(python scripts/get_version.py)"
+
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "Tag does not match pyproject.toml"
+            exit 1
+          fi
+
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
@@ -87,6 +103,13 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Extract canonical version
+        shell: bash
+        run: |
+          mkdir -p .ci
+          VERSION="$(python scripts/get_version.py)"
+          printf '%s\n' "$VERSION" > .ci/version.txt
+
       - name: Validate git tag matches pyproject version
         shell: bash
         run: |
@@ -96,12 +119,72 @@ jobs:
           fi
 
           TAG="${GITHUB_REF#refs/tags/v}"
-          VERSION="$(python scripts/get_version.py)"
+          VERSION="$(cat .ci/version.txt)"
 
           if [ "$TAG" != "$VERSION" ]; then
             echo "Tag does not match pyproject.toml"
             exit 1
           fi
+
+      - name: Rewrite manifests from canonical version
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          version = Path(".ci/version.txt").read_text(encoding="utf-8").strip()
+
+          # node_version/package.json
+          package_json_path = Path("node_version/package.json")
+          package_json = json.loads(package_json_path.read_text(encoding="utf-8"))
+          package_json["version"] = version
+          package_json_path.write_text(
+              json.dumps(package_json, indent=2) + "\n",
+              encoding="utf-8",
+          )
+
+          # node_version/package-lock.json
+          package_lock_path = Path("node_version/package-lock.json")
+          if package_lock_path.exists():
+              package_lock = json.loads(package_lock_path.read_text(encoding="utf-8"))
+              package_lock["version"] = version
+
+              packages = package_lock.get("packages")
+              if isinstance(packages, dict):
+                  root_pkg = packages.get("")
+                  if isinstance(root_pkg, dict):
+                      root_pkg["version"] = version
+
+              package_lock_path.write_text(
+                  json.dumps(package_lock, indent=2) + "\n",
+                  encoding="utf-8",
+              )
+
+          # dotnet_version/ExplainThisRepo.csproj
+          csproj_path = Path("dotnet_version/ExplainThisRepo.csproj")
+          csproj_text = csproj_path.read_text(encoding="utf-8")
+          new_text, count = re.subn(
+              r"<Version>.*?</Version>",
+              f"<Version>{version}</Version>",
+              csproj_text,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1:
+              raise SystemExit("Could not update <Version> in ExplainThisRepo.csproj")
+          csproj_path.write_text(new_text, encoding="utf-8")
+
+          # Generated version files
+          for version_file in [
+              Path("_version.py"),
+              Path("explain_this_repo/_version.py"),
+              Path("node_version/_version.py"),
+          ]:
+              if version_file.exists():
+                  version_file.write_text(f'VERSION = "{version}"\n', encoding="utf-8")
+          PY
 
       - name: Download native binaries
         uses: actions/download-artifact@v4
@@ -150,33 +233,21 @@ jobs:
           cache: npm
           cache-dependency-path: node_version/package-lock.json
 
-      - name: Install Node deps
-        working-directory: node_version
-        run: npm ci
-
-      - name: Sync version with pyproject.toml
+      - name: Check if npm version exists
         working-directory: node_version
         shell: bash
         run: |
-          VERSION="$(python ../scripts/get_version.py)"
-          CURRENT="$(node -p "require('./package.json').version")"
-
-          if [ "$VERSION" != "$CURRENT" ]; then
-            npm version "$VERSION" --no-git-tag-version
-          else
-            echo "Version already matches pyproject.toml, skipping"
-          fi
-
-      - name: Check if npm version exists
-        working-directory: node_version
-        run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION="$(cat ../.ci/version.txt)"
 
           if npm view "$PACKAGE_NAME@$VERSION" version >/dev/null 2>&1; then
             echo "Version already exists on npm"
             exit 1
           fi
+
+      - name: Install Node deps
+        working-directory: node_version
+        run: npm ci
 
       - name: Sync package metadata
         working-directory: node_version
@@ -196,46 +267,38 @@ jobs:
         working-directory: node_version
         run: npm pack --dry-run
 
+      - name: Publish to npm
+        working-directory: node_version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Sync .NET version with pyproject.toml
-        working-directory: dotnet_version
-        shell: bash
-        run: |
-          VERSION="$(python ../scripts/get_version.py)"
-          CURRENT=$(grep -oPm1 "(?<=<Version>)[^<]+" ExplainThisRepo.csproj)
-
-          if [ "$VERSION" != "$CURRENT" ]; then
-            sed -i "s|<Version>.*</Version>|<Version>$VERSION</Version>|" ExplainThisRepo.csproj
-          else
-            echo "Version already matches pyproject.toml, skipping"
-          fi
-
-      - name: Build and Pack .NET Global Tool
-        working-directory: dotnet_version
-        run: dotnet pack -c Release
-
       - name: Check if NuGet version exists
         working-directory: dotnet_version
         shell: bash
         run: |
-          PACKAGE_ID=$(grep -oPm1 "(?<=<ToolCommandName>)[^<]+" ExplainThisRepo.csproj)
-          VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" ExplainThisRepo.csproj)
+          PACKAGE_ID=$(grep -oPm1 "(?<=<PackageId>)[^<]+" ExplainThisRepo.csproj)
+          VERSION="$(cat ../.ci/version.txt)"
 
           if curl -fsSL "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID,,}/index.json" | grep "\"$VERSION\"" >/dev/null; then
             echo "Version already exists on NuGet"
             exit 1
           fi
 
+      - name: Build and Pack .NET Global Tool
+        working-directory: dotnet_version
+        run: dotnet pack -c Release
+
       - name: Publish to NuGet
         working-directory: dotnet_version
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        if: ${{ env.NUGET_API_KEY != '' }}
-        run: dotnet nuget push nupkg/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push nupkg/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
