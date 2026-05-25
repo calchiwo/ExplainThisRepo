@@ -7,8 +7,36 @@
     <ToolCommandName>explainthisrepo</ToolCommandName>
     <PackageId>ExplainThisRepo</PackageId>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <Version>0.27.2</Version>
-    
+    <Version>X.Y.Z</Version>
+    <!--
+    This version is a build-time placeholder only.
+
+    Do not edit manually.
+
+    CI rewrites <Version> from pyproject.toml before any tooling runs.
+
+    Single source of truth:
+    pyproject.toml
+
+    Build-time normalization rewrites:
+    - package.json
+    - package-lock.json
+    - ExplainThisRepo.csproj
+    - generated version files
+
+    Release architecture execution order:
+
+    pyproject.toml
+    ↓
+    extract version from pyproject.toml
+    ↓
+    THEN rewrite all manifests
+    ↓
+    restore / install (tooling runs on already-correct state)
+    ↓
+    build / pack / publish everywhere
+    -->
+
     <Authors>Caleb Wodi</Authors>
     <Description>The fastest way to understand any unfamiliar codebase using real project signals. Not blind AI guessing. Signals first. LLM second.</Description>
     <RepositoryUrl>https://github.com/calchiwo/ExplainThisRepo</RepositoryUrl>
