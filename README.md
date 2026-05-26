@@ -459,9 +459,9 @@ For installation notes, PATH setup, Gemini support, and mobile-specific recommen
 
 ## Philosophy
 
-I built this project with a personal motivation: my mum makes me fall in love with life again. That feeling of mental clarity, simplicity, grounded understanding and appreciation is what I wanted to bring into how developers understand codebases.
+I built ExplainThisRepo with a personal motivation: my mum makes me fall in love with life again. That feeling of mental clarity, simplicity, grounded understanding and appreciation is what I wanted to bring into how developers understand codebases.
 
-I believe understanding code should feel less overwhelming and more approachable. If this tool still makes you feel overwhelmed when reading code, I failed.
+I believe in this problem, and I want to solve it. I believe understanding code should feel less overwhelming and more comfortable when navigating large codebases. If ExplainThisRepo still makes you feel overwhelmed when reading code, I failed.
 
 ## Special Thanks
 
