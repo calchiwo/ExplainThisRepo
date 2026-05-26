@@ -10,6 +10,7 @@ ExplainThisRepo analyzes real project signals; configs, entrypoints, manifests, 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![npm version](https://img.shields.io/npm/v/explainthisrepo)](https://www.npmjs.com/package/explainthisrepo)
 [![Node](https://img.shields.io/node/v/explainthisrepo)](https://www.npmjs.com/package/explainthisrepo)
+[![.NuGet version](https://img.shields.io/nuget/v/explainthisrepo)](https://www.nuget.org/packages/explainthisrepo)
 [![Docs](https://img.shields.io/badge/docs-explainthisrepo.com-black)](https://explainthisrepo.com)
 
 ![demo](https://github.com/user-attachments/assets/837e0593-db64-4657-8855-bb1915011eb6)
