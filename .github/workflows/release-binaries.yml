@@ -205,8 +205,41 @@ jobs:
 
             cp "$artifact"/explainthisrepo* "node_version/dist/native/$target/"
             cp "$artifact"/explainthisrepo* "dotnet_version/native/$target/"
-            cp "$artifact"/explainthisrepo* release/
-          done
+
+            case "$target" in
+              darwin-arm64)
+                release_name="ExplainThisRepo-macOS-Apple-Silicon-arm64"
+                binary="explainthisrepo"
+                ;;
+              darwin-x64)
+                release_name="ExplainThisRepo-macOS-Intel-x64"
+                binary="explainthisrepo"
+                ;;
+              linux-arm64)
+                release_name="ExplainThisRepo-Linux-ARM64"
+                binary="explainthisrepo"
+                ;;
+              linux-x64)
+                release_name="ExplainThisRepo-Linux-x64"
+                binary="explainthisrepo"
+                ;;
+              win-arm64)
+                release_name="ExplainThisRepo-Windows-ARM64.exe"
+                binary="explainthisrepo.exe"
+                ;;
+              win-x64)
+                release_name="ExplainThisRepo-Windows-x64.exe"
+                binary="explainthisrepo.exe"
+                ;;
+              *)
+                echo "Unknown target: $target"
+                exit 1
+                ;;
+            esac
+
+            cp "$artifact/$binary" "release/$release_name"
+            cp "$artifact/$binary.sha256" "release/$release_name.sha256"
+          done    
 
       # HARD STOP if tampered
       - name: Verify checksums
