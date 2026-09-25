@@ -25,11 +25,17 @@ jobs:
           - target: darwin-arm64
             runner: macos-latest
 
+          - target: darwin-x64
+            runner: macos-15-intel
+
           - target: linux-x64
             runner: ubuntu-latest
 
           - target: linux-arm64
             runner: ubuntu-24.04-arm
+
+          - target: win-arm64
+            runner: windows-11-arm
 
           - target: win-x64
             runner: windows-latest
