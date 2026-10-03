@@ -3,8 +3,7 @@ name: Build and Publish Release
 on:
   push:
     tags:
-      - "v*"
-  workflow_dispatch:
+      - "v*.*.*"
 
 permissions:
   contents: write
@@ -63,6 +62,8 @@ jobs:
 
           if [ "$TAG" != "$VERSION" ]; then
             echo "Tag does not match pyproject.toml"
+            echo "Tag: $TAG"
+            echo "Version: $VERSION"
             exit 1
           fi
 
@@ -76,27 +77,70 @@ jobs:
       - name: Build PyInstaller binary
         run: python scripts/build_pyinstaller.py
 
-      # Generate checksum
-      - name: Generate checksum
+      - name: Generate binary checksum
         shell: bash
         run: |
-          cd node_version/dist/native/${{ matrix.target }}
-          for f in explainthisrepo*; do
-            if command -v sha256sum >/dev/null 2>&1; then
-              sha256sum "$f" > "$f.sha256"
+          set -euo pipefail
+
+          TARGET="${{ matrix.target }}"
+          DIR="node_version/dist/native/${TARGET}"
+
+          if [[ "${TARGET}" == win-* ]]; then
+            BINARY="explainthisrepo.exe"
+          else
+            BINARY="explainthisrepo"
+          fi
+
+          test -f "${DIR}/${BINARY}" || {
+            echo "Expected binary not found: ${DIR}/${BINARY}"
+            exit 1
+          }
+
+          cd "${DIR}"
+
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "${BINARY}" > "${BINARY}.sha256"
+          else
+            shasum -a 256 "${BINARY}" > "${BINARY}.sha256"
+          fi
+
+      - name: Verify binary checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TARGET="${{ matrix.target }}"
+          DIR="node_version/dist/native/${TARGET}"
+
+          cd "${DIR}"
+
+          if command -v sha256sum >/dev/null 2>&1; then
+            if [[ "${TARGET}" == win-* ]]; then
+              sha256sum -c explainthisrepo.exe.sha256
             else
-              shasum -a 256 "$f" > "$f.sha256"
+              sha256sum -c explainthisrepo.sha256
             fi
-          done
+          else
+            if [[ "${TARGET}" == win-* ]]; then
+              EXPECTED="$(awk '{print $1}' explainthisrepo.exe.sha256)"
+              ACTUAL="$(shasum -a 256 explainthisrepo.exe | awk '{print $1}')"
+            else
+              EXPECTED="$(awk '{print $1}' explainthisrepo.sha256)"
+              ACTUAL="$(shasum -a 256 explainthisrepo | awk '{print $1}')"
+            fi
+
+            test "${EXPECTED}" = "${ACTUAL}"
+          fi
 
       - name: Upload native binary + checksum
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
           path: node_version/dist/native/${{ matrix.target }}
+          if-no-files-found: error
 
   release:
-    name: Publish npm and GitHub Release
+    name: Package and Publish Release
     needs: build
     runs-on: ubuntu-latest
 
@@ -112,13 +156,19 @@ jobs:
       - name: Extract canonical version
         shell: bash
         run: |
+          set -euo pipefail
+
           mkdir -p .ci
+
           VERSION="$(python scripts/get_version.py)"
+
           printf '%s\n' "$VERSION" > .ci/version.txt
 
       - name: Validate git tag matches pyproject version
         shell: bash
         run: |
+          set -euo pipefail
+
           if [[ "${GITHUB_REF}" != refs/tags/* ]]; then
             echo "This workflow must run from a git tag"
             exit 1
@@ -129,12 +179,16 @@ jobs:
 
           if [ "$TAG" != "$VERSION" ]; then
             echo "Tag does not match pyproject.toml"
+            echo "Tag: $TAG"
+            echo "Version: $VERSION"
             exit 1
           fi
 
       - name: Rewrite manifests from canonical version
         shell: bash
         run: |
+          set -euo pipefail
+
           python - <<'PY'
           import json
           import re
@@ -146,6 +200,7 @@ jobs:
           package_json_path = Path("node_version/package.json")
           package_json = json.loads(package_json_path.read_text(encoding="utf-8"))
           package_json["version"] = version
+
           package_json_path.write_text(
               json.dumps(package_json, indent=2) + "\n",
               encoding="utf-8",
@@ -153,13 +208,19 @@ jobs:
 
           # node_version/package-lock.json
           package_lock_path = Path("node_version/package-lock.json")
+
           if package_lock_path.exists():
-              package_lock = json.loads(package_lock_path.read_text(encoding="utf-8"))
+              package_lock = json.loads(
+                  package_lock_path.read_text(encoding="utf-8")
+              )
+
               package_lock["version"] = version
 
               packages = package_lock.get("packages")
+
               if isinstance(packages, dict):
                   root_pkg = packages.get("")
+
                   if isinstance(root_pkg, dict):
                       root_pkg["version"] = version
 
@@ -171,6 +232,7 @@ jobs:
           # dotnet_version/ExplainThisRepo.csproj
           csproj_path = Path("dotnet_version/ExplainThisRepo.csproj")
           csproj_text = csproj_path.read_text(encoding="utf-8")
+
           new_text, count = re.subn(
               r"<Version>.*?</Version>",
               f"<Version>{version}</Version>",
@@ -178,8 +240,12 @@ jobs:
               count=1,
               flags=re.S,
           )
+
           if count != 1:
-              raise SystemExit("Could not update <Version> in ExplainThisRepo.csproj")
+              raise SystemExit(
+                  "Could not update <Version> in ExplainThisRepo.csproj"
+              )
+
           csproj_path.write_text(new_text, encoding="utf-8")
 
           # Generated version files
@@ -189,7 +255,10 @@ jobs:
               Path("node_version/_version.py"),
           ]:
               if version_file.exists():
-                  version_file.write_text(f'VERSION = "{version}"\n', encoding="utf-8")
+                  version_file.write_text(
+                      f'VERSION = "{version}"\n',
+                      encoding="utf-8",
+                  )
           PY
 
       - name: Download native binaries
@@ -197,72 +266,333 @@ jobs:
         with:
           path: artifacts
 
-      - name: Rehydrate native folder
+      - name: Rehydrate native folders and human-readable release assets
         shell: bash
         run: |
-          mkdir -p node_version/dist/native dotnet_version/native release
+          set -euo pipefail
+
+          VERSION="$(cat .ci/version.txt)"
+
+          mkdir -p \
+            node_version/dist/native \
+            dotnet_version/native \
+            release
 
           for artifact in artifacts/*; do
             [ -d "$artifact" ] || continue
-            target="$(basename "$artifact")"
 
-            mkdir -p "node_version/dist/native/$target"
-            mkdir -p "dotnet_version/native/$target"
+            TARGET="$(basename "$artifact")"
 
-            cp "$artifact"/explainthisrepo* "node_version/dist/native/$target/"
-            cp "$artifact"/explainthisrepo* "dotnet_version/native/$target/"
-
-            case "$target" in
+            case "$TARGET" in
               darwin-arm64)
-                release_name="ExplainThisRepo-macOS-Apple-Silicon-arm64"
-                binary="explainthisrepo"
+                RELEASE_NAME="ExplainThisRepo-macOS-Apple-Silicon-arm64"
+                BINARY="explainthisrepo"
                 ;;
+
               darwin-x64)
-                release_name="ExplainThisRepo-macOS-Intel-x64"
-                binary="explainthisrepo"
+                RELEASE_NAME="ExplainThisRepo-macOS-Intel-x64"
+                BINARY="explainthisrepo"
                 ;;
+
               linux-arm64)
-                release_name="ExplainThisRepo-Linux-ARM64"
-                binary="explainthisrepo"
+                RELEASE_NAME="ExplainThisRepo-Linux-ARM64"
+                BINARY="explainthisrepo"
                 ;;
+
               linux-x64)
-                release_name="ExplainThisRepo-Linux-x64"
-                binary="explainthisrepo"
+                RELEASE_NAME="ExplainThisRepo-Linux-x64"
+                BINARY="explainthisrepo"
                 ;;
+
               win-arm64)
-                release_name="ExplainThisRepo-Windows-ARM64.exe"
-                binary="explainthisrepo.exe"
+                RELEASE_NAME="ExplainThisRepo-Windows-ARM64.exe"
+                BINARY="explainthisrepo.exe"
                 ;;
+
               win-x64)
-                release_name="ExplainThisRepo-Windows-x64.exe"
-                binary="explainthisrepo.exe"
+                RELEASE_NAME="ExplainThisRepo-Windows-x64.exe"
+                BINARY="explainthisrepo.exe"
                 ;;
+
               *)
-                echo "Unknown target: $target"
+                echo "Unknown target: $TARGET"
                 exit 1
                 ;;
             esac
 
-            cp "$artifact/$binary" "release/$release_name"
-            cp "$artifact/$binary.sha256" "release/$release_name.sha256"
-          done    
+            test -f "$artifact/$BINARY" || {
+              echo "Missing binary: $artifact/$BINARY"
+              exit 1
+            }
 
-      # HARD STOP if tampered
-      - name: Verify checksums
+            test -f "$artifact/$BINARY.sha256" || {
+              echo "Missing checksum: $artifact/$BINARY.sha256"
+              exit 1
+            }
+
+            mkdir -p "node_version/dist/native/$TARGET"
+            mkdir -p "dotnet_version/native/$TARGET"
+
+            cp "$artifact/$BINARY" \
+              "node_version/dist/native/$TARGET/$BINARY"
+
+            cp "$artifact/$BINARY.sha256" \
+              "node_version/dist/native/$TARGET/$BINARY.sha256"
+
+            cp "$artifact/$BINARY" \
+              "dotnet_version/native/$TARGET/$BINARY"
+
+            cp "$artifact/$BINARY.sha256" \
+              "dotnet_version/native/$TARGET/$BINARY.sha256"
+
+            cp "$artifact/$BINARY" \
+              "release/$RELEASE_NAME"
+
+            cp "$artifact/$BINARY.sha256" \
+              "release/$RELEASE_NAME.sha256"
+          done
+
+      - name: Verify all native binary checksums
         shell: bash
         run: |
-          for checksum in $(find node_version/dist/native -name '*.sha256' | sort); do
-            dir="$(dirname "$checksum")"
+          set -euo pipefail
+
+          for target_dir in node_version/dist/native/*; do
+            [ -d "$target_dir" ] || continue
+
+            TARGET="$(basename "$target_dir")"
+
+            if [[ "${TARGET}" == win-* ]]; then
+              BINARY="explainthisrepo.exe"
+            else
+              BINARY="explainthisrepo"
+            fi
+
+            test -f "${target_dir}/${BINARY}"
+            test -f "${target_dir}/${BINARY}.sha256"
+
             (
-              cd "$dir"
-              sha256sum -c "$(basename "$checksum")"
+              cd "${target_dir}"
+              sha256sum -c "${BINARY}.sha256"
             )
           done
 
-      - name: Verify native binaries exist
+      - name: Verify exactly six native targets exist
         shell: bash
         run: |
-          find node_version/dist/native -type f | sort
+          set -euo pipefail
+
+          EXPECTED_TARGETS="
+          darwin-arm64
+          darwin-x64
+          linux-arm64
+          linux-x64
+          win-arm64
+          win-x64
+          "
+
+          for target in $EXPECTED_TARGETS; do
+            test -f "node_version/dist/native/${target}/explainthisrepo" \
+              || test -f "node_version/dist/native/${target}/explainthisrepo.exe" \
+              || {
+                echo "Missing native target: ${target}"
+                exit 1
+              }
+          done
+
+      - name: Package CLI installer archives
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(cat .ci/version.txt)"
+
+          package_unix() {
+            TARGET="$1"
+            BINARY="$2"
+
+            SOURCE_DIR="node_version/dist/native/${TARGET}"
+            ARCHIVE="explainthisrepo-v${VERSION}-cli-installer-${TARGET}.tar.gz"
+
+            STAGING="$(mktemp -d)"
+
+            cleanup_staging() {
+              rm -rf "${STAGING}"
+            }
+
+            trap cleanup_staging RETURN
+
+            cp "${SOURCE_DIR}/${BINARY}" "${STAGING}/${BINARY}"
+
+            (
+              cd "${STAGING}"
+              tar -czf "${GITHUB_WORKSPACE}/release/${ARCHIVE}" "${BINARY}"
+            )
+
+            sha256sum \
+              "release/${ARCHIVE}" \
+              > "release/${ARCHIVE}.sha256"
+          }
+
+          package_windows() {
+            TARGET="$1"
+            BINARY="explainthisrepo.exe"
+
+            SOURCE_DIR="node_version/dist/native/${TARGET}"
+            ARCHIVE="explainthisrepo-v${VERSION}-cli-installer-${TARGET}.zip"
+
+            STAGING="$(mktemp -d)"
+
+            cleanup_staging() {
+              rm -rf "${STAGING}"
+            }
+
+            trap cleanup_staging RETURN
+
+            cp "${SOURCE_DIR}/${BINARY}" "${STAGING}/${BINARY}"
+
+            (
+              cd "${STAGING}"
+              zip -q "${GITHUB_WORKSPACE}/release/${ARCHIVE}" "${BINARY}"
+            )
+
+            sha256sum \
+              "release/${ARCHIVE}" \
+              > "release/${ARCHIVE}.sha256"
+          }
+
+          package_unix "linux-x64" "explainthisrepo"
+          package_unix "linux-arm64" "explainthisrepo"
+          package_unix "darwin-x64" "explainthisrepo"
+          package_unix "darwin-arm64" "explainthisrepo"
+
+          package_windows "win-x64"
+          package_windows "win-arm64"
+
+      - name: Verify CLI installer archives
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(cat .ci/version.txt)"
+
+          for archive in release/*-cli-installer-*.tar.gz; do
+            test -f "${archive}"
+            sha256sum -c "${archive}.sha256"
+          done
+
+          for archive in release/*-cli-installer-*.zip; do
+            test -f "${archive}"
+            sha256sum -c "${archive}.sha256"
+          done
+
+      - name: Verify archive contents
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(cat .ci/version.txt)"
+
+          verify_tar() {
+            ARCHIVE="$1"
+
+            CONTENTS="$(tar -tzf "${ARCHIVE}")"
+
+            EXPECTED="explainthisrepo"
+
+            if [ "${CONTENTS}" != "${EXPECTED}" ]; then
+              echo "Invalid archive contents: ${ARCHIVE}"
+              echo "Expected:"
+              echo "${EXPECTED}"
+              echo "Actual:"
+              echo "${CONTENTS}"
+              exit 1
+            fi
+          }
+
+          verify_zip() {
+            ARCHIVE="$1"
+
+            CONTENTS="$(unzip -Z1 "${ARCHIVE}")"
+
+            EXPECTED="explainthisrepo.exe"
+
+            if [ "${CONTENTS}" != "${EXPECTED}" ]; then
+              echo "Invalid archive contents: ${ARCHIVE}"
+              echo "Expected:"
+              echo "${EXPECTED}"
+              echo "Actual:"
+              echo "${CONTENTS}"
+              exit 1
+            fi
+          }
+
+          verify_tar \
+            "release/explainthisrepo-v${VERSION}-cli-installer-linux-x64.tar.gz"
+
+          verify_tar \
+            "release/explainthisrepo-v${VERSION}-cli-installer-linux-arm64.tar.gz"
+
+          verify_tar \
+            "release/explainthisrepo-v${VERSION}-cli-installer-darwin-x64.tar.gz"
+
+          verify_tar \
+            "release/explainthisrepo-v${VERSION}-cli-installer-darwin-arm64.tar.gz"
+
+          verify_zip \
+            "release/explainthisrepo-v${VERSION}-cli-installer-win-x64.zip"
+
+          verify_zip \
+            "release/explainthisrepo-v${VERSION}-cli-installer-win-arm64.zip"
+
+      - name: Verify release asset layout
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(cat .ci/version.txt)"
+
+          expected_assets="
+          ExplainThisRepo-Linux-x64
+          ExplainThisRepo-Linux-x64.sha256
+          ExplainThisRepo-Linux-ARM64
+          ExplainThisRepo-Linux-ARM64.sha256
+          ExplainThisRepo-macOS-Apple-Silicon-arm64
+          ExplainThisRepo-macOS-Apple-Silicon-arm64.sha256
+          ExplainThisRepo-macOS-Intel-x64
+          ExplainThisRepo-macOS-Intel-x64.sha256
+          ExplainThisRepo-Windows-ARM64.exe
+          ExplainThisRepo-Windows-ARM64.exe.sha256
+          ExplainThisRepo-Windows-x64.exe
+          ExplainThisRepo-Windows-x64.exe.sha256
+          explainthisrepo-v${VERSION}-cli-installer-linux-x64.tar.gz
+          explainthisrepo-v${VERSION}-cli-installer-linux-x64.tar.gz.sha256
+          explainthisrepo-v${VERSION}-cli-installer-linux-arm64.tar.gz
+          explainthisrepo-v${VERSION}-cli-installer-linux-arm64.tar.gz.sha256
+          explainthisrepo-v${VERSION}-cli-installer-darwin-arm64.tar.gz
+          explainthisrepo-v${VERSION}-cli-installer-darwin-arm64.tar.gz.sha256
+          explainthisrepo-v${VERSION}-cli-installer-darwin-x64.tar.gz
+          explainthisrepo-v${VERSION}-cli-installer-darwin-x64.tar.gz.sha256
+          explainthisrepo-v${VERSION}-cli-installer-win-x64.zip
+          explainthisrepo-v${VERSION}-cli-installer-win-x64.zip.sha256
+          explainthisrepo-v${VERSION}-cli-installer-win-arm64.zip
+          explainthisrepo-v${VERSION}-cli-installer-win-arm64.zip.sha256
+          "
+
+          for asset in $expected_assets; do
+            test -f "release/${asset}" || {
+              echo "Missing release asset: ${asset}"
+              exit 1
+            }
+          done
+
+          ASSET_COUNT="$(find release -maxdepth 1 -type f | wc -l | tr -d ' ')"
+
+          if [ "${ASSET_COUNT}" != "24" ]; then
+            echo "Expected 24 release assets, found ${ASSET_COUNT}"
+            find release -maxdepth 1 -type f -printf '%f\n' | sort
+            exit 1
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -276,7 +606,9 @@ jobs:
         working-directory: node_version
         shell: bash
         run: |
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          set -euo pipefail
+
+          PACKAGE_NAME="$(node -p "require('./package.json').name")"
           VERSION="$(cat ../.ci/version.txt)"
 
           if npm view "$PACKAGE_NAME@$VERSION" version >/dev/null 2>&1; then
@@ -298,19 +630,22 @@ jobs:
 
       - name: Verify package contains native binaries
         working-directory: node_version
+        shell: bash
         run: |
-          TAR=$(ls *.tgz)
-          tar -tf "$TAR" | grep "dist/native" || (echo "Missing native binaries in package" && exit 1)
+          set -euo pipefail
+
+          TAR="$(ls *.tgz)"
+
+          tar -tf "$TAR" |
+            grep "dist/native" ||
+            (
+              echo "Missing native binaries in package"
+              exit 1
+            )
 
       - name: Package check
         working-directory: node_version
         run: npm pack --dry-run
-
-      - name: Publish to npm
-        working-directory: node_version
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -321,10 +656,14 @@ jobs:
         working-directory: dotnet_version
         shell: bash
         run: |
-          PACKAGE_ID=$(grep -oPm1 "(?<=<PackageId>)[^<]+" ExplainThisRepo.csproj)
+          set -euo pipefail
+
+          PACKAGE_ID="$(grep -oPm1 "(?<=<PackageId>)[^<]+" ExplainThisRepo.csproj)"
           VERSION="$(cat ../.ci/version.txt)"
 
-          if curl -fsSL "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID,,}/index.json" | grep "\"$VERSION\"" >/dev/null; then
+          if curl -fsSL \
+            "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID,,}/index.json" |
+            grep "\"$VERSION\"" >/dev/null; then
             echo "Version already exists on NuGet"
             exit 1
           fi
@@ -333,14 +672,25 @@ jobs:
         working-directory: dotnet_version
         run: dotnet pack -c Release
 
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: release/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+
+      - name: Publish to npm
+        working-directory: node_version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
+
       - name: Publish to NuGet
         working-directory: dotnet_version
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push nupkg/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
-
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: release/*
-          generate_release_notes: true
+        run: |
+          dotnet nuget push \
+            nupkg/*.nupkg \
+            -k "${NUGET_API_KEY}" \
+            -s https://api.nuget.org/v3/index.json

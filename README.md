@@ -37,7 +37,8 @@ ExplainThisRepo supports multiple installation methods:
 - pip (Python package)
 - npm (prebuilt native binaries)
 - .NET global tool
-- standalone binaries
+- standalone install CLI
+- manual standalone binaries
 
 ### Quick install
 
@@ -71,6 +72,42 @@ npx explainthisrepo owner/repo
 dotnet tool install -g ExplainThisRepo
 ```
 
+#### Standalone CLI Install
+
+Install ExplainThisRepo with one command:
+
+```bash
+curl -fsSL https://cli.explainthisrepo.com/install.sh | sh
+```
+
+The shell installer automatically detects your operating system and CPU architecture, downloads the correct native binary, verifies it, and installs `explainthisrepo` to `/usr/local/bin`.
+
+### Supported platforms
+
+| Operating system| Architecture
+|---------------- |---------------|
+| Linux| x64 |
+| Linux| ARM64 |
+| macOS| Intel |
+| macOS| Apple Silicon |
+| Windows| x64 |
+| Windows| ARM64 |
+
+The one-command shell installer currently supports Linux, macOS and Windows through with Git Bash/WSL. Windows (through Powershell or Commnd Prompt) users can download the appropriate Windows executable from the latest [release](https://github.com/calchiwo/ExplainThisRepo/releases/latest).
+
+You do not need Python, pip, Node.js, npm to use the standalone CLI installation.
+
+The installer downloads a prebuilt native ExplainThisRepo binary.
+
+#### Manual standalone binaries installation
+
+If you prefer to install manually, download the binary for your platform from the latest [GitHub release](https://github.com/calchiwo/ExplainThisRepo/releases/latest).
+
+For installation details, troubleshooting, and the distribution architecture, see:
+
+- [docs/INSTALLATION.md](docs/INSTALLATION.md)
+- [docs/RELEASE-DISTRIBUTION.md](docs/RELEASE-DISTRIBUTION.md)
+
 #### Run
 
 ```bash
@@ -84,6 +121,9 @@ explainthisrepo owner/repo
 explain-this-repo owner/repo
 etr owner/repo
 explain owner/repo
+ExplainThisRepo owner/repo
+explainthis owner/repo
+explain-this owner/repo
 ```
 
 Replace `owner/repo` with the GitHub repository identifier (e.g., `facebook/react`, `torvalds/linux`).
